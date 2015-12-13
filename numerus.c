@@ -50,3 +50,15 @@ static char roman_numeral_build_buffer[ROMAN_MAX_LENGTH];
 int init() {
     return regcomp(&ROMAN_SYNTAX_REGEX, ROMAN_SYNTAX_REGEX_STRING, REG_NOSUB);
 }
+
+/**
+ * Verifies if the passed string is a correct roman numeral.
+ *
+ * Matches `*roman` against ROMAN_SYNTAX_REGEX.
+ *
+ * @param *roman string containing a roman numeral to check
+ * @returns 1 if has correct syntax, 0 otherwise.
+ */
+int roman_has_correct_syntax(char *roman) {
+    return !regexec(&ROMAN_SYNTAX_REGEX, roman, 0, NULL, 0);
+}
