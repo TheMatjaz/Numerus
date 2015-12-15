@@ -8,8 +8,8 @@
  * - http://stackoverflow.com/a/30816418/5292928
  */
 
+#include <string.h> /* For `strcmp()` in is_nulla() */
 #include <regex.h>  /* For `regex_t`, match correct roman numeral syntax*/
-#include <stdlib.h> /* For malloc() */
 
 /**
  * Maximum value as int a roman numeral may have.
@@ -102,4 +102,38 @@ int is_roman(char *roman) {
         return -1;
     }
 
+/**
+ * Returns the length of the roman numeral including the leading '-', excluding the null terminator.
+ * If it's too long, then is not a roman numeral and returns -1.
+ * It's not using strlen() to be able to stop as soon as the string is longer
+ * than the maximum possible roman lenght.
+ *
+ * TODO: since it's a static function, can be used only inside the library. This means there is no need for it to be secure for external users. You may NOT perform the i < ROMAN_MAX_LENGTH check.
+ *
+ */
+static int roman_numeral_length(char *roman) {
+    int i;
+    for (i = 0; i < ROMAN_MAX_LENGTH; i++) {
+        if (roman[i] == '\0') {
+            return i;
+        }
+    }
+    return -1;
 }
+
+/**
+ * Calls strcmp to check if the roman number is NULLA or -NULLA.
+ *
+ * Returns 1 if the string is (-)NULLA or 0 if it's not.
+ */
+int roman_is_nulla(char *roman) {
+    if (*roman == '-') {
+        roman++;
+    }
+    if (strcmp(roman, NULLA) != 0) {
+        return 0;
+    } else {
+        return 1;
+    };
+}
+
