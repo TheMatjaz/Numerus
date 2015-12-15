@@ -34,3 +34,4 @@ extern const char *ROMAN_SYNTAX_REGEX_STRING;
 
 int is_roman(char *roman);
 
+int roman_is_nulla(char *roman);
