@@ -32,5 +32,5 @@ extern const int ROMAN_MAX_LENGTH;
  */
 extern const char *ROMAN_SYNTAX_REGEX_STRING;
 
-int init();
 int is_roman(char *roman);
+

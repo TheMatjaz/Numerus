@@ -41,7 +41,7 @@ const int ROMAN_MAX_LENGTH = 17;
 const char *ROMAN_SYNTAX_REGEX_STRING = "^-?((M{0,3})(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3}))$";
 
 /**
- * Compiled regex matching any syntactiacally correct roman numeral.
+ * Compiled regex matching any syntactically correct roman numeral.
  *
  * Obtained by compiling ROMAN_SYNTAX_REGEX_STRING.
  */
@@ -69,24 +69,37 @@ static int roman_regex_matching_status;
  */
 static char roman_numeral_build_buffer[ROMAN_MAX_LENGTH];
 
-/**
- * Compiles the the ROMAN_SYNTAX_REGEX from ROMAN_SYNTAX_REGEX_STRING.
- *
- * Returns the compilation status of the regex: 0 if compiled correctly, which
- * should happen since ROMAN_SYNTAX_REGEX_STRING is a correct constant.
- */
-int init() {
-    return regcomp(&ROMAN_SYNTAX_REGEX, ROMAN_SYNTAX_REGEX_STRING, REG_NOSUB);
-}
 
 /**
  * Verifies if the passed string is a correct roman numeral.
  *
  * Matches `*roman` against ROMAN_SYNTAX_REGEX.
  *
+ * Compiles the the ROMAN_SYNTAX_REGEX from ROMAN_SYNTAX_REGEX_STRING if necessary on the first run. The regex compilation status is dropped since
+ * since ROMAN_SYNTAX_REGEX_STRING is a correct hard coded constant.
+ * If you use the flag REG_NOSUB, then regcomp omits from the compiled regular expression the information necessary to record how subexpressions actually match. In this case, you might as well pass 0 for the matchptr and nmatch arguments when you call regexec.
+ * REG_ICASE ignores the case
+ * REG_EXTENDED uses the extended POSIX standard regular expressions, otherwise it does not work
+ * Those are all bit operators and the bit _or_ `|` concatenates them
+ * REG_NOSUB does not save subexpressions, only reports the success or failure of compiling the regex
+ *
  * @param *roman string containing a roman numeral to check
- * @returns 1 if has correct syntax, 0 otherwise.
+ * @returns 0 if has correct syntax.
  */
-int roman_has_correct_syntax(char *roman) {
-    return !regexec(&ROMAN_SYNTAX_REGEX, roman, 0, NULL, 0);
+int is_roman(char *roman) {
+    if (ROMAN_SYNTAX_REGEX.re_magic == 0) { /* The regex has not been compiled yet */
+        /* Compile it */
+        regcomp(&ROMAN_SYNTAX_REGEX, ROMAN_SYNTAX_REGEX_STRING, REG_NOSUB|REG_ICASE|REG_EXTENDED);
+    }
+    int match_result = regexec(&ROMAN_SYNTAX_REGEX, roman, 0, NULL, 0);
+    if (match_result == 0) { /* Match */
+        return 1;
+    } else if (match_result == REG_NOMATCH){ /* No match */
+        return 0;
+    } else { /* Error */
+        char msgbuf[100];
+        regerror(match_result, &ROMAN_SYNTAX_REGEX, msgbuf, sizeof(msgbuf));
+        return -1;
+    }
+
 }
