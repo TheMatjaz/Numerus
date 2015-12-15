@@ -122,7 +122,7 @@ static int roman_numeral_length(char *roman) {
 }
 
 /**
- * Calls strcmp to check if the roman number is NULLA or -NULLA.
+ * Calls strcmp to check if the roman number is NULLA or -NULLA (case INsensitive).
  *
  * Returns 1 if the string is (-)NULLA or 0 if it's not.
  */
@@ -130,10 +130,9 @@ int roman_is_nulla(char *roman) {
     if (*roman == '-') {
         roman++;
     }
-    if (strcmp(roman, NULLA) != 0) {
+    if (strcasecmp(roman, NULLA) != 0) {
         return 0;
     } else {
         return 1;
     };
 }
-
