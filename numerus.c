@@ -8,8 +8,10 @@
  * - http://stackoverflow.com/a/30816418/5292928
  */
 
-#include <string.h> /* For `strcmp()` in is_nulla() */
-#include <regex.h>  /* For `regex_t`, match correct roman numeral syntax*/
+#include <stdio.h>  /* To `fprintf()` to `stderr` */
+#include <stdlib.h> /* For `malloc()` */
+#include <string.h> /* For `strcmp()` in `roman_is_nulla()` */
+#include <regex.h>  /* To use regexes to match correct roman numeral syntax */
 
 /**
  * Maximum value as int a roman numeral may have.
@@ -101,6 +103,47 @@ int is_roman(char *roman) {
         regerror(match_result, &ROMAN_SYNTAX_REGEX, msgbuf, sizeof(msgbuf));
         return -1;
     }
+}
+
+/*
+In memory structure:   >  | 16 bit short | 3 bytes string | (string has '\0')
+If 1 byte (smallest accessable memory portion) = 8 bits, then it is:
+    >   | 16 bit short | 24 bit string | = 40 bits = 5 bytes to store a roman
+To store the dictionary it takes 65 bytes.
+To store all the roman numbers as STRUCTS it takes 96000 bytes (96 kB), including string null terminators, negative numbers and 0/NULLA, excluding any separators
+*/
+
+/**
+ * Struct containing a pair basic roman char and its short integer value.
+ *
+ * It's used to create the ROMAN_CHARS dictionary and used by conversion
+ * functions. The "roman chars" as called in this library are strings of 1 or 2
+ * chars that have a specific known value.
+ */
+static struct roman_char_struct {
+    const short int value;
+    const char chars[3]; /* 1-2 chars + \0 = length 3 */
+};
+
+/**
+ * Dictionary of basic roman chars and their values used by conversion
+ * functions.
+ */
+static const struct roman_char_struct ROMAN_CHARS[] = {
+        {1000, "M" },
+        { 900, "CM"},
+        { 500, "D" },
+        { 400, "CD"},
+        { 100, "C" },
+        {  90, "XC"},
+        {  50, "L" },
+        {  40, "XL"},
+        {  10, "X" },
+        {   9, "IX"},
+        {   5, "V" },
+        {   4, "IV"},
+        {   1, "I" }
+};
 
 /**
  * Returns the length of the roman numeral including the leading '-', excluding the null terminator.
@@ -135,4 +178,65 @@ int roman_is_nulla(char *roman) {
     } else {
         return 1;
     };
+}
+
+/**
+ * Copies a string of 1 or 2 characters.
+ *
+ * Copies the character from the source to the destination. If there is another
+ * character after that, that is not the null terminator, copies that as well.
+ * Everything is performed without security checks for faster performance. This
+ * function is used by int_to_roman() and  it's meant to be used just on the
+ * roman_char_struct in the dictionary ROMAN_CHARS.
+ */
+static char *copy_roman_char_from_dictionary(char *source, char *destination) {
+    *destination = *(source++);
+    if (*source != '\0') {
+        *(++destination) = *source;
+    }
+    return ++destination;
+}
+
+/**
+ * Converts an integer to a roman numeral.
+ *
+ * Returns NULL if the int is out of range, otherwise returns a pointer to a
+ * string containing the roman numeral.
+ */
+char* int_to_roman(int arabic) {
+    /* Out of range check */
+    if (arabic < -3999 || arabic > 3999) {
+        fprintf(stderr, "Roman conversion error: arabic %d out of range.\n", arabic);
+        return NULL;
+    }
+
+    /* Create pointer to buffer */
+    char *roman_string = &roman_numeral_build_buffer[0];
+
+    /* Save sign or return NULLA for 0 */
+    if (arabic < 0) {
+        arabic *= -1;
+        *(roman_string++) = '-';
+    } else if (arabic == 0) {
+        return NULLA; /* TODO: Probably should return a copy of it? */
+    }
+
+    /* Actual conversion */
+    struct roman_char_struct *current_roman_char = &ROMAN_CHARS[0];
+    while (arabic > 0) {
+        while (arabic >= current_roman_char->value) {
+            roman_string = copy_roman_char_from_dictionary(
+                    current_roman_char->chars, roman_string);
+            arabic -= current_roman_char->value;
+        }
+        current_roman_char++;
+    }
+
+    /* Null terminate builded string in buffer */
+    *roman_string = '\0';
+
+    /* Copy out of buffer and return it */
+    char *returnable_roman_string = malloc(roman_string - roman_numeral_build_buffer); /* Allocate the size of the builded string */
+    strcpy(returnable_roman_string, roman_numeral_build_buffer);
+    return returnable_roman_string;
 }
