@@ -8,8 +8,10 @@
  * - http://stackoverflow.com/a/30816418/5292928
  */
 
-#include <string.h> /* For `strcmp()` in is_nulla() */
-#include <regex.h>  /* For `regex_t`, match correct roman numeral syntax*/
+#include <stdio.h>  /* To `fprintf()` to `stderr` */
+#include <stdlib.h> /* For `malloc()` */
+#include <string.h> /* For `strcmp()` in `roman_is_nulla()` */
+#include <regex.h>  /* To use regexes to match correct roman numeral syntax */
 
 /**
  * Maximum value as int a roman numeral may have.
@@ -176,4 +178,65 @@ int roman_is_nulla(char *roman) {
     } else {
         return 1;
     };
+}
+
+/**
+ * Copies a string of 1 or 2 characters.
+ *
+ * Copies the character from the source to the destination. If there is another
+ * character after that, that is not the null terminator, copies that as well.
+ * Everything is performed without security checks for faster performance. This
+ * function is used by int_to_roman() and  it's meant to be used just on the
+ * roman_char_struct in the dictionary ROMAN_CHARS.
+ */
+static char *copy_roman_char_from_dictionary(char *source, char *destination) {
+    *destination = *(source++);
+    if (*source != '\0') {
+        *(++destination) = *source;
+    }
+    return ++destination;
+}
+
+/**
+ * Converts an integer to a roman numeral.
+ *
+ * Returns NULL if the int is out of range, otherwise returns a pointer to a
+ * string containing the roman numeral.
+ */
+char* int_to_roman(int arabic) {
+    /* Out of range check */
+    if (arabic < -3999 || arabic > 3999) {
+        fprintf(stderr, "Roman conversion error: arabic %d out of range.\n", arabic);
+        return NULL;
+    }
+
+    /* Create pointer to buffer */
+    char *roman_string = &roman_numeral_build_buffer[0];
+
+    /* Save sign or return NULLA for 0 */
+    if (arabic < 0) {
+        arabic *= -1;
+        *(roman_string++) = '-';
+    } else if (arabic == 0) {
+        return NULLA; /* TODO: Probably should return a copy of it? */
+    }
+
+    /* Actual conversion */
+    struct roman_char_struct *current_roman_char = &ROMAN_CHARS[0];
+    while (arabic > 0) {
+        while (arabic >= current_roman_char->value) {
+            roman_string = copy_roman_char_from_dictionary(
+                    current_roman_char->chars, roman_string);
+            arabic -= current_roman_char->value;
+        }
+        current_roman_char++;
+    }
+
+    /* Null terminate builded string in buffer */
+    *roman_string = '\0';
+
+    /* Copy out of buffer and return it */
+    char *returnable_roman_string = malloc(roman_string - roman_numeral_build_buffer); /* Allocate the size of the builded string */
+    strcpy(returnable_roman_string, roman_numeral_build_buffer);
+    return returnable_roman_string;
 }
