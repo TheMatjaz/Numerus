@@ -101,6 +101,47 @@ int is_roman(char *roman) {
         regerror(match_result, &ROMAN_SYNTAX_REGEX, msgbuf, sizeof(msgbuf));
         return -1;
     }
+}
+
+/*
+In memory structure:   >  | 16 bit short | 3 bytes string | (string has '\0')
+If 1 byte (smallest accessable memory portion) = 8 bits, then it is:
+    >   | 16 bit short | 24 bit string | = 40 bits = 5 bytes to store a roman
+To store the dictionary it takes 65 bytes.
+To store all the roman numbers as STRUCTS it takes 96000 bytes (96 kB), including string null terminators, negative numbers and 0/NULLA, excluding any separators
+*/
+
+/**
+ * Struct containing a pair basic roman char and its short integer value.
+ *
+ * It's used to create the ROMAN_CHARS dictionary and used by conversion
+ * functions. The "roman chars" as called in this library are strings of 1 or 2
+ * chars that have a specific known value.
+ */
+static struct roman_char_struct {
+    const short int value;
+    const char chars[3]; /* 1-2 chars + \0 = length 3 */
+};
+
+/**
+ * Dictionary of basic roman chars and their values used by conversion
+ * functions.
+ */
+static const struct roman_char_struct ROMAN_CHARS[] = {
+        {1000, "M" },
+        { 900, "CM"},
+        { 500, "D" },
+        { 400, "CD"},
+        { 100, "C" },
+        {  90, "XC"},
+        {  50, "L" },
+        {  40, "XL"},
+        {  10, "X" },
+        {   9, "IX"},
+        {   5, "V" },
+        {   4, "IV"},
+        {   1, "I" }
+};
 
 /**
  * Returns the length of the roman numeral including the leading '-', excluding the null terminator.
