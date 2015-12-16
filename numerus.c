@@ -300,6 +300,32 @@ short roman_to_short(char *roman, short int *error_code) {
     *error_code = 0;
     return sign * arabic;
 }
+
+/**
+ * Use indices as arabic integers. The char* stored at that index, points to the
+ * roman numeral of that value.
+ * Example usage:
+ * char **all_romans = allocate_all_romans(1);
+ * all_romans[702] will be int_to_roman(702) = "DCCII" */
+char** allocate_all_romans(short int include_negatives) {
+    short int num_of_romans = ROMAN_MAX_VALUE;
+    if (include_negatives) {
+        num_of_romans *= 2;
+    }
+    num_of_romans += 1; /* For nulla */
+    char* all_roman_numerals[num_of_romans]; /* Array of pointers to strings */
+    int index = 0;
+    short i;
+    if (include_negatives) {
+        for (i = ROMAN_MIN_VALUE; i < 0; i++) {
+            all_roman_numerals[index++] = int_to_roman(i);
+        }
+    }
+    for (i = 0; i <= ROMAN_MAX_VALUE; i++) {
+        all_roman_numerals[index++] = int_to_roman(i);
+    }
+    return &all_roman_numerals[0 + (include_negatives ? ROMAN_MAX_VALUE : 0)];
+}
 int save_to_sqlite3() {
     sqlite3 *db;
     char *err_msg = 0;
