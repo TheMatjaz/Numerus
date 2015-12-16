@@ -326,6 +326,19 @@ char** allocate_all_romans(short int include_negatives) {
     }
     return &all_roman_numerals[0 + (include_negatives ? ROMAN_MAX_VALUE : 0)];
 }
+int roman_is_bigger(char *roman_bigger, char *roman_smaller) {
+    short error_code;
+    short int value_bigger = roman_to_short(roman_bigger, &error_code);
+    short int value_smaller = roman_to_short(roman_smaller, &error_code);
+    if (value_bigger > value_smaller) {
+        return 1;
+    } else if (value_bigger == value_smaller) {
+        return 0;
+    } else {
+        return -1;
+    }
+}
+
 int save_to_sqlite3() {
     sqlite3 *db;
     char *err_msg = 0;
