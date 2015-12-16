@@ -12,6 +12,7 @@
 #include <stdlib.h> /* For `malloc()` */
 #include <string.h> /* For `strcmp()` in `roman_is_nulla()` */
 #include <regex.h>  /* To use regexes to match correct roman numeral syntax */
+#include <sqlite3.h> /* To save all roman integers to a sqlite3 file */
 
 /**
  * Maximum value as int a roman numeral may have.
@@ -247,7 +248,7 @@ char* int_to_roman(int arabic) {
  * Confronts if the two given string match in the the next 1 or 2 characters.
  *
  * Returns the length of the match, which may be 0 if they don't match or 1 or 2
- * if they match. This functions is used by roman_to_int().
+ * if they match. This functions is used by roman_to_short().
  */
 static short int begins_with(char *to_compare, char *pattern) {
     short pattern_length = strlen(pattern);
@@ -264,7 +265,7 @@ static short int begins_with(char *to_compare, char *pattern) {
  * If the value cannot be converted, returns a value bigger than ROMAN_MAX_VALUE
  * and a non-zero error code in the second parameter.
  */
-int roman_to_int(char *roman, short int *error_code) {
+short roman_to_short(char *roman, short int *error_code) {
     /* Exclude nulla numerals */
     if (roman_is_nulla(roman)) {
         return 0;
@@ -284,7 +285,7 @@ int roman_to_int(char *roman, short int *error_code) {
     }
 
     /* Actual conversion */
-    int arabic = 0;
+    short int arabic = 0;
     struct roman_char_struct *current_roman_char = &ROMAN_CHARS[0];
     while (*roman != '\0') {
         short matching_chars = begins_with(roman, current_roman_char->chars);
@@ -298,4 +299,56 @@ int roman_to_int(char *roman, short int *error_code) {
 
     *error_code = 0;
     return sign * arabic;
+}
+int save_to_sqlite3() {
+    sqlite3 *db;
+    char *err_msg = 0;
+
+    int rc = sqlite3_open_v2("file:numerus.db", &db, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, NULL); /* Open in RW mode and create if not exists */
+
+    if (rc != SQLITE_OK) {
+
+        fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db));
+        sqlite3_close(db);
+
+        return 1;
+    }
+
+    char *query = "DROP TABLE IF EXISTS roman_numerals; "
+                  "CREATE TABLE roman_numerals (value INT, numeral TEXT);";
+    rc = sqlite3_exec(db, query, 0, 0, &err_msg);
+    if (rc != SQLITE_OK ) {
+
+        fprintf(stderr, "SQL error: %s\n", err_msg);
+
+        sqlite3_free(err_msg);
+        sqlite3_free(query);
+        sqlite3_close(db);
+
+        return 1;
+    }
+    //sqlite3_free(query);
+
+    short i;
+    for (i = ROMAN_MIN_VALUE; i <= ROMAN_MAX_VALUE; i++) {
+        query = sqlite3_mprintf(
+                "INSERT INTO roman_numerals VALUES (%d, '%q');", i, int_to_roman(i));
+
+        rc = sqlite3_exec(db, query, 0, 0, &err_msg);
+        if (rc != SQLITE_OK ) {
+
+            fprintf(stderr, "SQL error: %s\n", err_msg);
+
+            sqlite3_free(err_msg);
+            sqlite3_free(query);
+            sqlite3_close(db);
+
+            return 1;
+        }
+    }
+
+    sqlite3_free(err_msg);
+    sqlite3_free(query);
+    sqlite3_close(db);
+    return 0;
 }
