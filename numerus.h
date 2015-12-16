@@ -35,3 +35,4 @@ extern const char *ROMAN_SYNTAX_REGEX_STRING;
 int is_roman(char *roman);
 int roman_is_nulla(char *roman);
 char* int_to_roman(int arabic);
+int roman_to_int(char *roman, short int *error_code);

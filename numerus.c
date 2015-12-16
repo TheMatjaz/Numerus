@@ -240,3 +240,62 @@ char* int_to_roman(int arabic) {
     strcpy(returnable_roman_string, roman_numeral_build_buffer);
     return returnable_roman_string;
 }
+
+
+
+/**
+ * Confronts if the two given string match in the the next 1 or 2 characters.
+ *
+ * Returns the length of the match, which may be 0 if they don't match or 1 or 2
+ * if they match. This functions is used by roman_to_int().
+ */
+static short int begins_with(char *to_compare, char *pattern) {
+    short pattern_length = strlen(pattern);
+    if (strncmp(to_compare, pattern, pattern_length) == 0) { /* run strcmp() on first "pattern_length" characters */
+        return pattern_length;
+    } else {
+        return 0;
+    }
+}
+
+/**
+ * Converts a roman numeral to int.
+ *
+ * If the value cannot be converted, returns a value bigger than ROMAN_MAX_VALUE
+ * and a non-zero error code in the second parameter.
+ */
+int roman_to_int(char *roman, short int *error_code) {
+    /* Exclude nulla numerals */
+    if (roman_is_nulla(roman)) {
+        return 0;
+    }
+
+    /* Return an error if the roman is not syntactically correct */
+    if (!is_roman(roman)) {
+        *error_code = 1;
+        return ROMAN_MAX_VALUE + 1;
+    }
+
+    /* Save sign */
+    short int sign = 1;
+    if (*roman == '-') {
+        sign = -1;
+        roman++;
+    }
+
+    /* Actual conversion */
+    int arabic = 0;
+    struct roman_char_struct *current_roman_char = &ROMAN_CHARS[0];
+    while (*roman != '\0') {
+        short matching_chars = begins_with(roman, current_roman_char->chars);
+        if (matching_chars > 0) {
+            roman += matching_chars;
+            arabic += current_roman_char->value;
+        } else {
+            current_roman_char++;
+        }
+    }
+
+    *error_code = 0;
+    return sign * arabic;
+}
