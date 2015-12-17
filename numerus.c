@@ -174,12 +174,14 @@ static char *copy_roman_char_from_dictionary(char *source, char *destination) {
 }
 
 /**
- * Converts an integer to a roman numeral.
+ * Converts a short int to a roman numeral.
  *
- * Returns NULL if the int is out of range, otherwise returns a pointer to a
- * string containing the roman numeral.
+ * It allocates a string with the roman numerals long just as required and returns a pointer to it.
+ * If the short is outside of [ROMAN_MIN_VALUE, ROMAN_MAX_VALUE], the conversion is impossible.
+ *
+ * @returns pointer to a string containing the roman numeral, NULL if the short is out of range.
  */
-char* int_to_roman(int arabic) {
+char *int_to_roman(short int arabic) {
     /* Out of range check */
     if (arabic < ROMAN_MIN_VALUE || arabic > ROMAN_MAX_VALUE) {
         fprintf(stderr, "Roman conversion error: short int %d out of range [%d, %d]\n",
@@ -187,7 +189,7 @@ char* int_to_roman(int arabic) {
         return NULL;
     }
 
-    /* Create pointer to buffer */
+    /* Create pointer to the building buffer */
     char *roman_string = &roman_numeral_build_buffer[0];
 
     /* Save sign or return ROMAN_ZERO for 0 */
@@ -198,7 +200,7 @@ char* int_to_roman(int arabic) {
         return ROMAN_ZERO; /* TODO: Probably should return a copy of it? */
     }
 
-    /* Actual conversion */
+    /* Actual conversion comparing appending chars from ROMAN_CHARS */
     struct roman_char_struct *current_roman_char = &ROMAN_CHARS[0];
     while (arabic > 0) {
         while (arabic >= current_roman_char->value) {
@@ -208,42 +210,45 @@ char* int_to_roman(int arabic) {
         }
         current_roman_char++;
     }
-
-    /* Null terminate builded string in buffer */
     *roman_string = '\0';
 
-    /* Copy out of buffer and return it */
-    char *returnable_roman_string = malloc(roman_string - roman_numeral_build_buffer); /* Allocate the size of the builded string */
+    /* Copy out of the buffer and return it */
+    char *returnable_roman_string = malloc(roman_string -
+                                           roman_numeral_build_buffer);
     strcpy(returnable_roman_string, roman_numeral_build_buffer);
     return returnable_roman_string;
 }
 
 
-
 /**
- * Confronts if the two given string match in the the next 1 or 2 characters.
+ * Checks if two strings match in the the next 1 or 2 characters.
  *
- * Returns the length of the match, which may be 0 if they don't match or 1 or 2
- * if they match. This functions is used by roman_to_short().
+ * This functions is used by roman_to_short() and is missing many security check since is internal and is meant to be called on ROMAN_CHARS.
+ *
+ * @param *to_compare the current position in the string to check against the pattern
+ * @param *pattern the position in the string containing the 1 or 2 characters that may be in *to_compare
+ * @returns length of the match as short: 0 if they don't match or 1 or 2
+ * if they match.
  */
 static short int begins_with(char *to_compare, char *pattern) {
-    short pattern_length = strlen(pattern);
-    if (strncmp(to_compare, pattern, pattern_length) == 0) { /* run strcmp() on first "pattern_length" characters */
-        return pattern_length;
+    size_t pattern_length = strlen(pattern);
+    if (strncmp(to_compare, pattern, pattern_length) == 0) {
+        /* compare the first pattern_length characters */
+        return (short) pattern_length;
     } else {
         return 0;
     }
 }
 
 /**
- * Converts a roman numeral to int.
+ * Converts a roman numeral to a short int.
  *
  * If the value cannot be converted, returns a value bigger than ROMAN_MAX_VALUE
  * and a non-zero error code in the second parameter.
  */
-short roman_to_short(char *roman, short int *error_code) {
+short int roman_to_short(char *roman, short int *error_code) {
     /* Exclude nulla numerals */
-    if (roman_is_nulla(roman)) {
+    if (roman_is_zero(roman)) {
         return 0;
     }
 
