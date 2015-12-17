@@ -11,7 +11,7 @@
 /**
  * Everything went all right.
  *
- * This is the opposite of ROMAN_ERROR.
+ * This is the opposite of any NUMERUS_ERROR_*.
  */
 #define NUMERUS_OK 1000;
 
@@ -36,8 +36,8 @@
  * regexec() internal error.
  *
  * Happens while checking the syntax correctness of a roman numeral to be
- * converted to short by numerus_roman_to_short(). Check regerror() and the stderr for
- * more information.
+ * converted to short by numerus_roman_to_short(). Check regerror() and the
+ * stderr for more information.
  */
 #define NUMERUS_ERROR_REGEXEC 102;
 
@@ -74,5 +74,5 @@ int numerus_roman_is_zero(char *roman);
 char *numerus_short_to_roman(short int arabic);
 short numerus_roman_to_short(char *roman);
 int numerus_compare_value(char *roman_bigger, char *roman_smaller);
-char**numerus_allocate_all_romans(short int include_negatives);
+char **numerus_allocate_all_romans(short int include_negatives);
 int numerus_export_all_to_sqlite3(char *filename);
