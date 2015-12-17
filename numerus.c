@@ -15,14 +15,14 @@
 #include <sqlite3.h>  /* To export all roman numerals to an SQLite3 file */
 
 /**
- * Maximum value as int a roman numeral may have.
+ * Maximum value as short a roman numeral may have.
  */
-const int ROMAN_MAX_VALUE = 3999;
+const short int ROMAN_MAX_VALUE = 3999;
 
 /**
- * Minimum value as int a roman numeral may have.
+ * Minimum value as short a roman numeral may have.
  */
-const int ROMAN_MIN_VALUE = -3999;
+const short int ROMAN_MIN_VALUE = -3999;
 
 /**
  * Roman numeral of value 0 (zero).
@@ -35,7 +35,7 @@ const char *NULLA = "NULLA";
  * The roman numeral `"-MMMDCCCLXXXVIII"` (value: -3888) + `\0` is a string long
  * 16+1 = 17 chars.
  */
-const int ROMAN_MAX_LENGTH = 17;
+const short int ROMAN_MAX_LENGTH = 17;
 
 /**
  * String containing a to-be-compiled regex matching any syntactiacally correct
