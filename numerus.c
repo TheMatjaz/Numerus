@@ -341,10 +341,22 @@ char **allocate_all_romans(short int include_negatives) {
     }
     return &all_roman_numerals[0 + (include_negatives ? ROMAN_MAX_VALUE : 0)];
 }
+
+/**
+ * Compares the value of two roman numerals, emulating the operator '>'.
+ *
+ * @param *roman_bigger string with a roman numeral to compare with the second parameter
+ * @param *roman_smaller string with a roman numeral to compare with the first parameter
+ * @returns 1 if the first parameter is bigger, 0 if they are equal, -1 if the second is bigger. Returns ROMAN_ERROR_CANNOT_COMPARE if at least one of the two numerals has wrong syntax and cannot be compared.
+ */
 int roman_is_bigger(char *roman_bigger, char *roman_smaller) {
-    short error_code;
-    short int value_bigger = roman_to_short(roman_bigger, &error_code);
-    short int value_smaller = roman_to_short(roman_smaller, &error_code);
+    short int value_bigger = roman_to_short(roman_bigger);
+    short int value_smaller = roman_to_short(roman_smaller);
+    if (value_bigger > ROMAN_MAX_VALUE || value_smaller > ROMAN_MAX_VALUE) {
+        fprintf(stderr, "Roman comparition error: cannot compare syntactically wrong numerals\n");
+        roman_error_code = ROMAN_ERROR_CANNOT_COMPARE;
+        return ROMAN_ERROR_CANNOT_COMPARE;
+    }
     if (value_bigger > value_smaller) {
         return 1;
     } else if (value_bigger == value_smaller) {
