@@ -67,7 +67,7 @@ static char roman_numeral_build_buffer[ROMAN_MAX_LENGTH];
  *
  * It may contain any of the ROMAN_ERROR_* error codes or ROMAN_OK.
  */
-unsigned short int roman_error_code = ROMAN_OK;
+short int roman_error_code = ROMAN_OK;
 
 
 /**
