@@ -133,7 +133,7 @@ int roman_is_zero(char *roman) {
  * @param *destination the string, already allocated, to copy the *source into
  * @returns the new position of the destination pointer after the characters have been copied
  */
-static char *copy_roman_char_from_dictionary(char *source, char *destination) {
+static char *copy_roman_char_from_dictionary(const char *source, char *destination) {
     *destination = *(source++);
     if (*source != '\0') {
         *(++destination) = *source;
@@ -170,7 +170,7 @@ char *short_to_roman(short int arabic) {
     }
 
     /* Actual conversion comparing appending chars from ROMAN_CHARS */
-    struct roman_char_struct *current_roman_char = &ROMAN_CHARS[0];
+    const struct roman_char_struct *current_roman_char = &ROMAN_CHARS[0];
     while (arabic > 0) {
         while (arabic >= current_roman_char->value) {
             roman_string = copy_roman_char_from_dictionary(
@@ -239,7 +239,7 @@ int is_roman(char *roman) {
  * @returns length of the match as short: 0 if they don't match or 1 or 2
  * if they match.
  */
-static short int begins_with(char *to_compare, char *pattern) {
+static short int begins_with(char *to_compare, const char *pattern) {
     size_t pattern_length = strlen(pattern);
     if (strncmp(to_compare, pattern, pattern_length) == 0) {
         /* compare the first pattern_length characters */
@@ -280,7 +280,7 @@ short int roman_to_short(char *roman) {
 
     /* Actual conversion */
     short int arabic = 0;
-    struct roman_char_struct *current_roman_char = &ROMAN_CHARS[0];
+    const struct roman_char_struct *current_roman_char = &ROMAN_CHARS[0];
     while (*roman != '\0') {
         short matching_chars = begins_with(roman, current_roman_char->chars);
         if (matching_chars > 0) {
