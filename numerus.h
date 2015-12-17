@@ -38,7 +38,7 @@ extern const char *ROMAN_SYNTAX_REGEX_STRING;
 
 int is_roman(char *roman);
 int roman_is_nulla(char *roman);
-char* int_to_roman(int arabic);
+char *short_to_roman(short int arabic);
 short roman_to_short(char *roman);
 int roman_is_bigger(char *roman_bigger, char *roman_smaller);
 char** allocate_all_romans(short int include_negatives);

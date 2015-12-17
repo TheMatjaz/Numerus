@@ -126,7 +126,7 @@ int roman_is_zero(char *roman) {
  * Copies the character from the source to the destination. If there is another
  * character after that, that is not the null terminator, copies that as well.
  * Everything is performed without security checks for faster performance. This
- * function is used by int_to_roman() and it's meant to be used just on the
+ * function is used by short_to_roman() and it's meant to be used just on the
  * roman_char_struct in the dictionary ROMAN_CHARS.
  *
  * @param *source the string of 1-2 characters to copy
@@ -149,7 +149,7 @@ static char *copy_roman_char_from_dictionary(char *source, char *destination) {
  *
  * @returns pointer to a string containing the roman numeral, NULL if the short is out of range.
  */
-char *int_to_roman(short int arabic) {
+char *short_to_roman(short int arabic) {
     /* Out of range check */
     if (arabic < ROMAN_MIN_VALUE || arabic > ROMAN_MAX_VALUE) {
         roman_error_code = ROMAN_ERROR_OUT_OF_RANGE;
