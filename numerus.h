@@ -34,6 +34,11 @@
  */
 #define ROMAN_ERROR_CANNOT_COMPARE 104;
 
+/**
+ * Could not allocate enough memory for the array of all roman numerals in allocate_all_romans().
+ */
+#define ROMAN_ERROR_ALLOCATE_ALL 105;
+
 extern const short int ROMAN_MAX_VALUE;
 extern const short int ROMAN_MIN_VALUE;
 extern const char *ROMAN_ZERO;

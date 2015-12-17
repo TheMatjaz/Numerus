@@ -318,12 +318,11 @@ short int roman_to_short(char *roman) {
  *
  * \code{.c}
  * char **all_romans = allocate_all_romans(1);
- * all_romans[42]  is "XLII"
- * all_romans[-42] is "-XLII"
+ * char *fortytwo = all_romans[42];
  * \endcode
  *
  * @param include_negatives set it to 0 to create the array from 0 to ROMAN_MAX_VALUE or to anything else to create it from ROMAN_MIN_VALUE to ROMAN_MAX_VALUE
- * @returns the address of the value 0 (which points to ROMAN_ZERO) in the array
+ * @returns the address of the value 0 (which points to ROMAN_ZERO) in the array or NULL if malloc() fails to allocate the array
  */
 char **allocate_all_romans(short int include_negatives) {
     short int num_of_romans = ROMAN_MAX_VALUE;
@@ -332,7 +331,16 @@ char **allocate_all_romans(short int include_negatives) {
         num_of_romans *= 2;
     }
     num_of_romans += 1; /* Include ROMAN_ZERO */
-    char *all_roman_numerals[num_of_romans]; /* Array of pointers to strings */
+
+    /* Allocate an array of pointers to strings */
+    char **all_roman_numerals = malloc(num_of_romans * sizeof(char *));
+    if (all_roman_numerals == NULL) {
+        roman_error_code = ROMAN_ERROR_ALLOCATE_ALL;
+        fprintf(stderr, "All romans allocation error in malloc()\n");
+        return NULL;
+    }
+
+    /* Fill the array */
     int index = 0;
     short i;
     if (include_negatives) {
