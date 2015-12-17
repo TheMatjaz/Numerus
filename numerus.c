@@ -49,7 +49,8 @@ const short int ROMAN_MAX_LENGTH = 17;
  * String containing a to-be-compiled regex matching any syntactiacally correct
  * roman numeral.
  */
-const char *ROMAN_SYNTAX_REGEX_STRING = "^-?M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$";
+const char *ROMAN_SYNTAX_REGEX_STRING
+                 = "^-?M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$";
 
 /**
  * Compiled regex matching any syntactically correct roman numeral.
@@ -61,10 +62,10 @@ static regex_t ROMAN_SYNTAX_REGEX;
 /**
  * Buffer where the strings with roman numerals are build an then copied from.
  *
- * This buffer is as long as the longest roman numeral. The usage of this
- * buffer allows one conversion at the time but is more memory efficient since
- * the roman numerals have variable length and can be returned as a string
- * copied from the buffer with just the right amount of space allocated.
+ * This buffer is as long as the longest roman numeral. The usage of this buffer
+ * allows one conversion at the time but is more memory efficient since the
+ * roman numerals have variable length and can be returned as a string copied
+ * from the buffer with just the right amount of space allocated.
  */
 static char roman_numeral_build_buffer[ROMAN_MAX_LENGTH];
 
@@ -137,7 +138,8 @@ int roman_is_zero(char *roman) {
  *
  * @param *source the string of 1-2 characters to copy
  * @param *destination the string, already allocated, to copy the *source into
- * @returns the new position of the destination pointer after the characters have been copied
+ * @returns the new position of the destination pointer after the characters 
+ * have been copied
  */
 static char *copy_roman_char_from_dictionary(const char *source, char *destination) {
     *destination = *(source++);
@@ -150,16 +152,19 @@ static char *copy_roman_char_from_dictionary(const char *source, char *destinati
 /**
  * Converts a short int to a roman numeral.
  *
- * It allocates a string with the roman numerals long just as required and returns a pointer to it.
- * If the short is outside of [ROMAN_MIN_VALUE, ROMAN_MAX_VALUE], the conversion is impossible.
+ * It allocates a string with the roman numerals long just as required and
+ * returns a pointer to it.  If the short is outside of [ROMAN_MIN_VALUE,
+ * ROMAN_MAX_VALUE], the conversion is impossible.
  *
- * @returns pointer to a string containing the roman numeral, NULL if the short is out of range.
+ * @returns pointer to a string containing the roman numeral, NULL if the short 
+ * is out of range.
  */
 char *short_to_roman(short int arabic) {
     /* Out of range check */
     if (arabic < ROMAN_MIN_VALUE || arabic > ROMAN_MAX_VALUE) {
         roman_error_code = ROMAN_ERROR_OUT_OF_RANGE;
-        fprintf(stderr, "Roman conversion error: short int %d out of range [%d, %d]\n",
+        fprintf(stderr,
+                "Roman conversion error: short int %d out of range [%d, %d]\n",
                 arabic, ROMAN_MIN_VALUE, ROMAN_MAX_VALUE);
         return NULL;
     }
@@ -191,8 +196,8 @@ char *short_to_roman(short int arabic) {
     *roman_string = '\0';
 
     /* Copy out of the buffer and return it */
-    char *returnable_roman_string = malloc(roman_string -
-                                           roman_numeral_build_buffer);
+    char *returnable_roman_string =
+          malloc(roman_string - roman_numeral_build_buffer);
     strcpy(returnable_roman_string, roman_numeral_build_buffer);
     return returnable_roman_string;
 }
@@ -201,11 +206,10 @@ char *short_to_roman(short int arabic) {
  * Verifies if the passed string is a correct roman numeral.
  *
  * Performs syntax check of the passed roman numeral by checking it against a
- * regex compiled from
- * ROMAN_SYNTAX_REGEX_STRING. It is case insensitive. The compilation is once
- * for all subsequent calls of the function during runtime. The regex
- * compilation status is dropped since ROMAN_SYNTAX_REGEX_STRING is a correct
- * hard coded constant.
+ * regex compiled from ROMAN_SYNTAX_REGEX_STRING. It is case insensitive. The
+ * compilation is once for all subsequent calls of the function during
+ * runtime. The regex compilation status is dropped since
+ * ROMAN_SYNTAX_REGEX_STRING is a correct hard coded constant.
  *
  * @param *roman string containing a roman numeral to check
  * @returns int 1 if has correct roman syntax, 0 if it does not and  in case
@@ -241,10 +245,14 @@ int is_roman(char *roman) {
 /**
  * Checks if two strings match in the the next 1 or 2 characters.
  *
- * It is case insensitive. This functions is used by roman_to_short() and is missing many security check since is internal and is meant to be called on ROMAN_CHARS.
+ * It is case insensitive. This functions is used by roman_to_short() and is
+ * missing many security check since is internal and is meant to be called on
+ * ROMAN_CHARS.
  *
- * @param *to_compare the current position in the string to check against the pattern
- * @param *pattern the position in the string containing the 1 or 2 characters that may be in *to_compare
+ * @param *to_compare the current position in the string to check against the 
+ * pattern
+ * @param *pattern the position in the string containing the 1 or 2 characters 
+ * that may be in *to_compare
  * @returns length of the match as short: 0 if they don't match or 1 or 2
  * if they match.
  */
@@ -261,11 +269,14 @@ static short int begins_with(char *to_compare, const char *pattern) {
 /**
  * Converts a roman numeral to a short int.
  *
- * It is case insensitive and accepts negative roman numerals. If the numeral cannot be converted, it means it has wrong syntax. In that case a value bigger than ROMAN_MAX_VALUE is returned
- * and the error code ROMAN_ERROR_WRONG_SYNTAX is stored in roman_error_code.
+ * It is case insensitive and accepts negative roman numerals. If the numeral
+ * cannot be converted, it means it has wrong syntax. In that case a value
+ * bigger than ROMAN_MAX_VALUE is returned and the error code
+ * ROMAN_ERROR_WRONG_SYNTAX is stored in roman_error_code.
  *
  * @param *roman string with a roman numeral
- * @returns short value of the roman numeral or a value bigger than ROMAN_MAX_VALUE in case of error
+ * @returns short value of the roman numeral or a value bigger than 
+ * ROMAN_MAX_VALUE in case of error
  */
 short int roman_to_short(char *roman) {
     /* Exclude nulla numerals */
@@ -305,9 +316,12 @@ short int roman_to_short(char *roman) {
 }
 
 /**
- * Allocates all roman numerals and their values in memory for fast conversions from value to roman numeral.
+ * Allocates all roman numerals and their values in memory for fast conversions
+ * from value to roman numeral.
  *
- * It creates an array of pointers to strings, char*. Each char* points to the roman numeral with the same value as the index of the char* in the array. The returned pointer to the array points to the value 0.
+ * It creates an array of pointers to strings, char*. Each char* points to the
+ * roman numeral with the same value as the index of the char* in the array. The
+ * returned pointer to the array points to the value 0.
  *
  * Example structure:
  *
@@ -326,8 +340,11 @@ short int roman_to_short(char *roman) {
  * char *fortytwo = all_romans[42];
  * \endcode
  *
- * @param include_negatives set it to 0 to create the array from 0 to ROMAN_MAX_VALUE or to anything else to create it from ROMAN_MIN_VALUE to ROMAN_MAX_VALUE
- * @returns the address of the value 0 (which points to ROMAN_ZERO) in the array or NULL if malloc() fails to allocate the array
+ * @param include_negatives set it to 0 to create the array from 0 to 
+ * ROMAN_MAX_VALUE or to anything else to create it from ROMAN_MIN_VALUE to 
+ * ROMAN_MAX_VALUE
+ * @returns the address of the value 0 (which points to ROMAN_ZERO) in the 
+ * array or NULL if malloc() fails to allocate the array
  */
 char **allocate_all_romans(short int include_negatives) {
     short int num_of_romans = ROMAN_MAX_VALUE;
@@ -362,15 +379,20 @@ char **allocate_all_romans(short int include_negatives) {
 /**
  * Compares the value of two roman numerals, emulating the operator '>'.
  *
- * @param *roman_bigger string with a roman numeral to compare with the second parameter
- * @param *roman_smaller string with a roman numeral to compare with the first parameter
- * @returns 1 if the first parameter is bigger, 0 if they are equal, -1 if the second is bigger. Returns ROMAN_ERROR_CANNOT_COMPARE if at least one of the two numerals has wrong syntax and cannot be compared.
+ * @param *roman_bigger string with a roman numeral to compare with the second 
+ * parameter
+ * @param *roman_smaller string with a roman numeral to compare with the first 
+ * parameter
+ * @returns 1 if the first parameter is bigger, 0 if they are equal, -1 if the 
+ * second is bigger. Returns ROMAN_ERROR_CANNOT_COMPARE if at least one of the 
+ * two numerals has wrong syntax and cannot be compared.
  */
 int roman_is_bigger(char *roman_bigger, char *roman_smaller) {
     short int value_bigger = roman_to_short(roman_bigger);
     short int value_smaller = roman_to_short(roman_smaller);
     if (value_bigger > ROMAN_MAX_VALUE || value_smaller > ROMAN_MAX_VALUE) {
-        fprintf(stderr, "Roman comparition error: cannot compare syntactically wrong numerals\n");
+        fprintf(stderr, "Roman comparition error: "
+                        "cannot compare syntactically wrong numerals\n");
         roman_error_code = ROMAN_ERROR_CANNOT_COMPARE;
         return ROMAN_ERROR_CANNOT_COMPARE;
     }
@@ -384,12 +406,18 @@ int roman_is_bigger(char *roman_bigger, char *roman_smaller) {
 }
 
 /**
- * Saves all roman numerals with their values to a SQLite3 file in a table called "roman_numerals".
+ * Saves all roman numerals with their values to a SQLite3 file in a table
+ * called "roman_numerals".
  *
- * The filename should be formatted as URI, see some [examples from the SQLite3 docs](https://www.sqlite.org/c3ref/open.html#urifilenameexamples). Errors are printed to stderr.
+ * The filename should be formatted as URI, see some [examples from the SQLite3
+ * docs](https://www.sqlite.org/c3ref/open.html#urifilenameexamples). Errors are
+ * printed to stderr.
  *
- * @param filename string with the SQLite3 file name to store into formatted as URI. If NULL, the file is saved to a file in the current directory named "numerus.db"
- * @returns response code as int: ROMAN_OK if everything went OK, ROMAN_ERROR_SQLITE if something went wrong.
+ * @param filename string with the SQLite3 file name to store into formatted as 
+ * URI. If NULL, the file is saved to a file in the current directory named 
+ * "numerus.db"
+ * @returns response code as int: ROMAN_OK if everything went OK, 
+ * ROMAN_ERROR_SQLITE if something went wrong.
  */
 int save_to_sqlite3(char *filename) {
     if (filename == NULL) {
@@ -415,7 +443,8 @@ int save_to_sqlite3(char *filename) {
                       "value INT PRIMARY KEY,"
                       "numeral TEXT"
                   ");";
-    sqlite3_resp_code = sqlite3_exec(db_connection, query, 0, 0, &sqlite_error_msg);
+    sqlite3_resp_code = sqlite3_exec(db_connection, query, 0, 0,
+                                     &sqlite_error_msg);
     if (sqlite3_resp_code != SQLITE_OK) {
         fprintf(stderr, "SQL error: %s\n", sqlite_error_msg);
         sqlite3_free(sqlite_error_msg);
@@ -430,7 +459,8 @@ int save_to_sqlite3(char *filename) {
         query = sqlite3_mprintf(
                 "INSERT INTO roman_numerals VALUES (%d, '%q');", i,
                 short_to_roman(i));
-        sqlite3_resp_code = sqlite3_exec(db_connection, query, 0, 0, &sqlite_error_msg);
+        sqlite3_resp_code = sqlite3_exec(db_connection, query, 0, 0,
+                                         &sqlite_error_msg);
         if (sqlite3_resp_code != SQLITE_OK) {
             fprintf(stderr, "SQL error: %s\n", sqlite_error_msg);
             sqlite3_free(sqlite_error_msg);
