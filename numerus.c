@@ -51,15 +51,6 @@ const char *ROMAN_SYNTAX_REGEX_STRING = "^-?M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3
 static regex_t ROMAN_SYNTAX_REGEX;
 
 /**
- * Status of regexec() matching a string against ROMAN_SYNTAX_REGEX.
- *
- * `0` = the string matches and is a syntactically correct roman numeral, `1` =
- * the string does not match, it is not a roman numeral and cannot be converted
- * or manipulated.
- */
-static int roman_regex_matching_status;
-
-/**
  * Buffer where the strings with roman numerals are build an then copied from.
  *
  * This buffer is as long as the longest roman numeral. The usage of this
@@ -146,24 +137,6 @@ static const struct roman_char_struct ROMAN_CHARS[] = {
         {   1, "I" }
 };
 
-/**
- * Returns the length of the roman numeral including the leading '-', excluding the null terminator.
- * If it's too long, then is not a roman numeral and returns -1.
- * It's not using strlen() to be able to stop as soon as the string is longer
- * than the maximum possible roman lenght.
- *
- * TODO: since it's a static function, can be used only inside the library. This means there is no need for it to be secure for external users. You may NOT perform the i < ROMAN_MAX_LENGTH check.
- *
- */
-static int roman_numeral_length(char *roman) {
-    int i;
-    for (i = 0; i < ROMAN_MAX_LENGTH; i++) {
-        if (roman[i] == '\0') {
-            return i;
-        }
-    }
-    return -1;
-}
 
 /**
  * Verifies if the passed roman numeral is (-)ROMAN_ZERO, case insensitive.
