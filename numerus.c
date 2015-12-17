@@ -252,10 +252,13 @@ static short int begins_with(char *to_compare, char *pattern) {
 /**
  * Converts a roman numeral to a short int.
  *
- * If the value cannot be converted, returns a value bigger than ROMAN_MAX_VALUE
- * and a non-zero error code in the second parameter.
+ * It is case insensitive and accepts negative roman numerals. If the numeral cannot be converted, it means it has wrong syntax. In that case a value bigger than ROMAN_MAX_VALUE is returned
+ * and the error code ROMAN_ERROR_WRONG_SYNTAX is stored in roman_error_code.
+ *
+ * @param *roman string with a roman numeral
+ * @returns short value of the roman numeral or a value bigger than ROMAN_MAX_VALUE in case of error
  */
-short int roman_to_short(char *roman, short int *error_code) {
+short int roman_to_short(char *roman) {
     /* Exclude nulla numerals */
     if (roman_is_zero(roman)) {
         return 0;
@@ -263,7 +266,8 @@ short int roman_to_short(char *roman, short int *error_code) {
 
     /* Return an error if the roman is not syntactically correct */
     if (!is_roman(roman)) {
-        *error_code = 1;
+        roman_error_code = ROMAN_ERROR_WRONG_SYNTAX;
+        fprintf(stderr, "Roman conversion error: wrong syntax of numeral %s\n", roman);
         return ROMAN_MAX_VALUE + 1;
     }
 
@@ -287,7 +291,7 @@ short int roman_to_short(char *roman, short int *error_code) {
         }
     }
 
-    *error_code = 0;
+    roman_error_code = 0;
     return sign * arabic;
 }
 
