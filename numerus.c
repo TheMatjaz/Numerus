@@ -13,6 +13,8 @@
 #include <string.h>   /* For `strcmp()` */
 #include <regex.h>    /* To use regexes to match correct roman numeral syntax */
 #include <sqlite3.h>  /* To export all roman numerals to an SQLite3 file */
+#include "numerus.h"
+
 
 /**
  * Maximum value as short a roman numeral may have.
@@ -60,21 +62,12 @@ static regex_t ROMAN_SYNTAX_REGEX;
  */
 static char roman_numeral_build_buffer[ROMAN_MAX_LENGTH];
 
-
 /**
- * Verifies if the passed string is a correct roman numeral.
+ * Global error code variable to store any errors during conversions.
  *
- * Performs syntax check of the passed roman numeral by checking it against a
- * regex compiled from
- * ROMAN_SYNTAX_REGEX_STRING. It is case insensitive. The compilation is once
- * for all subsequent calls of the function during runtime. The regex
- * compilation status is dropped since ROMAN_SYNTAX_REGEX_STRING is a correct
- * hard coded constant.
- *
- * @param *roman string containing a roman numeral to check
- * @returns int 1 if has correct roman syntax, 0 if it does not and -1 in case
- * of regex errors.
+ * It may contain any of the ROMAN_ERROR_* error codes or ROMAN_OK.
  */
+unsigned short int roman_error_code = ROMAN_OK;
 
 
 /**
@@ -159,6 +152,7 @@ static char *copy_roman_char_from_dictionary(char *source, char *destination) {
 char *int_to_roman(short int arabic) {
     /* Out of range check */
     if (arabic < ROMAN_MIN_VALUE || arabic > ROMAN_MAX_VALUE) {
+        roman_error_code = ROMAN_ERROR_OUT_OF_RANGE;
         fprintf(stderr, "Roman conversion error: short int %d out of range [%d, %d]\n",
                 arabic, ROMAN_MIN_VALUE, ROMAN_MAX_VALUE);
         return NULL;

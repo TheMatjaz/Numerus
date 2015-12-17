@@ -3,33 +3,37 @@
  * @brief Numerus roman numerals library header
  */
 
-/**
- * Maximum value as int a roman numeral may have.
- */
-extern const int ROMAN_MAX_VALUE;
 
 /**
- * Minimum value as int a roman numeral may have.
+ * Everything went all right. This is the opposite of ROMAN_ERROR.
  */
-extern const int ROMAN_MIN_VALUE;
+#define ROMAN_OK 1000;
 
 /**
- * Roman numeral of value 0 (zero).
+ * Numeral is not a correct roman one. Check the syntax of the roman numeral for non-roman characters, too many repetitions or wrong character order.
  */
-extern const char *NULLA;
+#define ROMAN_ERROR_WRONG_SYNTAX 100;
 
 /**
- * Maximum length of a roman numeral string including the null terminator.
- *
- * The roman numeral `"-MMMDCCCLXXXVIII"` (value: -3888) + `\0` is a string long
- * 16+1 = 17 chars.
+ * Integer out of conversion range. short_to_roman() cannot convert the passed value because it exceed the possible values a roman numeral may represent, which are the integers in the interval [ROMAN_MIN_VALUE, ROMAN_MAX_VALUE].
  */
-extern const int ROMAN_MAX_LENGTH;
+#define ROMAN_ERROR_OUT_OF_RANGE 101;
 
 /**
- * String containing a to-be-compiled regex matching any syntactically correct
- * roman numeral.
+ * regexec() internal error while checking the syntax correctness of a roman numeral to be converted to short by roman_to_short(). Check regerror() and the stderr for more information.
  */
+#define ROMAN_ERROR_REGEXEC 102;
+
+/**
+ * A SQLite error happened. Check the stderr for more information.
+ */
+#define ROMAN_ERROR_SQLITE 103;
+
+/**
+ * roman_is_bigger() could not compare the two roman numerals because at least one of them cannot be converted to short so it has no value.
+ */
+#define ROMAN_ERROR_CANNOT_COMPARE 104;
+
 extern const char *ROMAN_SYNTAX_REGEX_STRING;
 
 int is_roman(char *roman);
