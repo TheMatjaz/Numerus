@@ -296,27 +296,48 @@ short int roman_to_short(char *roman) {
 }
 
 /**
- * Use indices as arabic integers. The char* stored at that index, points to the
- * roman numeral of that value.
+ * Allocates all roman numerals and their values in memory for fast conversions from value to roman numeral.
+ *
+ * It creates an array of pointers to strings, char*. Each char* points to the roman numeral with the same value as the index of the char* in the array. The returned pointer to the array points to the value 0.
+ *
+ * Example structure:
+ *
+ * \verbatim
+ *  i  | p --> numeral
+ * ----|---------------------
+ * -1  | * --> "-I"
+ *  0  | * --> "NULLA"
+ *  1  | * --> "I"
+ * \endverbatim
+ *
  * Example usage:
+ *
+ * \code{.c}
  * char **all_romans = allocate_all_romans(1);
- * all_romans[702] will be int_to_roman(702) = "DCCII" */
-char** allocate_all_romans(short int include_negatives) {
+ * all_romans[42]  is "XLII"
+ * all_romans[-42] is "-XLII"
+ * \endcode
+ *
+ * @param include_negatives set it to 0 to create the array from 0 to ROMAN_MAX_VALUE or to anything else to create it from ROMAN_MIN_VALUE to ROMAN_MAX_VALUE
+ * @returns the address of the value 0 (which points to ROMAN_ZERO) in the array
+ */
+char **allocate_all_romans(short int include_negatives) {
     short int num_of_romans = ROMAN_MAX_VALUE;
-    if (include_negatives) {
+    if (include_negatives != 0) {
+        include_negatives = 1;
         num_of_romans *= 2;
     }
-    num_of_romans += 1; /* For nulla */
-    char* all_roman_numerals[num_of_romans]; /* Array of pointers to strings */
+    num_of_romans += 1; /* Include ROMAN_ZERO */
+    char *all_roman_numerals[num_of_romans]; /* Array of pointers to strings */
     int index = 0;
     short i;
     if (include_negatives) {
         for (i = ROMAN_MIN_VALUE; i < 0; i++) {
-            all_roman_numerals[index++] = int_to_roman(i);
+            all_roman_numerals[index++] = short_to_roman(i);
         }
     }
     for (i = 0; i <= ROMAN_MAX_VALUE; i++) {
-        all_roman_numerals[index++] = int_to_roman(i);
+        all_roman_numerals[index++] = short_to_roman(i);
     }
     return &all_roman_numerals[0 + (include_negatives ? ROMAN_MAX_VALUE : 0)];
 }
