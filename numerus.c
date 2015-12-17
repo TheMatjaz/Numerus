@@ -54,12 +54,9 @@ static regex_t ROMAN_SYNTAX_REGEX;
  * Buffer where the strings with roman numerals are build an then copied from.
  *
  * This buffer is as long as the longest roman numeral. The usage of this
- * buffer allows one coversion at the time but is more memory efficient since
- * the roman numerals have variable length and can be returned as a string with
- * just the right amount of space allocated. The alternative of not using this
- * buffer would be constuct each roman numeral in an allocated space of
- * ROMAN_MAX_LENGTH characters and return it or at least copy it into a shorter
- * string and free the buffer each time.
+ * buffer allows one conversion at the time but is more memory efficient since
+ * the roman numerals have variable length and can be returned as a string
+ * copied from the buffer with just the right amount of space allocated.
  */
 static char roman_numeral_build_buffer[ROMAN_MAX_LENGTH];
 
@@ -67,50 +64,50 @@ static char roman_numeral_build_buffer[ROMAN_MAX_LENGTH];
 /**
  * Verifies if the passed string is a correct roman numeral.
  *
- * Matches `*roman` against ROMAN_SYNTAX_REGEX.
- *
- * Compiles the the ROMAN_SYNTAX_REGEX from ROMAN_SYNTAX_REGEX_STRING if necessary on the first run. The regex compilation status is dropped since
- * since ROMAN_SYNTAX_REGEX_STRING is a correct hard coded constant.
- * If you use the flag REG_NOSUB, then regcomp omits from the compiled regular expression the information necessary to record how subexpressions actually match. In this case, you might as well pass 0 for the matchptr and nmatch arguments when you call regexec.
- * REG_ICASE ignores the case
- * REG_EXTENDED uses the extended POSIX standard regular expressions, otherwise it does not work
- * Those are all bit operators and the bit _or_ `|` concatenates them
- * REG_NOSUB does not save subexpressions, only reports the success or failure of compiling the regex
+ * Performs syntax check of the passed roman numeral by checking it against a
+ * regex compiled from
+ * ROMAN_SYNTAX_REGEX_STRING. It is case insensitive. The compilation is once
+ * for all subsequent calls of the function during runtime. The regex
+ * compilation status is dropped since ROMAN_SYNTAX_REGEX_STRING is a correct
+ * hard coded constant.
  *
  * @param *roman string containing a roman numeral to check
- * @returns 0 if has correct syntax.
+ * @returns int 1 if has correct roman syntax, 0 if it does not and -1 in case
+ * of regex errors.
  */
 int is_roman(char *roman) {
-    if (ROMAN_SYNTAX_REGEX.re_magic == 0) { /* The regex has not been compiled yet */
-        /* Compile it */
-        regcomp(&ROMAN_SYNTAX_REGEX, ROMAN_SYNTAX_REGEX_STRING, REG_NOSUB|REG_ICASE|REG_EXTENDED);
+    /* Compile the regex if it has not been done yet */
+    if (ROMAN_SYNTAX_REGEX.re_magic == 0) {
+        /**
+         * Flags in regcomp():
+         * - REG_NOSUB:    does not save subexpressions (groups), only
+         *                 reports the success or failure of compiling the regex
+         * - REG_ICASE:    ignores the case, making the regex case insensitive
+         * - REG_EXTENDED: uses the extended POSIX standard regular expressions,
+         *                 which are required for the regex structure
+         */
+        regcomp(&ROMAN_SYNTAX_REGEX, ROMAN_SYNTAX_REGEX_STRING,
+                REG_NOSUB | REG_ICASE | REG_EXTENDED);
     }
     int match_result = regexec(&ROMAN_SYNTAX_REGEX, roman, 0, NULL, 0);
-    if (match_result == 0) { /* Match */
+    if (match_result == 0) { /* Matches regex */
         return 1;
-    } else if (match_result == REG_NOMATCH){ /* No match */
+    } else if (match_result == REG_NOMATCH) { /* Does not match regex */
         return 0;
-    } else { /* Error */
+    } else { /* Other errors */
         char msgbuf[100];
         regerror(match_result, &ROMAN_SYNTAX_REGEX, msgbuf, sizeof(msgbuf));
         return -1;
     }
 }
 
-/*
-In memory structure:   >  | 16 bit short | 3 bytes string | (string has '\0')
-If 1 byte (smallest accessable memory portion) = 8 bits, then it is:
-    >   | 16 bit short | 24 bit string | = 40 bits = 5 bytes to store a roman
-To store the dictionary it takes 65 bytes.
-To store all the roman numbers as STRUCTS it takes 96000 bytes (96 kB), including string null terminators, negative numbers and 0/NULLA, excluding any separators
-*/
 
 /**
- * Struct containing a pair basic roman char and its short integer value.
+ * Struct containing a pair: basic roman char and its short integer value.
  *
  * It's used to create the ROMAN_CHARS dictionary and used by conversion
  * functions. The "roman chars" as called in this library are strings of 1 or 2
- * chars that have a specific known value.
+ * chars that have a specific a priori known value.
  */
 static struct roman_char_struct {
     const short int value;
@@ -122,19 +119,19 @@ static struct roman_char_struct {
  * functions.
  */
 static const struct roman_char_struct ROMAN_CHARS[] = {
-        {1000, "M" },
-        { 900, "CM"},
-        { 500, "D" },
-        { 400, "CD"},
-        { 100, "C" },
-        {  90, "XC"},
-        {  50, "L" },
-        {  40, "XL"},
-        {  10, "X" },
-        {   9, "IX"},
-        {   5, "V" },
-        {   4, "IV"},
-        {   1, "I" }
+    {1000, "M" },
+    { 900, "CM"},
+    { 500, "D" },
+    { 400, "CD"},
+    { 100, "C" },
+    {  90, "XC"},
+    {  50, "L" },
+    {  40, "XL"},
+    {  10, "X" },
+    {   9, "IX"},
+    {   5, "V" },
+    {   4, "IV"},
+    {   1, "I" }
 };
 
 
@@ -161,8 +158,12 @@ int roman_is_zero(char *roman) {
  * Copies the character from the source to the destination. If there is another
  * character after that, that is not the null terminator, copies that as well.
  * Everything is performed without security checks for faster performance. This
- * function is used by int_to_roman() and  it's meant to be used just on the
+ * function is used by int_to_roman() and it's meant to be used just on the
  * roman_char_struct in the dictionary ROMAN_CHARS.
+ *
+ * @param *source the string of 1-2 characters to copy
+ * @param *destination the string, already allocated, to copy the *source into
+ * @returns the new position of the destination pointer after the characters have been copied
  */
 static char *copy_roman_char_from_dictionary(char *source, char *destination) {
     *destination = *(source++);
