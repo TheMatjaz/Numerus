@@ -1,0 +1,303 @@
+\hypertarget{numerus_8h}{}\section{numerus.\+h File Reference}
+\label{numerus_8h}\index{numerus.\+h@{numerus.\+h}}
+
+
+Numerus roman numerals library header.  
+
+
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{numerus_8h_a769074e765a25bd0e7d38c48e9adc739}{N\+U\+M\+E\+R\+U\+S\+\_\+\+O\+K}~1000;
+\begin{DoxyCompactList}\small\item\em Everything went all right. \end{DoxyCompactList}\item 
+\#define \hyperlink{numerus_8h_ab8845c8c0e66d7d6b4d5770e02d9f24f}{N\+U\+M\+E\+R\+U\+S\+\_\+\+E\+R\+R\+O\+R\+\_\+\+W\+R\+O\+N\+G\+\_\+\+S\+Y\+N\+T\+A\+X}~100;
+\begin{DoxyCompactList}\small\item\em Numeral is not a correct roman one. \end{DoxyCompactList}\item 
+\#define \hyperlink{numerus_8h_aa0542f6b1ca6aa921e1eaebbe82c18e4}{N\+U\+M\+E\+R\+U\+S\+\_\+\+E\+R\+R\+O\+R\+\_\+\+O\+U\+T\+\_\+\+O\+F\+\_\+\+R\+A\+N\+G\+E}~101;
+\begin{DoxyCompactList}\small\item\em Integer out of conversion range. \end{DoxyCompactList}\item 
+\#define \hyperlink{numerus_8h_a301a012f6771b319efa6689e64c3e58b}{N\+U\+M\+E\+R\+U\+S\+\_\+\+E\+R\+R\+O\+R\+\_\+\+R\+E\+G\+E\+X\+E\+C}~102;
+\begin{DoxyCompactList}\small\item\em regexec() internal error. \end{DoxyCompactList}\item 
+\#define \hyperlink{numerus_8h_ac9e9a2168a32145743b791cca51282a0}{N\+U\+M\+E\+R\+U\+S\+\_\+\+E\+R\+R\+O\+R\+\_\+\+S\+Q\+L\+I\+T\+E}~103;
+\begin{DoxyCompactList}\small\item\em An S\+Q\+Lite error happened. \end{DoxyCompactList}\item 
+\#define \hyperlink{numerus_8h_aba121be2b89527f89b6b488596456b4c}{N\+U\+M\+E\+R\+U\+S\+\_\+\+E\+R\+R\+O\+R\+\_\+\+C\+A\+N\+N\+O\+T\+\_\+\+C\+O\+M\+P\+A\+R\+E}~104;
+\begin{DoxyCompactList}\small\item\em \hyperlink{numerus_8h_ab812f63dd1634010d9687f2e822fbf6c}{numerus\+\_\+compare\+\_\+value()} comparision failed. \end{DoxyCompactList}\item 
+\hypertarget{numerus_8h_a34a6517c6ed7b169f7187bb211735afb}{}\#define \hyperlink{numerus_8h_a34a6517c6ed7b169f7187bb211735afb}{N\+U\+M\+E\+R\+U\+S\+\_\+\+E\+R\+R\+O\+R\+\_\+\+A\+L\+L\+O\+C\+A\+T\+E\+\_\+\+A\+L\+L}~105;\label{numerus_8h_a34a6517c6ed7b169f7187bb211735afb}
+
+\begin{DoxyCompactList}\small\item\em Could not allocate enough memory for the array of all roman numerals in \hyperlink{numerus_8h_a1985927a2efc30174ad115621a140fc9}{numerus\+\_\+allocate\+\_\+all\+\_\+romans()}. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{numerus_8h_a98f1428149c99316e52f04ebbcca103f}{numerus\+\_\+is\+\_\+roman} (char $\ast$roman)
+\begin{DoxyCompactList}\small\item\em Verifies if the passed string is a correct roman numeral. \end{DoxyCompactList}\item 
+int \hyperlink{numerus_8h_aa5b273274535ecddcd76a6014c34e0b5}{numerus\+\_\+roman\+\_\+is\+\_\+zero} (char $\ast$roman)
+\begin{DoxyCompactList}\small\item\em Verifies if the passed roman numeral is (-\/)N\+U\+M\+E\+R\+U\+S\+\_\+\+Z\+E\+R\+O, case insensitive. \end{DoxyCompactList}\item 
+char $\ast$ \hyperlink{numerus_8h_a2de772c8d7bd71805a4a3b3d0f700523}{numerus\+\_\+short\+\_\+to\+\_\+roman} (short int arabic)
+\begin{DoxyCompactList}\small\item\em Converts a short int to a roman numeral. \end{DoxyCompactList}\item 
+short \hyperlink{numerus_8h_ae42f1118505de888adc965a6761e9013}{numerus\+\_\+roman\+\_\+to\+\_\+short} (char $\ast$roman)
+\begin{DoxyCompactList}\small\item\em Converts a roman numeral to a short int. \end{DoxyCompactList}\item 
+int \hyperlink{numerus_8h_ab812f63dd1634010d9687f2e822fbf6c}{numerus\+\_\+compare\+\_\+value} (char $\ast$roman\+\_\+bigger, char $\ast$roman\+\_\+smaller)
+\begin{DoxyCompactList}\small\item\em Compares the value of two roman numerals, emulating the operator \textquotesingle{}$>$\textquotesingle{}. \end{DoxyCompactList}\item 
+char $\ast$$\ast$ \hyperlink{numerus_8h_a1985927a2efc30174ad115621a140fc9}{numerus\+\_\+allocate\+\_\+all\+\_\+romans} (short int include\+\_\+negatives)
+\begin{DoxyCompactList}\small\item\em Allocates all roman numerals and their values in memory for fast conversions from value to roman numeral. \end{DoxyCompactList}\item 
+int \hyperlink{numerus_8h_a89c7a72e1b891a4f377c22061f2e0b4d}{numerus\+\_\+export\+\_\+all\+\_\+to\+\_\+sqlite3} (char $\ast$filename)
+\begin{DoxyCompactList}\small\item\em Saves all roman numerals with their values to a S\+Q\+Lite3 file in a table called \char`\"{}roman\+\_\+numerals\char`\"{}. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{numerus_8h_a8d2e6e5b0552894b3986747b1d9bf872}{}const short int \hyperlink{numerus_8h_a8d2e6e5b0552894b3986747b1d9bf872}{N\+U\+M\+E\+R\+U\+S\+\_\+\+M\+A\+X\+\_\+\+V\+A\+L\+U\+E}\label{numerus_8h_a8d2e6e5b0552894b3986747b1d9bf872}
+
+\begin{DoxyCompactList}\small\item\em Maximum value as short a roman numeral may have. \end{DoxyCompactList}\item 
+\hypertarget{numerus_8h_aa1f412e8d418552143dd257fa5fdaade}{}const short int \hyperlink{numerus_8h_aa1f412e8d418552143dd257fa5fdaade}{N\+U\+M\+E\+R\+U\+S\+\_\+\+M\+I\+N\+\_\+\+V\+A\+L\+U\+E}\label{numerus_8h_aa1f412e8d418552143dd257fa5fdaade}
+
+\begin{DoxyCompactList}\small\item\em Minimum value as short a roman numeral may have. \end{DoxyCompactList}\item 
+\hypertarget{numerus_8h_a2b0f3e4dc1e2f76a1dbcc35226ef0c14}{}const char $\ast$ \hyperlink{numerus_8h_a2b0f3e4dc1e2f76a1dbcc35226ef0c14}{N\+U\+M\+E\+R\+U\+S\+\_\+\+Z\+E\+R\+O}\label{numerus_8h_a2b0f3e4dc1e2f76a1dbcc35226ef0c14}
+
+\begin{DoxyCompactList}\small\item\em Roman numeral of value 0 (zero). \end{DoxyCompactList}\item 
+const short int \hyperlink{numerus_8h_afd549ff8beb744d0518d80cd134ac2b4}{N\+U\+M\+E\+R\+U\+S\+\_\+\+M\+A\+X\+\_\+\+L\+E\+N\+G\+T\+H}
+\begin{DoxyCompactList}\small\item\em Maximum length of a roman numeral string including the null terminator. \end{DoxyCompactList}\item 
+\hypertarget{numerus_8h_acd98f5328dc6c12fddc1a7de3bc1878e}{}const char $\ast$ \hyperlink{numerus_8h_acd98f5328dc6c12fddc1a7de3bc1878e}{N\+U\+M\+E\+R\+U\+S\+\_\+\+S\+Y\+N\+T\+A\+X\+\_\+\+R\+E\+G\+E\+X\+\_\+\+S\+T\+R\+I\+N\+G}\label{numerus_8h_acd98f5328dc6c12fddc1a7de3bc1878e}
+
+\begin{DoxyCompactList}\small\item\em String containing a to-\/be-\/compiled regex matching any syntactiacally correct roman numeral. \end{DoxyCompactList}\item 
+short int \hyperlink{numerus_8h_a2ab1a73c274208f6319bdcdabb1a72d8}{numerus\+\_\+error\+\_\+code}
+\begin{DoxyCompactList}\small\item\em Global error code variable to store any errors during conversions. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Numerus roman numerals library header. 
+
+\begin{DoxyCopyright}{Copyright}
+Copyright © 2015, Matjaž Guštin \href{mailto:dev@matjaz.it}{\tt dev@matjaz.\+it} \href{http://matjaz.it}{\tt http\+://matjaz.\+it}. All rights reserved. 
+\end{DoxyCopyright}
+\begin{DoxyParagraph}{License\+:}
+This file is part of the Numerus project which is released under the B\+S\+D 3-\/clause license. 
+\end{DoxyParagraph}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{numerus_8h_aba121be2b89527f89b6b488596456b4c}{}\index{numerus.\+h@{numerus.\+h}!N\+U\+M\+E\+R\+U\+S\+\_\+\+E\+R\+R\+O\+R\+\_\+\+C\+A\+N\+N\+O\+T\+\_\+\+C\+O\+M\+P\+A\+R\+E@{N\+U\+M\+E\+R\+U\+S\+\_\+\+E\+R\+R\+O\+R\+\_\+\+C\+A\+N\+N\+O\+T\+\_\+\+C\+O\+M\+P\+A\+R\+E}}
+\index{N\+U\+M\+E\+R\+U\+S\+\_\+\+E\+R\+R\+O\+R\+\_\+\+C\+A\+N\+N\+O\+T\+\_\+\+C\+O\+M\+P\+A\+R\+E@{N\+U\+M\+E\+R\+U\+S\+\_\+\+E\+R\+R\+O\+R\+\_\+\+C\+A\+N\+N\+O\+T\+\_\+\+C\+O\+M\+P\+A\+R\+E}!numerus.\+h@{numerus.\+h}}
+\subsubsection[{N\+U\+M\+E\+R\+U\+S\+\_\+\+E\+R\+R\+O\+R\+\_\+\+C\+A\+N\+N\+O\+T\+\_\+\+C\+O\+M\+P\+A\+R\+E}]{\setlength{\rightskip}{0pt plus 5cm}\#define N\+U\+M\+E\+R\+U\+S\+\_\+\+E\+R\+R\+O\+R\+\_\+\+C\+A\+N\+N\+O\+T\+\_\+\+C\+O\+M\+P\+A\+R\+E~104;}\label{numerus_8h_aba121be2b89527f89b6b488596456b4c}
+
+
+\hyperlink{numerus_8h_ab812f63dd1634010d9687f2e822fbf6c}{numerus\+\_\+compare\+\_\+value()} comparision failed. 
+
+It could not compare the two roman numerals because at least one of them cannot be converted to short so it has no value. \hypertarget{numerus_8h_aa0542f6b1ca6aa921e1eaebbe82c18e4}{}\index{numerus.\+h@{numerus.\+h}!N\+U\+M\+E\+R\+U\+S\+\_\+\+E\+R\+R\+O\+R\+\_\+\+O\+U\+T\+\_\+\+O\+F\+\_\+\+R\+A\+N\+G\+E@{N\+U\+M\+E\+R\+U\+S\+\_\+\+E\+R\+R\+O\+R\+\_\+\+O\+U\+T\+\_\+\+O\+F\+\_\+\+R\+A\+N\+G\+E}}
+\index{N\+U\+M\+E\+R\+U\+S\+\_\+\+E\+R\+R\+O\+R\+\_\+\+O\+U\+T\+\_\+\+O\+F\+\_\+\+R\+A\+N\+G\+E@{N\+U\+M\+E\+R\+U\+S\+\_\+\+E\+R\+R\+O\+R\+\_\+\+O\+U\+T\+\_\+\+O\+F\+\_\+\+R\+A\+N\+G\+E}!numerus.\+h@{numerus.\+h}}
+\subsubsection[{N\+U\+M\+E\+R\+U\+S\+\_\+\+E\+R\+R\+O\+R\+\_\+\+O\+U\+T\+\_\+\+O\+F\+\_\+\+R\+A\+N\+G\+E}]{\setlength{\rightskip}{0pt plus 5cm}\#define N\+U\+M\+E\+R\+U\+S\+\_\+\+E\+R\+R\+O\+R\+\_\+\+O\+U\+T\+\_\+\+O\+F\+\_\+\+R\+A\+N\+G\+E~101;}\label{numerus_8h_aa0542f6b1ca6aa921e1eaebbe82c18e4}
+
+
+Integer out of conversion range. 
+
+\hyperlink{numerus_8h_a2de772c8d7bd71805a4a3b3d0f700523}{numerus\+\_\+short\+\_\+to\+\_\+roman()} cannot convert the passed value because it exceed the possible values a roman numeral may represent, which are the integers in the interval \mbox{[}N\+U\+M\+E\+R\+U\+S\+\_\+\+M\+I\+N\+\_\+\+V\+A\+L\+U\+E, N\+U\+M\+E\+R\+U\+S\+\_\+\+M\+A\+X\+\_\+\+V\+A\+L\+U\+E\mbox{]}. \hypertarget{numerus_8h_a301a012f6771b319efa6689e64c3e58b}{}\index{numerus.\+h@{numerus.\+h}!N\+U\+M\+E\+R\+U\+S\+\_\+\+E\+R\+R\+O\+R\+\_\+\+R\+E\+G\+E\+X\+E\+C@{N\+U\+M\+E\+R\+U\+S\+\_\+\+E\+R\+R\+O\+R\+\_\+\+R\+E\+G\+E\+X\+E\+C}}
+\index{N\+U\+M\+E\+R\+U\+S\+\_\+\+E\+R\+R\+O\+R\+\_\+\+R\+E\+G\+E\+X\+E\+C@{N\+U\+M\+E\+R\+U\+S\+\_\+\+E\+R\+R\+O\+R\+\_\+\+R\+E\+G\+E\+X\+E\+C}!numerus.\+h@{numerus.\+h}}
+\subsubsection[{N\+U\+M\+E\+R\+U\+S\+\_\+\+E\+R\+R\+O\+R\+\_\+\+R\+E\+G\+E\+X\+E\+C}]{\setlength{\rightskip}{0pt plus 5cm}\#define N\+U\+M\+E\+R\+U\+S\+\_\+\+E\+R\+R\+O\+R\+\_\+\+R\+E\+G\+E\+X\+E\+C~102;}\label{numerus_8h_a301a012f6771b319efa6689e64c3e58b}
+
+
+regexec() internal error. 
+
+Happens while checking the syntax correctness of a roman numeral to be converted to short by \hyperlink{numerus_8h_ae42f1118505de888adc965a6761e9013}{numerus\+\_\+roman\+\_\+to\+\_\+short()}. Check regerror() and the stderr for more information. \hypertarget{numerus_8h_ac9e9a2168a32145743b791cca51282a0}{}\index{numerus.\+h@{numerus.\+h}!N\+U\+M\+E\+R\+U\+S\+\_\+\+E\+R\+R\+O\+R\+\_\+\+S\+Q\+L\+I\+T\+E@{N\+U\+M\+E\+R\+U\+S\+\_\+\+E\+R\+R\+O\+R\+\_\+\+S\+Q\+L\+I\+T\+E}}
+\index{N\+U\+M\+E\+R\+U\+S\+\_\+\+E\+R\+R\+O\+R\+\_\+\+S\+Q\+L\+I\+T\+E@{N\+U\+M\+E\+R\+U\+S\+\_\+\+E\+R\+R\+O\+R\+\_\+\+S\+Q\+L\+I\+T\+E}!numerus.\+h@{numerus.\+h}}
+\subsubsection[{N\+U\+M\+E\+R\+U\+S\+\_\+\+E\+R\+R\+O\+R\+\_\+\+S\+Q\+L\+I\+T\+E}]{\setlength{\rightskip}{0pt plus 5cm}\#define N\+U\+M\+E\+R\+U\+S\+\_\+\+E\+R\+R\+O\+R\+\_\+\+S\+Q\+L\+I\+T\+E~103;}\label{numerus_8h_ac9e9a2168a32145743b791cca51282a0}
+
+
+An S\+Q\+Lite error happened. 
+
+Check the stderr for more information. \hypertarget{numerus_8h_ab8845c8c0e66d7d6b4d5770e02d9f24f}{}\index{numerus.\+h@{numerus.\+h}!N\+U\+M\+E\+R\+U\+S\+\_\+\+E\+R\+R\+O\+R\+\_\+\+W\+R\+O\+N\+G\+\_\+\+S\+Y\+N\+T\+A\+X@{N\+U\+M\+E\+R\+U\+S\+\_\+\+E\+R\+R\+O\+R\+\_\+\+W\+R\+O\+N\+G\+\_\+\+S\+Y\+N\+T\+A\+X}}
+\index{N\+U\+M\+E\+R\+U\+S\+\_\+\+E\+R\+R\+O\+R\+\_\+\+W\+R\+O\+N\+G\+\_\+\+S\+Y\+N\+T\+A\+X@{N\+U\+M\+E\+R\+U\+S\+\_\+\+E\+R\+R\+O\+R\+\_\+\+W\+R\+O\+N\+G\+\_\+\+S\+Y\+N\+T\+A\+X}!numerus.\+h@{numerus.\+h}}
+\subsubsection[{N\+U\+M\+E\+R\+U\+S\+\_\+\+E\+R\+R\+O\+R\+\_\+\+W\+R\+O\+N\+G\+\_\+\+S\+Y\+N\+T\+A\+X}]{\setlength{\rightskip}{0pt plus 5cm}\#define N\+U\+M\+E\+R\+U\+S\+\_\+\+E\+R\+R\+O\+R\+\_\+\+W\+R\+O\+N\+G\+\_\+\+S\+Y\+N\+T\+A\+X~100;}\label{numerus_8h_ab8845c8c0e66d7d6b4d5770e02d9f24f}
+
+
+Numeral is not a correct roman one. 
+
+Check the syntax of the roman numeral for non-\/roman characters, too many repetitions or wrong character order. \hypertarget{numerus_8h_a769074e765a25bd0e7d38c48e9adc739}{}\index{numerus.\+h@{numerus.\+h}!N\+U\+M\+E\+R\+U\+S\+\_\+\+O\+K@{N\+U\+M\+E\+R\+U\+S\+\_\+\+O\+K}}
+\index{N\+U\+M\+E\+R\+U\+S\+\_\+\+O\+K@{N\+U\+M\+E\+R\+U\+S\+\_\+\+O\+K}!numerus.\+h@{numerus.\+h}}
+\subsubsection[{N\+U\+M\+E\+R\+U\+S\+\_\+\+O\+K}]{\setlength{\rightskip}{0pt plus 5cm}\#define N\+U\+M\+E\+R\+U\+S\+\_\+\+O\+K~1000;}\label{numerus_8h_a769074e765a25bd0e7d38c48e9adc739}
+
+
+Everything went all right. 
+
+This is the opposite of R\+O\+M\+A\+N\+\_\+\+E\+R\+R\+O\+R. 
+
+\subsection{Function Documentation}
+\hypertarget{numerus_8h_a1985927a2efc30174ad115621a140fc9}{}\index{numerus.\+h@{numerus.\+h}!numerus\+\_\+allocate\+\_\+all\+\_\+romans@{numerus\+\_\+allocate\+\_\+all\+\_\+romans}}
+\index{numerus\+\_\+allocate\+\_\+all\+\_\+romans@{numerus\+\_\+allocate\+\_\+all\+\_\+romans}!numerus.\+h@{numerus.\+h}}
+\subsubsection[{numerus\+\_\+allocate\+\_\+all\+\_\+romans(short int include\+\_\+negatives)}]{\setlength{\rightskip}{0pt plus 5cm}char$\ast$$\ast$ numerus\+\_\+allocate\+\_\+all\+\_\+romans (
+\begin{DoxyParamCaption}
+\item[{short int}]{include\+\_\+negatives}
+\end{DoxyParamCaption}
+)}\label{numerus_8h_a1985927a2efc30174ad115621a140fc9}
+
+
+Allocates all roman numerals and their values in memory for fast conversions from value to roman numeral. 
+
+It creates an array of pointers to strings, char$\ast$. Each char$\ast$ points to the roman numeral with the same value as the index of the char$\ast$ in the array. The returned pointer to the array points to the value 0.
+
+Example structure\+:
+
+\begin{DoxyVerb}*  i  | p --> numeral
+* ----|---------------------
+* -1  | * --> "-I"
+*  0  | * --> "NULLA"
+*  1  | * --> "I"
+* \end{DoxyVerb}
+
+
+Example usage\+:
+
+
+\begin{DoxyCode}
+\textcolor{keywordtype}{char} **all\_romans = \hyperlink{numerus_8c_a1985927a2efc30174ad115621a140fc9}{numerus\_allocate\_all\_romans}(1);
+\textcolor{keywordtype}{char} *fortytwo = all\_romans[42];
+\end{DoxyCode}
+
+
+
+\begin{DoxyParams}{Parameters}
+{\em include\+\_\+negatives} & set it to 0 to create the array from 0 to N\+U\+M\+E\+R\+U\+S\+\_\+\+M\+A\+X\+\_\+\+V\+A\+L\+U\+E or to anything else to create it from N\+U\+M\+E\+R\+U\+S\+\_\+\+M\+I\+N\+\_\+\+V\+A\+L\+U\+E to N\+U\+M\+E\+R\+U\+S\+\_\+\+M\+A\+X\+\_\+\+V\+A\+L\+U\+E \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the address of the value 0 (which points to N\+U\+M\+E\+R\+U\+S\+\_\+\+Z\+E\+R\+O) in the array or N\+U\+L\+L if malloc() fails to allocate the array 
+\end{DoxyReturn}
+\hypertarget{numerus_8h_ab812f63dd1634010d9687f2e822fbf6c}{}\index{numerus.\+h@{numerus.\+h}!numerus\+\_\+compare\+\_\+value@{numerus\+\_\+compare\+\_\+value}}
+\index{numerus\+\_\+compare\+\_\+value@{numerus\+\_\+compare\+\_\+value}!numerus.\+h@{numerus.\+h}}
+\subsubsection[{numerus\+\_\+compare\+\_\+value(char $\ast$roman\+\_\+bigger, char $\ast$roman\+\_\+smaller)}]{\setlength{\rightskip}{0pt plus 5cm}int numerus\+\_\+compare\+\_\+value (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{roman\+\_\+bigger, }
+\item[{char $\ast$}]{roman\+\_\+smaller}
+\end{DoxyParamCaption}
+)}\label{numerus_8h_ab812f63dd1634010d9687f2e822fbf6c}
+
+
+Compares the value of two roman numerals, emulating the operator \textquotesingle{}$>$\textquotesingle{}. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em $\ast$roman\+\_\+bigger} & string with a roman numeral to compare with the second parameter \\
+\hline
+{\em $\ast$roman\+\_\+smaller} & string with a roman numeral to compare with the first parameter \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+1 if the first parameter is bigger, 0 if they are equal, -\/1 if the second is bigger. Returns N\+U\+M\+E\+R\+U\+S\+\_\+\+E\+R\+R\+O\+R\+\_\+\+C\+A\+N\+N\+O\+T\+\_\+\+C\+O\+M\+P\+A\+R\+E if at least one of the two numerals has wrong syntax and cannot be compared. 
+\end{DoxyReturn}
+\hypertarget{numerus_8h_a89c7a72e1b891a4f377c22061f2e0b4d}{}\index{numerus.\+h@{numerus.\+h}!numerus\+\_\+export\+\_\+all\+\_\+to\+\_\+sqlite3@{numerus\+\_\+export\+\_\+all\+\_\+to\+\_\+sqlite3}}
+\index{numerus\+\_\+export\+\_\+all\+\_\+to\+\_\+sqlite3@{numerus\+\_\+export\+\_\+all\+\_\+to\+\_\+sqlite3}!numerus.\+h@{numerus.\+h}}
+\subsubsection[{numerus\+\_\+export\+\_\+all\+\_\+to\+\_\+sqlite3(char $\ast$filename)}]{\setlength{\rightskip}{0pt plus 5cm}int numerus\+\_\+export\+\_\+all\+\_\+to\+\_\+sqlite3 (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{filename}
+\end{DoxyParamCaption}
+)}\label{numerus_8h_a89c7a72e1b891a4f377c22061f2e0b4d}
+
+
+Saves all roman numerals with their values to a S\+Q\+Lite3 file in a table called \char`\"{}roman\+\_\+numerals\char`\"{}. 
+
+The filename should be formatted as U\+R\+I, see some \href{https://www.sqlite.org/c3ref/open.html#urifilenameexamples}{\tt examples from the S\+Q\+Lite3 docs}. Errors are printed to stderr.
+
+
+\begin{DoxyParams}{Parameters}
+{\em filename} & string with the S\+Q\+Lite3 file name to store into formatted as U\+R\+I. If N\+U\+L\+L, the file is saved to a file in the current directory named \char`\"{}numerus.\+db\char`\"{} \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+response code as int\+: N\+U\+M\+E\+R\+U\+S\+\_\+\+O\+K if everything went O\+K, N\+U\+M\+E\+R\+U\+S\+\_\+\+E\+R\+R\+O\+R\+\_\+\+S\+Q\+L\+I\+T\+E if something went wrong. 
+\end{DoxyReturn}
+\hypertarget{numerus_8h_a98f1428149c99316e52f04ebbcca103f}{}\index{numerus.\+h@{numerus.\+h}!numerus\+\_\+is\+\_\+roman@{numerus\+\_\+is\+\_\+roman}}
+\index{numerus\+\_\+is\+\_\+roman@{numerus\+\_\+is\+\_\+roman}!numerus.\+h@{numerus.\+h}}
+\subsubsection[{numerus\+\_\+is\+\_\+roman(char $\ast$roman)}]{\setlength{\rightskip}{0pt plus 5cm}int numerus\+\_\+is\+\_\+roman (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{roman}
+\end{DoxyParamCaption}
+)}\label{numerus_8h_a98f1428149c99316e52f04ebbcca103f}
+
+
+Verifies if the passed string is a correct roman numeral. 
+
+Performs syntax check of the passed roman numeral by checking it against a regex compiled from N\+U\+M\+E\+R\+U\+S\+\_\+\+S\+Y\+N\+T\+A\+X\+\_\+\+R\+E\+G\+E\+X\+\_\+\+S\+T\+R\+I\+N\+G. It is case insensitive. The compilation is once for all subsequent calls of the function during runtime. The regex compilation status is dropped since N\+U\+M\+E\+R\+U\+S\+\_\+\+S\+Y\+N\+T\+A\+X\+\_\+\+R\+E\+G\+E\+X\+\_\+\+S\+T\+R\+I\+N\+G is a correct hard coded constant.
+
+
+\begin{DoxyParams}{Parameters}
+{\em $\ast$roman} & string containing a roman numeral to check \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+int 1 if has correct roman syntax, 0 if it does not and in case of regex errors. 
+\end{DoxyReturn}
+Flags in regcomp()\+:
+\begin{DoxyItemize}
+\item R\+E\+G\+\_\+\+N\+O\+S\+U\+B\+: does not save subexpressions (groups), only reports the success or failure of compiling the regex
+\item R\+E\+G\+\_\+\+I\+C\+A\+S\+E\+: ignores the case, making the regex case insensitive
+\item R\+E\+G\+\_\+\+E\+X\+T\+E\+N\+D\+E\+D\+: uses the extended P\+O\+S\+I\+X standard regular expressions, which are required for the regex structure
+\end{DoxyItemize}\hypertarget{numerus_8h_aa5b273274535ecddcd76a6014c34e0b5}{}\index{numerus.\+h@{numerus.\+h}!numerus\+\_\+roman\+\_\+is\+\_\+zero@{numerus\+\_\+roman\+\_\+is\+\_\+zero}}
+\index{numerus\+\_\+roman\+\_\+is\+\_\+zero@{numerus\+\_\+roman\+\_\+is\+\_\+zero}!numerus.\+h@{numerus.\+h}}
+\subsubsection[{numerus\+\_\+roman\+\_\+is\+\_\+zero(char $\ast$roman)}]{\setlength{\rightskip}{0pt plus 5cm}int numerus\+\_\+roman\+\_\+is\+\_\+zero (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{roman}
+\end{DoxyParamCaption}
+)}\label{numerus_8h_aa5b273274535ecddcd76a6014c34e0b5}
+
+
+Verifies if the passed roman numeral is (-\/)N\+U\+M\+E\+R\+U\+S\+\_\+\+Z\+E\+R\+O, case insensitive. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em $\ast$roman} & string containing a numeral to check if it is N\+U\+M\+E\+R\+U\+S\+\_\+\+Z\+E\+R\+O. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+int 1 if the string is (-\/)N\+U\+M\+E\+R\+U\+S\+\_\+\+Z\+E\+R\+O or 0 if it\textquotesingle{}s not. 
+\end{DoxyReturn}
+\hypertarget{numerus_8h_ae42f1118505de888adc965a6761e9013}{}\index{numerus.\+h@{numerus.\+h}!numerus\+\_\+roman\+\_\+to\+\_\+short@{numerus\+\_\+roman\+\_\+to\+\_\+short}}
+\index{numerus\+\_\+roman\+\_\+to\+\_\+short@{numerus\+\_\+roman\+\_\+to\+\_\+short}!numerus.\+h@{numerus.\+h}}
+\subsubsection[{numerus\+\_\+roman\+\_\+to\+\_\+short(char $\ast$roman)}]{\setlength{\rightskip}{0pt plus 5cm}short numerus\+\_\+roman\+\_\+to\+\_\+short (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{roman}
+\end{DoxyParamCaption}
+)}\label{numerus_8h_ae42f1118505de888adc965a6761e9013}
+
+
+Converts a roman numeral to a short int. 
+
+It is case insensitive and accepts negative roman numerals. If the numeral cannot be converted, it means it has wrong syntax. In that case a value bigger than N\+U\+M\+E\+R\+U\+S\+\_\+\+M\+A\+X\+\_\+\+V\+A\+L\+U\+E is returned and the error code N\+U\+M\+E\+R\+U\+S\+\_\+\+E\+R\+R\+O\+R\+\_\+\+W\+R\+O\+N\+G\+\_\+\+S\+Y\+N\+T\+A\+X is stored in numerus\+\_\+error\+\_\+code.
+
+
+\begin{DoxyParams}{Parameters}
+{\em $\ast$roman} & string with a roman numeral \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+short value of the roman numeral or a value bigger than N\+U\+M\+E\+R\+U\+S\+\_\+\+M\+A\+X\+\_\+\+V\+A\+L\+U\+E in case of error 
+\end{DoxyReturn}
+\hypertarget{numerus_8h_a2de772c8d7bd71805a4a3b3d0f700523}{}\index{numerus.\+h@{numerus.\+h}!numerus\+\_\+short\+\_\+to\+\_\+roman@{numerus\+\_\+short\+\_\+to\+\_\+roman}}
+\index{numerus\+\_\+short\+\_\+to\+\_\+roman@{numerus\+\_\+short\+\_\+to\+\_\+roman}!numerus.\+h@{numerus.\+h}}
+\subsubsection[{numerus\+\_\+short\+\_\+to\+\_\+roman(short int arabic)}]{\setlength{\rightskip}{0pt plus 5cm}char$\ast$ numerus\+\_\+short\+\_\+to\+\_\+roman (
+\begin{DoxyParamCaption}
+\item[{short int}]{arabic}
+\end{DoxyParamCaption}
+)}\label{numerus_8h_a2de772c8d7bd71805a4a3b3d0f700523}
+
+
+Converts a short int to a roman numeral. 
+
+It allocates a string with the roman numerals long just as required and returns a pointer to it. If the short is outside of \mbox{[}N\+U\+M\+E\+R\+U\+S\+\_\+\+M\+I\+N\+\_\+\+V\+A\+L\+U\+E, N\+U\+M\+E\+R\+U\+S\+\_\+\+M\+A\+X\+\_\+\+V\+A\+L\+U\+E\mbox{]}, the conversion is impossible.
+
+\begin{DoxyReturn}{Returns}
+pointer to a string containing the roman numeral, N\+U\+L\+L if the short is out of range. 
+\end{DoxyReturn}
+
+
+\subsection{Variable Documentation}
+\hypertarget{numerus_8h_a2ab1a73c274208f6319bdcdabb1a72d8}{}\index{numerus.\+h@{numerus.\+h}!numerus\+\_\+error\+\_\+code@{numerus\+\_\+error\+\_\+code}}
+\index{numerus\+\_\+error\+\_\+code@{numerus\+\_\+error\+\_\+code}!numerus.\+h@{numerus.\+h}}
+\subsubsection[{numerus\+\_\+error\+\_\+code}]{\setlength{\rightskip}{0pt plus 5cm}short int numerus\+\_\+error\+\_\+code}\label{numerus_8h_a2ab1a73c274208f6319bdcdabb1a72d8}
+
+
+Global error code variable to store any errors during conversions. 
+
+It may contain any of the R\+O\+M\+A\+N\+\_\+\+E\+R\+R\+O\+R\+\_\+$\ast$ error codes or N\+U\+M\+E\+R\+U\+S\+\_\+\+O\+K. \hypertarget{numerus_8h_afd549ff8beb744d0518d80cd134ac2b4}{}\index{numerus.\+h@{numerus.\+h}!N\+U\+M\+E\+R\+U\+S\+\_\+\+M\+A\+X\+\_\+\+L\+E\+N\+G\+T\+H@{N\+U\+M\+E\+R\+U\+S\+\_\+\+M\+A\+X\+\_\+\+L\+E\+N\+G\+T\+H}}
+\index{N\+U\+M\+E\+R\+U\+S\+\_\+\+M\+A\+X\+\_\+\+L\+E\+N\+G\+T\+H@{N\+U\+M\+E\+R\+U\+S\+\_\+\+M\+A\+X\+\_\+\+L\+E\+N\+G\+T\+H}!numerus.\+h@{numerus.\+h}}
+\subsubsection[{N\+U\+M\+E\+R\+U\+S\+\_\+\+M\+A\+X\+\_\+\+L\+E\+N\+G\+T\+H}]{\setlength{\rightskip}{0pt plus 5cm}const short int N\+U\+M\+E\+R\+U\+S\+\_\+\+M\+A\+X\+\_\+\+L\+E\+N\+G\+T\+H}\label{numerus_8h_afd549ff8beb744d0518d80cd134ac2b4}
+
+
+Maximum length of a roman numeral string including the null terminator. 
+
+The roman numeral {\ttfamily \char`\"{}-\/\+M\+M\+M\+D\+C\+C\+C\+L\+X\+X\+X\+V\+I\+I\+I\char`\"{}} (value\+: -\/3888) + {\ttfamily \textbackslash{}0} is a string long 16+1 = 17 chars. 

@@ -1,0 +1,10 @@
+var searchData=
+[
+  ['numerus_5fallocate_5fall_5fromans',['numerus_allocate_all_romans',['../numerus_8c.html#a1985927a2efc30174ad115621a140fc9',1,'numerus_allocate_all_romans(short int include_negatives):&#160;numerus.c'],['../numerus_8h.html#a1985927a2efc30174ad115621a140fc9',1,'numerus_allocate_all_romans(short int include_negatives):&#160;numerus.c']]],
+  ['numerus_5fcompare_5fvalue',['numerus_compare_value',['../numerus_8c.html#ab812f63dd1634010d9687f2e822fbf6c',1,'numerus_compare_value(char *roman_bigger, char *roman_smaller):&#160;numerus.c'],['../numerus_8h.html#ab812f63dd1634010d9687f2e822fbf6c',1,'numerus_compare_value(char *roman_bigger, char *roman_smaller):&#160;numerus.c']]],
+  ['numerus_5fexport_5fall_5fto_5fsqlite3',['numerus_export_all_to_sqlite3',['../numerus_8c.html#a89c7a72e1b891a4f377c22061f2e0b4d',1,'numerus_export_all_to_sqlite3(char *filename):&#160;numerus.c'],['../numerus_8h.html#a89c7a72e1b891a4f377c22061f2e0b4d',1,'numerus_export_all_to_sqlite3(char *filename):&#160;numerus.c']]],
+  ['numerus_5fis_5froman',['numerus_is_roman',['../numerus_8c.html#a98f1428149c99316e52f04ebbcca103f',1,'numerus_is_roman(char *roman):&#160;numerus.c'],['../numerus_8h.html#a98f1428149c99316e52f04ebbcca103f',1,'numerus_is_roman(char *roman):&#160;numerus.c']]],
+  ['numerus_5froman_5fis_5fzero',['numerus_roman_is_zero',['../numerus_8c.html#aa5b273274535ecddcd76a6014c34e0b5',1,'numerus_roman_is_zero(char *roman):&#160;numerus.c'],['../numerus_8h.html#aa5b273274535ecddcd76a6014c34e0b5',1,'numerus_roman_is_zero(char *roman):&#160;numerus.c']]],
+  ['numerus_5froman_5fto_5fshort',['numerus_roman_to_short',['../numerus_8c.html#a01b5007101b70c5b7258bce12298a0cd',1,'numerus_roman_to_short(char *roman):&#160;numerus.c'],['../numerus_8h.html#ae42f1118505de888adc965a6761e9013',1,'numerus_roman_to_short(char *roman):&#160;numerus.c']]],
+  ['numerus_5fshort_5fto_5froman',['numerus_short_to_roman',['../numerus_8c.html#a2de772c8d7bd71805a4a3b3d0f700523',1,'numerus_short_to_roman(short int arabic):&#160;numerus.c'],['../numerus_8h.html#a2de772c8d7bd71805a4a3b3d0f700523',1,'numerus_short_to_roman(short int arabic):&#160;numerus.c']]]
+];

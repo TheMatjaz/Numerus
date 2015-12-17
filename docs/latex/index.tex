@@ -1,0 +1,31 @@
+ Numerus is an open-\/source C library that allows conversion and manipulation of roman numerals.
+
+\subsection*{Usage }
+
+The real core of Numerus are two functions\+:
+
+
+\begin{DoxyItemize}
+\item {\ttfamily numerus\+\_\+short\+\_\+to\+\_\+roman(char $\ast$roman)} to convert a roman numeral (a string) to an integer with the value of the roman numeral
+\item {\ttfamily numerus\+\_\+roman\+\_\+to\+\_\+short(short arabic)} to convert an arabic integer to a roman numeral
+\end{DoxyItemize}
+
+All Numerus functions and variables start with the {\ttfamily numerus\+\_\+} prefix, while the constants have {\ttfamily N\+U\+M\+E\+R\+U\+S\+\_\+} to be easily identifiable (thanks to the S\+Q\+Lite3 C A\+P\+I for the idea), while the static functions and variables meant just for internal operations in the library are prefixed {\ttfamily \+\_\+num}.
+
+\subsection*{License }
+
+Numerus is released under the \hyperlink{md__l_i_c_e_n_s_e}{B\+S\+D 3-\/clause license}.
+
+\subsection*{Credits }
+
+Matjaž Guštin \href{mailto:dev@matjaz.it}{\tt dev@matjaz.\+it} \href{http://matjaz.it}{\tt matjaz.\+it}
+
+Numerus is a port of my (not-\/really-\/finished but functioning) project with the same name in Java. The goal of the project is mainly learning good programming, source control, clean code, optimizations and documentation. For any suggestions please contact me.
+
+The inspirations for the conversion functions were\+:
+
+
+\begin{DoxyItemize}
+\item \href{http://stackoverflow.com/a/26723344/5292928}{\tt http\+://stackoverflow.\+com/a/26723344/5292928}
+\item \href{http://stackoverflow.com/a/30816418/5292928}{\tt http\+://stackoverflow.\+com/a/30816418/5292928} 
+\end{DoxyItemize}
