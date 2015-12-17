@@ -6,6 +6,9 @@ roman numerals.
 Usage
 -----
 
+Everything is explained in the
+[documentation](http://thematjaz.github.io/Numerus/), check it out!
+
 The real core of Numerus are two functions:
  
  - `numerus_short_to_roman(char *roman)` to convert a roman numeral (a string)
@@ -29,10 +32,10 @@ Credits
 
 Matjaž Guštin <dev@matjaz.it> [matjaz.it](http://matjaz.it)
 
-Numerus is a port of my (not-really-finished but functioning) project with the
-same name in Java. The goal of the project is mainly learning good programming,
-source control, clean code, optimizations and documentation. For any suggestions
-please contact me.
+Numerus is a port of my (not-really-finished but functioning) project
+[with the same name](https://github.com/TheMatjaz/jNumerus) in Java. The goal of
+the project is mainly learning good programming, source control, clean code,
+optimizations and documentation. For any suggestions please contact me.
 
 The inspirations for the conversion functions were:
 
