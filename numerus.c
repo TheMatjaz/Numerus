@@ -232,7 +232,7 @@ int is_roman(char *roman) {
 /**
  * Checks if two strings match in the the next 1 or 2 characters.
  *
- * This functions is used by roman_to_short() and is missing many security check since is internal and is meant to be called on ROMAN_CHARS.
+ * It is case insensitive. This functions is used by roman_to_short() and is missing many security check since is internal and is meant to be called on ROMAN_CHARS.
  *
  * @param *to_compare the current position in the string to check against the pattern
  * @param *pattern the position in the string containing the 1 or 2 characters that may be in *to_compare
@@ -241,8 +241,8 @@ int is_roman(char *roman) {
  */
 static short int begins_with(char *to_compare, const char *pattern) {
     size_t pattern_length = strlen(pattern);
-    if (strncmp(to_compare, pattern, pattern_length) == 0) {
-        /* compare the first pattern_length characters */
+    if (strncasecmp(to_compare, pattern, pattern_length) == 0) {
+        /* Compare the first pattern_length characters */
         return (short) pattern_length;
     } else {
         return 0;
