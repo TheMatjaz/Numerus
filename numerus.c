@@ -75,31 +75,6 @@ static char roman_numeral_build_buffer[ROMAN_MAX_LENGTH];
  * @returns int 1 if has correct roman syntax, 0 if it does not and -1 in case
  * of regex errors.
  */
-int is_roman(char *roman) {
-    /* Compile the regex if it has not been done yet */
-    if (ROMAN_SYNTAX_REGEX.re_magic == 0) {
-        /**
-         * Flags in regcomp():
-         * - REG_NOSUB:    does not save subexpressions (groups), only
-         *                 reports the success or failure of compiling the regex
-         * - REG_ICASE:    ignores the case, making the regex case insensitive
-         * - REG_EXTENDED: uses the extended POSIX standard regular expressions,
-         *                 which are required for the regex structure
-         */
-        regcomp(&ROMAN_SYNTAX_REGEX, ROMAN_SYNTAX_REGEX_STRING,
-                REG_NOSUB | REG_ICASE | REG_EXTENDED);
-    }
-    int match_result = regexec(&ROMAN_SYNTAX_REGEX, roman, 0, NULL, 0);
-    if (match_result == 0) { /* Matches regex */
-        return 1;
-    } else if (match_result == REG_NOMATCH) { /* Does not match regex */
-        return 0;
-    } else { /* Other errors */
-        char msgbuf[100];
-        regerror(match_result, &ROMAN_SYNTAX_REGEX, msgbuf, sizeof(msgbuf));
-        return -1;
-    }
-}
 
 
 /**
@@ -219,6 +194,46 @@ char *int_to_roman(short int arabic) {
     return returnable_roman_string;
 }
 
+/**
+ * Verifies if the passed string is a correct roman numeral.
+ *
+ * Performs syntax check of the passed roman numeral by checking it against a
+ * regex compiled from
+ * ROMAN_SYNTAX_REGEX_STRING. It is case insensitive. The compilation is once
+ * for all subsequent calls of the function during runtime. The regex
+ * compilation status is dropped since ROMAN_SYNTAX_REGEX_STRING is a correct
+ * hard coded constant.
+ *
+ * @param *roman string containing a roman numeral to check
+ * @returns int 1 if has correct roman syntax, 0 if it does not and  in case
+ * of regex errors.
+ */
+int is_roman(char *roman) {
+    /* Compile the regex if it has not been done yet */
+    if (ROMAN_SYNTAX_REGEX.re_magic == 0) {
+        /**
+         * Flags in regcomp():
+         * - REG_NOSUB:    does not save subexpressions (groups), only
+         *                 reports the success or failure of compiling the regex
+         * - REG_ICASE:    ignores the case, making the regex case insensitive
+         * - REG_EXTENDED: uses the extended POSIX standard regular expressions,
+         *                 which are required for the regex structure
+         */
+        regcomp(&ROMAN_SYNTAX_REGEX, ROMAN_SYNTAX_REGEX_STRING,
+                REG_NOSUB | REG_ICASE | REG_EXTENDED);
+    }
+    int match_result = regexec(&ROMAN_SYNTAX_REGEX, roman, 0, NULL, 0);
+    if (match_result == 0) { /* Matches regex */
+        return 1;
+    } else if (match_result == REG_NOMATCH) { /* Does not match regex */
+        return 0;
+    } else { /* Other errors */
+        char msgbuf[100];
+        regerror(match_result, &ROMAN_SYNTAX_REGEX, msgbuf, sizeof(msgbuf));
+        fprintf(stderr, "Roman syntax regex matching internal error.");
+        return ROMAN_ERROR_REGEXEC;
+    }
+}
 
 /**
  * Checks if two strings match in the the next 1 or 2 characters.
