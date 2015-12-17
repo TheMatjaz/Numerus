@@ -13,6 +13,7 @@
 #include <string.h>   /* For `strcmp()` */
 #include <regex.h>    /* To use regexes to match correct roman numeral syntax */
 #include <sqlite3.h>  /* To export all roman numerals to an SQLite3 file */
+#include <stdbool.h>  /* To use booleans `true` and `false` */
 #include "numerus.h"
 
 
@@ -114,9 +115,9 @@ int roman_is_zero(char *roman) {
         roman++;
     }
     if (strcasecmp(roman, ROMAN_ZERO) != 0) {
-        return 0;
+        return false;
     } else {
-        return 1;
+        return true;
     };
 }
 
@@ -218,9 +219,9 @@ int is_roman(char *roman) {
     }
     int match_result = regexec(&ROMAN_SYNTAX_REGEX, roman, 0, NULL, 0);
     if (match_result == 0) { /* Matches regex */
-        return 1;
+        return true;
     } else if (match_result == REG_NOMATCH) { /* Does not match regex */
-        return 0;
+        return false;
     } else { /* Other errors */
         char msgbuf[100];
         regerror(match_result, &ROMAN_SYNTAX_REGEX, msgbuf, sizeof(msgbuf));
