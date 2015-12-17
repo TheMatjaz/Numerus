@@ -366,55 +366,66 @@ int roman_is_bigger(char *roman_bigger, char *roman_smaller) {
     }
 }
 
-int save_to_sqlite3() {
-    sqlite3 *db;
-    char *err_msg = 0;
+/**
+ * Saves all roman numerals with their values to a SQLite3 file in a table called "roman_numerals".
+ *
+ * The filename should be formatted as URI, see some [examples from the SQLite3 docs](https://www.sqlite.org/c3ref/open.html#urifilenameexamples). Errors are printed to stderr.
+ *
+ * @param filename string with the SQLite3 file name to store into formatted as URI. If NULL, the file is saved to a file in the current directory named "numerus.db"
+ * @returns response code as int: ROMAN_OK if everything went OK, ROMAN_ERROR_SQLITE if something went wrong.
+ */
+int save_to_sqlite3(char *filename) {
+    if (filename == NULL) {
+        filename = "file:numerus.db";
+    }
+    sqlite3 *db_connection;
+    char *sqlite_error_msg = 0;
 
-    int rc = sqlite3_open_v2("file:numerus.db", &db, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, NULL); /* Open in RW mode and create if not exists */
-
-    if (rc != SQLITE_OK) {
-
-        fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db));
-        sqlite3_close(db);
-
-        return 1;
+    /* Open the database in read-write mode, create it if not exists yet */
+    int sqlite3_resp_code = sqlite3_open_v2(filename, &db_connection,
+                             SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE,
+                                            NULL);
+    if (sqlite3_resp_code != SQLITE_OK) {
+        fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(
+                db_connection));
+        sqlite3_close(db_connection);
+        return ROMAN_ERROR_SQLITE;
     }
 
+    /* Create table query */
     char *query = "DROP TABLE IF EXISTS roman_numerals; "
-                  "CREATE TABLE roman_numerals (value INT, numeral TEXT);";
-    rc = sqlite3_exec(db, query, 0, 0, &err_msg);
-    if (rc != SQLITE_OK ) {
-
-        fprintf(stderr, "SQL error: %s\n", err_msg);
-
-        sqlite3_free(err_msg);
+                  "CREATE TABLE roman_numerals ("
+                      "value INT PRIMARY KEY,"
+                      "numeral TEXT"
+                  ");";
+    sqlite3_resp_code = sqlite3_exec(db_connection, query, 0, 0, &sqlite_error_msg);
+    if (sqlite3_resp_code != SQLITE_OK) {
+        fprintf(stderr, "SQL error: %s\n", sqlite_error_msg);
+        sqlite3_free(sqlite_error_msg);
         sqlite3_free(query);
-        sqlite3_close(db);
-
-        return 1;
+        sqlite3_close(db_connection);
+        return ROMAN_ERROR_SQLITE;
     }
-    //sqlite3_free(query);
 
+    /* Insert all roman numerals */
     short i;
     for (i = ROMAN_MIN_VALUE; i <= ROMAN_MAX_VALUE; i++) {
         query = sqlite3_mprintf(
-                "INSERT INTO roman_numerals VALUES (%d, '%q');", i, int_to_roman(i));
-
-        rc = sqlite3_exec(db, query, 0, 0, &err_msg);
-        if (rc != SQLITE_OK ) {
-
-            fprintf(stderr, "SQL error: %s\n", err_msg);
-
-            sqlite3_free(err_msg);
+                "INSERT INTO roman_numerals VALUES (%d, '%q');", i,
+                short_to_roman(i));
+        sqlite3_resp_code = sqlite3_exec(db_connection, query, 0, 0, &sqlite_error_msg);
+        if (sqlite3_resp_code != SQLITE_OK) {
+            fprintf(stderr, "SQL error: %s\n", sqlite_error_msg);
+            sqlite3_free(sqlite_error_msg);
             sqlite3_free(query);
-            sqlite3_close(db);
-
-            return 1;
+            sqlite3_close(db_connection);
+            return ROMAN_ERROR_SQLITE;
         }
     }
 
-    sqlite3_free(err_msg);
+    /* Cleanup and return */
+    sqlite3_free(sqlite_error_msg);
     sqlite3_free(query);
-    sqlite3_close(db);
-    return 0;
+    sqlite3_close(db_connection);
+    return ROMAN_OK;
 }
