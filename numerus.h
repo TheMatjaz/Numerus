@@ -34,12 +34,17 @@
  */
 #define ROMAN_ERROR_CANNOT_COMPARE 104;
 
+extern const short int ROMAN_MAX_VALUE;
+extern const short int ROMAN_MIN_VALUE;
+extern const char *ROMAN_ZERO;
+extern const short int ROMAN_MAX_LENGTH;
 extern const char *ROMAN_SYNTAX_REGEX_STRING;
+extern short int roman_error_code;
 
 int is_roman(char *roman);
-int roman_is_nulla(char *roman);
+int roman_is_zero(char *roman);
 char *short_to_roman(short int arabic);
 short roman_to_short(char *roman);
 int roman_is_bigger(char *roman_bigger, char *roman_smaller);
 char** allocate_all_romans(short int include_negatives);
-int save_to_sqlite3();
+int save_to_sqlite3(char *filename);
