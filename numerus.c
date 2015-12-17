@@ -27,7 +27,7 @@ const short int ROMAN_MIN_VALUE = -3999;
 /**
  * Roman numeral of value 0 (zero).
  */
-const char *NULLA = "NULLA";
+const char *ROMAN_ZERO = "NULLA";
 
 /**
  * Maximum length of a roman numeral string including the null terminator.
@@ -166,15 +166,16 @@ static int roman_numeral_length(char *roman) {
 }
 
 /**
- * Calls strcmp to check if the roman number is NULLA or -NULLA (case INsensitive).
+ * Verifies if the passed roman numeral is (-)ROMAN_ZERO, case insensitive.
  *
- * Returns 1 if the string is (-)NULLA or 0 if it's not.
+ * @param *roman string containing a numeral to chech if it is ROMAN_ZERO.
+ * @returns int 1 if the string is (-)ROMAN_ZERO or 0 if it's not.
  */
-int roman_is_nulla(char *roman) {
+int roman_is_zero(char *roman) {
     if (*roman == '-') {
         roman++;
     }
-    if (strcasecmp(roman, NULLA) != 0) {
+    if (strcasecmp(roman, ROMAN_ZERO) != 0) {
         return 0;
     } else {
         return 1;
@@ -214,12 +215,12 @@ char* int_to_roman(int arabic) {
     /* Create pointer to buffer */
     char *roman_string = &roman_numeral_build_buffer[0];
 
-    /* Save sign or return NULLA for 0 */
+    /* Save sign or return ROMAN_ZERO for 0 */
     if (arabic < 0) {
         arabic *= -1;
         *(roman_string++) = '-';
     } else if (arabic == 0) {
-        return NULLA; /* TODO: Probably should return a copy of it? */
+        return ROMAN_ZERO; /* TODO: Probably should return a copy of it? */
     }
 
     /* Actual conversion */
