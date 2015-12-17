@@ -78,7 +78,7 @@ short int roman_error_code = ROMAN_OK;
  * functions. The "roman chars" as called in this library are strings of 1 or 2
  * chars that have a specific a priori known value.
  */
-static struct roman_char_struct {
+struct roman_char_struct {
     const short int value;
     const char chars[3]; /* 1-2 chars + \0 = length 3 */
 };
@@ -167,7 +167,10 @@ char *short_to_roman(short int arabic) {
         arabic *= -1;
         *(roman_string++) = '-';
     } else if (arabic == 0) {
-        return ROMAN_ZERO; /* TODO: Probably should return a copy of it? */
+        /* Return writable copy of ROMAN_ZERO */
+        char *zero_string = malloc(strlen(ROMAN_ZERO) + 1);
+        strcpy(zero_string, ROMAN_ZERO);
+        return zero_string;
     }
 
     /* Actual conversion comparing appending chars from ROMAN_CHARS */
