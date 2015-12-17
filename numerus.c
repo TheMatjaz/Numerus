@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief Numerus core function for roman numerals conversion.
+ * @brief Numerus constants and functions for roman numerals conversion and manipulation.
  *
  * Inspired by:
  * 
@@ -8,11 +8,11 @@
  * - http://stackoverflow.com/a/30816418/5292928
  */
 
-#include <stdio.h>  /* To `fprintf()` to `stderr` */
-#include <stdlib.h> /* For `malloc()` */
-#include <string.h> /* For `strcmp()` in `roman_is_nulla()` */
-#include <regex.h>  /* To use regexes to match correct roman numeral syntax */
-#include <sqlite3.h> /* To save all roman integers to a sqlite3 file */
+#include <stdio.h>    /* To `fprintf()` to `stderr` */
+#include <stdlib.h>   /* For `malloc()` */
+#include <string.h>   /* For `strcmp()` */
+#include <regex.h>    /* To use regexes to match correct roman numeral syntax */
+#include <sqlite3.h>  /* To export all roman numerals to an SQLite3 file */
 
 /**
  * Maximum value as int a roman numeral may have.
