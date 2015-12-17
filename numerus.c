@@ -1,6 +1,11 @@
 /**
- * @file
- * @brief Numerus constants and functions for roman numerals conversion and manipulation.
+ * @file numerus.c
+ * @brief Numerus constants and functions for roman numerals conversion and 
+ * manipulation.
+ * @copyright Copyright © 2015, Matjaž Guštin <dev@matjaz.it> 
+ * <http://matjaz.it>. All rights reserved.
+ * @license This file is part of the Numerus project which is released under 
+ * the BSD 3-clause license.
  *
  * Inspired by:
  * 
