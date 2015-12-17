@@ -8,17 +8,20 @@ Usage
 
 The real core of Numerus are two functions:
  
- - `short_to_roman(char *roman)` to convert a roman numeral (a string)
+ - `numerus_short_to_roman(char *roman)` to convert a roman numeral (a string)
    to an integer with the value of the roman numeral
- - `roman_to_short(short arabic)` to convert an arabic integer to a roman numeral
+ - `numerus_roman_to_short(short arabic)` to convert an arabic integer to a roman numeral
  
-Check the [documentation](docs/html/index.html) for more information.
+All Numerus functions and variables start with the `numerus_` prefix, while the 
+constants have `NUMERUS_` to be easily identifiable (thanks to the SQLite3 C 
+API for the idea), while the static functions and variables meant just for 
+internal operations in the library are prefixed `_num`.
 
 
 License
 -------
 
-Numerus is released under the BSD 3-clause license.
+Numerus is released under the [BSD 3-clause license](LICENSE.md).
 
 
 Credits
