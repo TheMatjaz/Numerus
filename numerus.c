@@ -41,7 +41,7 @@ const short int ROMAN_MAX_LENGTH = 17;
  * String containing a to-be-compiled regex matching any syntactiacally correct
  * roman numeral.
  */
-const char *ROMAN_SYNTAX_REGEX_STRING = "^-?((M{0,3})(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3}))$";
+const char *ROMAN_SYNTAX_REGEX_STRING = "^-?M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$";
 
 /**
  * Compiled regex matching any syntactically correct roman numeral.
