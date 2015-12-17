@@ -181,8 +181,9 @@ static char *copy_roman_char_from_dictionary(char *source, char *destination) {
  */
 char* int_to_roman(int arabic) {
     /* Out of range check */
-    if (arabic < -3999 || arabic > 3999) {
-        fprintf(stderr, "Roman conversion error: arabic %d out of range.\n", arabic);
+    if (arabic < ROMAN_MIN_VALUE || arabic > ROMAN_MAX_VALUE) {
+        fprintf(stderr, "Roman conversion error: short int %d out of range [%d, %d]\n",
+                arabic, ROMAN_MIN_VALUE, ROMAN_MAX_VALUE);
         return NULL;
     }
 
