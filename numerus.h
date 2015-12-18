@@ -28,7 +28,7 @@
  *
  * numerus_short_to_roman() cannot convert the passed value because it exceed the
  * possible values a roman numeral may represent, which are the integers in the
- * interval [NUMERUS_MIN_VALUE, NUMERUS_MAX_VALUE].
+ * interval [NUMERUS_MIN_LONG_VALUE, NUMERUS_MAX_LONG_VALUE].
  */
 #define NUMERUS_ERROR_OUT_OF_RANGE 101;
 
@@ -62,17 +62,18 @@
  */
 #define NUMERUS_ERROR_ALLOCATE_ALL 105;
 
-extern const short int NUMERUS_MAX_VALUE;
-extern const short int NUMERUS_MIN_VALUE;
+extern const long int NUMERUS_MAX_LONG_VALUE;
+extern const long int NUMERUS_MIN_LONG_VALUE;
 extern const char *NUMERUS_ZERO;
-extern const short int NUMERUS_MAX_LENGTH;
-extern const char *NUMERUS_SYNTAX_REGEX_STRING;
+extern const short int NUMERUS_MAX_LONG_LENGTH;
+extern const char *NUMERUS_LONG_SYNTAX_REGEX_STRING;
 extern short int numerus_error_code;
 
-int numerus_is_roman(char *roman);
+int numerus_is_roman(char *roman, int is_short_numeral);
 int numerus_roman_is_zero(char *roman);
-char *numerus_short_to_roman(short int arabic);
-short numerus_roman_to_short(char *roman);
+char *numerus_long_to_roman(long int arabic);
+long numerus_roman_to_long(char *roman);
 int numerus_compare_value(char *roman_bigger, char *roman_smaller);
 char **numerus_allocate_all_romans(short int include_negatives);
 int numerus_export_all_to_sqlite3(char *filename);
+int numerus_export_all_to_csv(char *filename);

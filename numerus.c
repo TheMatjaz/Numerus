@@ -23,14 +23,24 @@
 
 
 /**
- * Maximum value as short a roman numeral may have.
+ * Maximum value a long roman numeral (with '_') may have.
  */
-const short int NUMERUS_MAX_VALUE = 3999;
+const long int NUMERUS_MAX_LONG_VALUE = 3999999;
 
 /**
- * Minimum value as short a roman numeral may have.
+ * Minimum value a long a roman numeral (with '_') may have.
  */
-const short int NUMERUS_MIN_VALUE = -3999;
+const long int NUMERUS_MIN_LONG_VALUE = -3999999;
+
+/**
+ * Maximum value a short roman numeral (without '_') may have.
+ */
+const short int NUMERUS_MAX_SHORT_VALUE = 3999;
+
+/**
+ * Minimum value a short roman numeral (without '_') may have.
+ */
+const short int NUMERUS_MIN_SHORT_VALUE = -3999;
 
 /**
  * Roman numeral of value 0 (zero).
@@ -38,26 +48,55 @@ const short int NUMERUS_MIN_VALUE = -3999;
 const char *NUMERUS_ZERO = "NULLA";
 
 /**
- * Maximum length of a roman numeral string including the null terminator.
+ * Maximum length of a long roman numeral string including the null terminator.
  *
- * The roman numeral `"-MMMDCCCLXXXVIII"` (value: -3888) + `\0` is a string long
- * 16+1 = 17 chars.
+ * The roman numeral `"-_MMMDCCCLXXXVIII_DCCCLXXXVIII"` (value: -3888888) + `\0`
+ * is a string long 30+1 = 31 chars.
  */
-const short int NUMERUS_MAX_LENGTH = 17;
+const short int NUMERUS_MAX_LONG_LENGTH = 31;
 
 /**
- * String containing a to-be-compiled regex matching any syntactiacally correct
- * roman numeral.
+ * Maximum length of a short roman numeral string including the null terminator.
+ *
+ * The roman numeral `"-MMMDCCCLXXXVIII"` (value: -3888) + `\0` is a string
+ * long 16+1 = 17 chars.
  */
-const char *NUMERUS_SYNTAX_REGEX_STRING
-                 = "^-?M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$";
+const short int NUMERUS_MAX_SHORT_LENGTH = 17;
 
 /**
- * Compiled regex matching any syntactically correct roman numeral.
+ * String containing a to-be-compiled regex matching any syntactically correct
+ * roman numeral, including long roman numerals.
  *
- * Obtained by compiling NUMERUS_SYNTAX_REGEX_STRING.
+ * The underscores are a notation used by Numerus to indicate so called "long roman numerals": the numbers
+ * between them should be overlined (the line is called "vinculum") in other notations with graphical
+ * capabilities, such as handwriting. The overlined characters have their value multiplied by 1000.
  */
-static regex_t NUMERUS_SYNTAX_REGEX;
+const char *NUMERUS_LONG_SYNTAX_REGEX_STRING =
+        "^-?((_M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})_)"
+                "|M{0,3})(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$";
+
+/**
+ * String containing a to-be-compiled regex matching only short syntactically correct
+ * roman numerals.
+ *
+ * The so called "short roman numerals" don't have underscores and use normal syntax.
+ */
+const char *NUMERUS_SHORT_SYNTAX_REGEX_STRING =
+        "^-?M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$";
+
+/**
+ * Compiled regex matching any syntactically correct roman numeral, including long numerals.
+ *
+ * Obtained by compiling NUMERUS_LONG_SYNTAX_REGEX_STRING.
+ */
+static regex_t NUMERUS_LONG_SYNTAX_REGEX;
+
+/**
+ * Compiled regex matching any syntactically correct short roman numeral.
+ *
+ * Obtained by compiling NUMERUS_SHORT_SYNTAX_REGEX_STRING.
+ */
+static regex_t NUMERUS_SHORT_SYNTAX_REGEX;
 
 /**
  * Buffer where the strings with roman numerals are build an then copied from.
@@ -67,12 +106,12 @@ static regex_t NUMERUS_SYNTAX_REGEX;
  * roman numerals have variable length and can be returned as a string copied
  * from the buffer with just the right amount of space allocated.
  */
-static char _num_numeral_build_buffer[NUMERUS_MAX_LENGTH];
+static char _num_numeral_build_buffer[NUMERUS_MAX_LONG_LENGTH];
 
 /**
  * Global error code variable to store any errors during conversions.
  *
- * It may contain any of the ROMAN_ERROR_* error codes or NUMERUS_OK.
+ * It may contain any of the NUMERUS_ERROR_* error codes or NUMERUS_OK.
  */
 short int numerus_error_code = NUMERUS_OK;
 
@@ -113,8 +152,9 @@ static const struct _num_char_struct _NUM_DICTIONARY[] = {
 /**
  * Verifies if the passed roman numeral is (-)NUMERUS_ZERO, case insensitive.
  *
- * @param *roman string containing a numeral to check if it is NUMERUS_ZERO.
- * @returns int 1 if the string is (-)NUMERUS_ZERO or 0 if it's not.
+ * @param *roman string containing a roman numeral to check if it is
+ * NUMERUS_ZERO
+ * @returns int 1 if the string is (-)NUMERUS_ZERO or 0 if it's not
  */
 int numerus_roman_is_zero(char *roman) {
     if (*roman == '-') {
@@ -125,6 +165,70 @@ int numerus_roman_is_zero(char *roman) {
     } else {
         return true;
     };
+}
+
+/**
+ * Verifies if the passed roman numeral is a long numeral, outside
+ * [NUMERUS_MIN_SHORT_VALUE, NUMERUS_MAX_SHORT_VALUE].
+ *
+ * Does **not** perform a syntax check. Any string starting with "-_" or "-"
+ * would return a true result.
+ *
+ * @param *roman string containing a roman numeral to check if it is a long
+ * roman numeral
+ * @returns int 1 if the string is a long roman numeral or 0 if it's not
+ */
+int numerus_is_long_numeral(char *roman) {
+    if (*roman == '_' || (*roman == '-' && *(roman+1) == '_')) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+
+/**
+ * Calculates the number of roman characters in the roman numeral.
+ *
+ * Includes the minus `-` and any of the following characters `MDCLXVI`.
+ * Exludes underscroes `_` and the null terminator. It does not perform a
+ * syntax check, but it stops at NUMERAL_MAX_LONG_LENGTH characters. If the
+ * string is longer, returns -1. If any non-roman character is found in the
+ * string, returns -2.
+ *
+ * @param *roman string containing a roman numeral to count the roman chars of
+ * @returns short number of roman characters in a roman numeral, -1 if the
+ * string is too long for a roman numeral, -2 if any non roman character is
+ * found.
+ */
+short numerus_numeral_length(char *roman) {
+    short i = 0;
+    while (*roman != '\0') {
+        if (i > NUMERUS_MAX_LONG_LENGTH) {
+            return -1;
+        }
+        switch (*roman) {
+            case '_': {
+                roman++;
+                break;
+            }
+            case '-':
+            case 'M':
+            case 'D':
+            case 'C':
+            case 'L':
+            case 'X':
+            case 'V':
+            case 'I': {
+                i++;
+                break;
+            }
+            default: {
+                return -2;
+            }
+        }
+    }
+    return i;
 }
 
 /**
@@ -150,23 +254,40 @@ static char *_num_copy_char_from_dictionary(const char *source,
     return ++destination;
 }
 
+
+/**
+ * Converts just the internal part of the underscores or the part after them. Stores it into *roman_string. Returns position after the inserted string.
+ */
+static char *_num_short_to_roman(long int arabic, char *roman_string) {
+    const struct _num_char_struct *current_roman_char = &_NUM_DICTIONARY[0];
+    while (arabic > 0) {
+        while (arabic >= current_roman_char->value) {
+            roman_string = _num_copy_char_from_dictionary(
+                    current_roman_char->chars, roman_string);
+            arabic -= current_roman_char->value;
+        }
+        current_roman_char++;
+    }
+    return roman_string;
+}
+
 /**
  * Converts a short int to a roman numeral.
  *
  * It allocates a string with the roman numerals long just as required and
- * returns a pointer to it.  If the short is outside of [NUMERUS_MIN_VALUE,
- * NUMERUS_MAX_VALUE], the conversion is impossible.
+ * returns a pointer to it.  If the short is outside of [NUMERUS_MIN_LONG_VALUE,
+ * NUMERUS_MAX_LONG_VALUE], the conversion is impossible.
  *
- * @returns pointer to a string containing the roman numeral, NULL if the short 
+ * @returns pointer to a string containing the roman numeral, NULL if the short
  * is out of range.
  */
-char *numerus_short_to_roman(short int arabic) {
+char *numerus_long_to_roman(long int arabic) {
     /* Out of range check */
-    if (arabic < NUMERUS_MIN_VALUE || arabic > NUMERUS_MAX_VALUE) {
+    if (arabic < NUMERUS_MIN_LONG_VALUE || arabic > NUMERUS_MAX_LONG_VALUE) {
         numerus_error_code = NUMERUS_ERROR_OUT_OF_RANGE;
         fprintf(stderr,
-                "Roman conversion error: short int %d out of range [%d, %d]\n",
-                arabic, NUMERUS_MIN_VALUE, NUMERUS_MAX_VALUE);
+                "Roman conversion error: short int %li out of range [%li, %li]\n",
+                arabic, NUMERUS_MIN_LONG_VALUE, NUMERUS_MAX_LONG_VALUE);
         return NULL;
     }
 
@@ -184,21 +305,24 @@ char *numerus_short_to_roman(short int arabic) {
         return zero_string;
     }
 
+
     /* Actual conversion comparing appending chars from _NUM_DICTIONARY */
     const struct _num_char_struct *current_roman_char = &_NUM_DICTIONARY[0];
-    while (arabic > 0) {
-        while (arabic >= current_roman_char->value) {
-            roman_string = _num_copy_char_from_dictionary(
-                    current_roman_char->chars, roman_string);
-            arabic -= current_roman_char->value;
-        }
-        current_roman_char++;
+
+    /* Create part between underscores */
+    if (arabic > NUMERUS_MAX_SHORT_VALUE) {
+        *(roman_string++) = '_';
+        roman_string = _num_short_to_roman(arabic / 1000, roman_string);
+        arabic -= (arabic / 1000) * 1000; /* Keep just the 3 right-most digits because of the integer division */
+        *(roman_string++) = '_';
     }
+    /* Create part after underscores */
+    roman_string = _num_short_to_roman(arabic, roman_string);
     *roman_string = '\0';
 
     /* Copy out of the buffer and return it */
     char *returnable_roman_string =
-          malloc(roman_string - _num_numeral_build_buffer);
+            malloc(roman_string - _num_numeral_build_buffer);
     strcpy(returnable_roman_string, _num_numeral_build_buffer);
     return returnable_roman_string;
 }
@@ -207,18 +331,28 @@ char *numerus_short_to_roman(short int arabic) {
  * Verifies if the passed string is a correct roman numeral.
  *
  * Performs syntax check of the passed roman numeral by checking it against a
- * regex compiled from NUMERUS_SYNTAX_REGEX_STRING. It is case insensitive. The
+ * regex compiled from NUMERUS_LONG_SYNTAX_REGEX_STRING. It is case insensitive. The
  * compilation is once for all subsequent calls of the function during
  * runtime. The regex compilation status is dropped since
- * NUMERUS_SYNTAX_REGEX_STRING is a correct hard coded constant.
+ * NUMERUS_LONG_SYNTAX_REGEX_STRING is a correct hard coded constant.
  *
  * @param *roman string containing a roman numeral to check
+ * @param is_short_numeral set it to non-zero to check the numeral only if it's a short numeral.
  * @returns int 1 if has correct roman syntax, 0 if it does not and  in case
  * of regex errors.
  */
-int numerus_is_roman(char *roman) {
+int numerus_is_roman(char *roman, int is_short_numeral) {
+    regex_t *regex_to_use;
+    const char *regex_string_to_use;
+    if (is_short_numeral != 0) {
+        regex_to_use = &NUMERUS_SHORT_SYNTAX_REGEX;
+        regex_string_to_use = NUMERUS_SHORT_SYNTAX_REGEX_STRING;
+    } else {
+        regex_to_use = &NUMERUS_LONG_SYNTAX_REGEX;
+        regex_string_to_use = NUMERUS_LONG_SYNTAX_REGEX_STRING;
+    }
     /* Compile the regex if it has not been done yet */
-    if (NUMERUS_SYNTAX_REGEX.re_magic == 0) {
+    if (regex_to_use->re_magic == 0) {
         /**
          * Flags in regcomp():
          * - REG_NOSUB:    does not save subexpressions (groups), only
@@ -227,17 +361,17 @@ int numerus_is_roman(char *roman) {
          * - REG_EXTENDED: uses the extended POSIX standard regular expressions,
          *                 which are required for the regex structure
          */
-        regcomp(&NUMERUS_SYNTAX_REGEX, NUMERUS_SYNTAX_REGEX_STRING,
+        regcomp(regex_to_use, regex_string_to_use,
                 REG_NOSUB | REG_ICASE | REG_EXTENDED);
     }
-    int match_result = regexec(&NUMERUS_SYNTAX_REGEX, roman, 0, NULL, 0);
+    int match_result = regexec(regex_to_use, roman, 0, NULL, 0);
     if (match_result == 0) { /* Matches regex */
         return true;
     } else if (match_result == REG_NOMATCH) { /* Does not match regex */
         return false;
     } else { /* Other errors */
         char msgbuf[100];
-        regerror(match_result, &NUMERUS_SYNTAX_REGEX, msgbuf, sizeof(msgbuf));
+        regerror(match_result, regex_to_use, msgbuf, sizeof(msgbuf));
         fprintf(stderr, "Roman syntax regex matching internal error.");
         return NUMERUS_ERROR_REGEXEC;
     }
@@ -267,29 +401,46 @@ static short int _num_begins_with(char *to_compare, const char *pattern) {
     }
 }
 
+static long _num_roman_to_short(char **roman) {
+    long arabic = 0;
+    const struct _num_char_struct *current_roman_char = &_NUM_DICTIONARY[0];
+    while (**roman != '_' && **roman != '\0') {
+        short matching_chars = _num_begins_with(*roman,
+                                                current_roman_char->chars);
+        if (matching_chars > 0) {
+            *roman += matching_chars;
+            arabic += current_roman_char->value;
+        } else {
+            current_roman_char++;
+        }
+    }
+    return arabic;
+}
+
+
 /**
  * Converts a roman numeral to a short int.
  *
  * It is case insensitive and accepts negative roman numerals. If the numeral
  * cannot be converted, it means it has wrong syntax. In that case a value
- * bigger than NUMERUS_MAX_VALUE is returned and the error code
+ * bigger than NUMERUS_MAX_LONG_VALUE is returned and the error code
  * NUMERUS_ERROR_WRONG_SYNTAX is stored in numerus_error_code.
  *
  * @param *roman string with a roman numeral
  * @returns short value of the roman numeral or a value bigger than 
- * NUMERUS_MAX_VALUE in case of error
+ * NUMERUS_MAX_LONG_VALUE in case of error
  */
-short int numerus_roman_to_short(char *roman) {
+long numerus_roman_to_long(char *roman) {
     /* Exclude nulla numerals */
     if (numerus_roman_is_zero(roman)) {
         return 0;
     }
 
     /* Return an error if the roman is not syntactically correct */
-    if (!numerus_is_roman(roman)) {
+    if (!numerus_is_roman(roman, 0)) {
         numerus_error_code = NUMERUS_ERROR_WRONG_SYNTAX;
         fprintf(stderr, "Roman conversion error: wrong syntax of numeral %s\n", roman);
-        return NUMERUS_MAX_VALUE + 1;
+        return NUMERUS_MAX_LONG_VALUE + 1;
     }
 
     /* Save sign */
@@ -300,20 +451,15 @@ short int numerus_roman_to_short(char *roman) {
     }
 
     /* Actual conversion */
-    short int arabic = 0;
-    const struct _num_char_struct *current_roman_char = &_NUM_DICTIONARY[0];
-    while (*roman != '\0') {
-        short matching_chars = _num_begins_with(roman,
-                                                current_roman_char->chars);
-        if (matching_chars > 0) {
-            roman += matching_chars;
-            arabic += current_roman_char->value;
-        } else {
-            current_roman_char++;
-        }
+    long arabic = 0;
+    if (*roman == '_') {
+        roman++; /* Skip '_' */
+        arabic += _num_roman_to_short(&roman) * 1000;
+        roman++; /* Skip '_' */
     }
+    arabic += _num_roman_to_short(&roman);
 
-    numerus_error_code = 0;
+    numerus_error_code = NUMERUS_OK;
     return sign * arabic;
 }
 
@@ -369,11 +515,11 @@ char **numerus_allocate_all_romans(short int include_negatives) {
     short i;
     if (include_negatives) {
         for (i = NUMERUS_MIN_VALUE; i < 0; i++) {
-            all_roman_numerals[index++] = numerus_short_to_roman(i);
+            all_roman_numerals[index++] = numerus_int_to_roman(i);
         }
     }
     for (i = 0; i <= NUMERUS_MAX_VALUE; i++) {
-        all_roman_numerals[index++] = numerus_short_to_roman(i);
+        all_roman_numerals[index++] = numerus_int_to_roman(i);
     }
     return &all_roman_numerals[0 + (include_negatives ? NUMERUS_MAX_VALUE : 0)];
 }
@@ -390,9 +536,10 @@ char **numerus_allocate_all_romans(short int include_negatives) {
  * two numerals has wrong syntax and cannot be compared.
  */
 int numerus_compare_value(char *roman_bigger, char *roman_smaller) {
-    short int value_bigger = numerus_roman_to_short(roman_bigger);
-    short int value_smaller = numerus_roman_to_short(roman_smaller);
-    if (value_bigger > NUMERUS_MAX_VALUE || value_smaller > NUMERUS_MAX_VALUE) {
+    long value_bigger = numerus_roman_to_long(roman_bigger);
+    long value_smaller = numerus_roman_to_long(roman_smaller);
+    if (value_bigger > NUMERUS_MAX_LONG_VALUE || value_smaller >
+                                                 NUMERUS_MAX_LONG_VALUE) {
         fprintf(stderr, "Roman comparition error: "
                         "cannot compare syntactically wrong numerals\n");
         numerus_error_code = NUMERUS_ERROR_CANNOT_COMPARE;
@@ -406,6 +553,21 @@ int numerus_compare_value(char *roman_bigger, char *roman_smaller) {
         return -1;
     }
 }
+
+int numerus_export_all_to_csv(char *filename) {
+    if (filename == NULL) {
+        filename = "/tmp/numerus.csv";
+    }
+    FILE *csv = fopen(filename, "w");
+    long int i;
+    for (i = NUMERUS_MIN_LONG_VALUE; i <= NUMERUS_MAX_LONG_VALUE; i++) {
+            fprintf(csv, "%li, %s\n", i, numerus_long_to_roman(i));
+        }
+    fclose(csv);
+    return 0;
+}
+
+
 
 /**
  * Saves all roman numerals with their values to a SQLite3 file in a table
@@ -439,42 +601,65 @@ int numerus_export_all_to_sqlite3(char *filename) {
         return NUMERUS_ERROR_SQLITE;
     }
 
+    /* OPTIMIZE */
+    sqlite3_exec(db_connection, "PRAGMA synchronous = OFF", NULL, NULL, &sqlite_error_msg);
+    sqlite3_exec(db_connection, "PRAGMA journal_mode = MEMORY", NULL, NULL, &sqlite_error_msg);
+
     /* Create table query */
-    char *query = "DROP TABLE IF EXISTS roman_numerals; "
+    char *query_table = "DROP TABLE IF EXISTS roman_numerals; "
                   "CREATE TABLE roman_numerals ("
-                      "value INT PRIMARY KEY,"
+                      "value BIGINT,"
                       "numeral TEXT"
                   ");";
-    sqlite3_resp_code = sqlite3_exec(db_connection, query, 0, 0,
+    sqlite3_resp_code = sqlite3_exec(db_connection, query_table, 0, 0,
                                      &sqlite_error_msg);
     if (sqlite3_resp_code != SQLITE_OK) {
         fprintf(stderr, "SQL error: %s\n", sqlite_error_msg);
         sqlite3_free(sqlite_error_msg);
-        sqlite3_free(query);
+        sqlite3_free(query_table);
         sqlite3_close(db_connection);
         return NUMERUS_ERROR_SQLITE;
     }
-
+    //free(query_table);
     /* Insert all roman numerals */
-    short i;
-    for (i = NUMERUS_MIN_VALUE; i <= NUMERUS_MAX_VALUE; i++) {
-        query = sqlite3_mprintf(
-                "INSERT INTO roman_numerals VALUES (%d, '%q');", i,
-                numerus_short_to_roman(i));
-        sqlite3_resp_code = sqlite3_exec(db_connection, query, 0, 0,
-                                         &sqlite_error_msg);
-        if (sqlite3_resp_code != SQLITE_OK) {
-            fprintf(stderr, "SQL error: %s\n", sqlite_error_msg);
-            sqlite3_free(sqlite_error_msg);
-            sqlite3_free(query);
-            sqlite3_close(db_connection);
-            return NUMERUS_ERROR_SQLITE;
+
+    /* Prepare statement */
+    //char *query = malloc(150 * sizeof(char));
+    char *query = "INSERT INTO roman_numerals VALUES (@i, @s);";
+    sqlite3_stmt *stmt;
+    sqlite3_prepare_v2(db_connection, query, 150, &stmt, NULL);
+
+    /* Start transaction */
+    sqlite3_resp_code = sqlite3_exec(db_connection, "BEGIN TRANSACTION", 0, 0,
+                                     &sqlite_error_msg);
+    long int i;
+    for (i = NUMERUS_MIN_LONG_VALUE; i <= NUMERUS_MAX_LONG_VALUE; i++) {
+        if (i % 100000 == 0) {
+            printf("Inserting to SQLite: %5.2f%%\n", 100 * (i -
+                                                            NUMERUS_MIN_LONG_VALUE) / (
+                    NUMERUS_MAX_LONG_VALUE * 2.0 + 1));
         }
+        char *roman = numerus_long_to_roman(i);
+        /* Fill statement */
+        sqlite3_bind_int64(stmt, 1, i);
+        sqlite3_bind_text(stmt, 2, roman, -1, SQLITE_TRANSIENT);
+
+        /* Execute statement */
+        sqlite3_step(stmt);
+
+        /* Cleanup memory */
+        free(roman);
+        sqlite3_clear_bindings(stmt);
+        sqlite3_reset(stmt);
     }
+    sqlite3_resp_code = sqlite3_exec(db_connection, "END TRANSACTION", 0, 0,
+                                     &sqlite_error_msg);
+    sqlite3_resp_code = sqlite3_exec(db_connection, "CREATE INDEX 'idx_roman_value' ON roman_numerals (value);", 0, 0,
+                                     &sqlite_error_msg);
 
     /* Cleanup and return */
+    sqlite3_finalize(stmt);
     sqlite3_free(sqlite_error_msg);
-    sqlite3_free(query);
     sqlite3_close(db_connection);
     return NUMERUS_OK;
 }
