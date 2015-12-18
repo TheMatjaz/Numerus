@@ -536,9 +536,10 @@ char **numerus_allocate_all_romans(short int include_negatives) {
  * two numerals has wrong syntax and cannot be compared.
  */
 int numerus_compare_value(char *roman_bigger, char *roman_smaller) {
-    short int value_bigger = numerus_roman_to_short(roman_bigger);
-    short int value_smaller = numerus_roman_to_short(roman_smaller);
-    if (value_bigger > NUMERUS_MAX_VALUE || value_smaller > NUMERUS_MAX_VALUE) {
+    long value_bigger = numerus_roman_to_long(roman_bigger);
+    long value_smaller = numerus_roman_to_long(roman_smaller);
+    if (value_bigger > NUMERUS_MAX_LONG_VALUE || value_smaller >
+                                                 NUMERUS_MAX_LONG_VALUE) {
         fprintf(stderr, "Roman comparition error: "
                         "cannot compare syntactically wrong numerals\n");
         numerus_error_code = NUMERUS_ERROR_CANNOT_COMPARE;
@@ -559,8 +560,8 @@ int numerus_export_all_to_csv(char *filename) {
     }
     FILE *csv = fopen(filename, "w");
     long int i;
-    for (i = NUMERUS_MIN_VALUE; i <= NUMERUS_MAX_VALUE; i++) {
-            fprintf(csv, "%li, %s\n", i, numerus_int_to_roman(i));
+    for (i = NUMERUS_MIN_LONG_VALUE; i <= NUMERUS_MAX_LONG_VALUE; i++) {
+            fprintf(csv, "%li, %s\n", i, numerus_long_to_roman(i));
         }
     fclose(csv);
     return 0;
@@ -632,11 +633,13 @@ int numerus_export_all_to_sqlite3(char *filename) {
     sqlite3_resp_code = sqlite3_exec(db_connection, "BEGIN TRANSACTION", 0, 0,
                                      &sqlite_error_msg);
     long int i;
-    for (i = NUMERUS_MIN_VALUE; i <= NUMERUS_MAX_VALUE; i++) {
+    for (i = NUMERUS_MIN_LONG_VALUE; i <= NUMERUS_MAX_LONG_VALUE; i++) {
         if (i % 100000 == 0) {
-            printf("Inserting to SQLite: %5.2f%%\n", 100*(i-NUMERUS_MIN_VALUE)/(NUMERUS_MAX_VALUE*2.0+1));
+            printf("Inserting to SQLite: %5.2f%%\n", 100 * (i -
+                                                            NUMERUS_MIN_LONG_VALUE) / (
+                    NUMERUS_MAX_LONG_VALUE * 2.0 + 1));
         }
-        char *roman = numerus_int_to_roman(i);
+        char *roman = numerus_long_to_roman(i);
         /* Fill statement */
         sqlite3_bind_int64(stmt, 1, i);
         sqlite3_bind_text(stmt, 2, roman, -1, SQLITE_TRANSIENT);
