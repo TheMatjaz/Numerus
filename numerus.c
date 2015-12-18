@@ -77,7 +77,7 @@ static char _num_numeral_build_buffer[NUMERUS_MAX_LENGTH];
 /**
  * Global error code variable to store any errors during conversions.
  *
- * It may contain any of the ROMAN_ERROR_* error codes or NUMERUS_OK.
+ * It may contain any of the NUMERUS_ERROR_* error codes or NUMERUS_OK.
  */
 short int numerus_error_code = NUMERUS_OK;
 
@@ -118,8 +118,9 @@ static const struct _num_char_struct _NUM_DICTIONARY[] = {
 /**
  * Verifies if the passed roman numeral is (-)NUMERUS_ZERO, case insensitive.
  *
- * @param *roman string containing a numeral to check if it is NUMERUS_ZERO.
- * @returns int 1 if the string is (-)NUMERUS_ZERO or 0 if it's not.
+ * @param *roman string containing a roman numeral to check if it is
+ * NUMERUS_ZERO
+ * @returns int 1 if the string is (-)NUMERUS_ZERO or 0 if it's not
  */
 int numerus_roman_is_zero(char *roman) {
     if (*roman == '-') {
