@@ -460,6 +460,21 @@ int numerus_compare_value(char *roman_bigger, char *roman_smaller) {
     }
 }
 
+int numerus_export_all_to_csv(char *filename) {
+    if (filename == NULL) {
+        filename = "/tmp/numerus.csv";
+    }
+    FILE *csv = fopen(filename, "w");
+    long int i;
+    for (i = NUMERUS_MIN_VALUE; i <= NUMERUS_MAX_VALUE; i++) {
+            fprintf(csv, "%li, %s\n", i, numerus_int_to_roman(i));
+        }
+    fclose(csv);
+    return 0;
+}
+
+
+
 /**
  * Saves all roman numerals with their values to a SQLite3 file in a table
  * called "roman_numerals".
