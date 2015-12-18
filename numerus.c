@@ -23,14 +23,24 @@
 
 
 /**
- * Maximum value as short a roman numeral may have.
+ * Maximum value a long roman numeral (with '_') may have.
  */
-const long int NUMERUS_MAX_VALUE = 3999999;
+const long int NUMERUS_MAX_LONG_VALUE = 3999999;
 
 /**
- * Minimum value as short a roman numeral may have.
+ * Minimum value a long a roman numeral (with '_') may have.
  */
-const long int NUMERUS_MIN_VALUE = -3999999;
+const long int NUMERUS_MIN_LONG_VALUE = -3999999;
+
+/**
+ * Maximum value a short roman numeral (without '_') may have.
+ */
+const short int NUMERUS_MAX_SHORT_VALUE = 3999;
+
+/**
+ * Minimum value a short roman numeral (without '_') may have.
+ */
+const short int NUMERUS_MIN_SHORT_VALUE = -3999;
 
 /**
  * Roman numeral of value 0 (zero).
@@ -38,16 +48,24 @@ const long int NUMERUS_MIN_VALUE = -3999999;
 const char *NUMERUS_ZERO = "NULLA";
 
 /**
- * Maximum length of a roman numeral string including the null terminator.
+ * Maximum length of a long roman numeral string including the null terminator.
  *
  * The roman numeral `"-_MMMDCCCLXXXVIII_DCCCLXXXVIII"` (value: -3888888) + `\0`
  * is a string long 30+1 = 31 chars.
  */
-const short int NUMERUS_MAX_LENGTH = 31;
+const short int NUMERUS_MAX_LONG_LENGTH = 31;
+
+/**
+ * Maximum length of a short roman numeral string including the null terminator.
+ *
+ * The roman numeral `"-MMMDCCCLXXXVIII"` (value: -3888) + `\0` is a string
+ * long 16+1 = 17 chars.
+ */
+const short int NUMERUS_MAX_SHORT_LENGTH = 17;
 
 /**
  * String containing a to-be-compiled regex matching any syntactically correct
- * roman numeral.
+ * roman numeral, including long roman numerals.
  *
  * The underscores are a notation used by Numerus to indicate that the numbers
  * between them should be overlined in other notations with graphical
@@ -72,7 +90,7 @@ static regex_t NUMERUS_SYNTAX_REGEX;
  * roman numerals have variable length and can be returned as a string copied
  * from the buffer with just the right amount of space allocated.
  */
-static char _num_numeral_build_buffer[NUMERUS_MAX_LENGTH];
+static char _num_numeral_build_buffer[NUMERUS_MAX_LONG_LENGTH];
 
 /**
  * Global error code variable to store any errors during conversions.
@@ -134,11 +152,15 @@ int numerus_roman_is_zero(char *roman) {
 }
 
 /**
- * Verifies if the passed roman numeral is a big numeral, outside [-3999, 3999].
+ * Verifies if the passed roman numeral is a long numeral, outside
+ * [NUMERUS_MIN_SHORT_VALUE, NUMERUS_MAX_SHORT_VALUE].
  *
- * @param *roman string containing a roman numeral to check if it is a big
- * numeral
- * @returns int 1 if the string is a big numeral or 0 if it's not
+ * Does **not** perform a syntax check. Any string starting with "-_" or "-"
+ * would return a true result.
+ *
+ * @param *roman string containing a roman numeral to check if it is a long
+ * roman numeral
+ * @returns int 1 if the string is a long roman numeral or 0 if it's not
  */
 int numerus_is_bignumeral(char *roman) {
     if (*roman == '_' || *(roman+1) == '_') {
@@ -191,19 +213,19 @@ static char *_num_copy_char_from_dictionary(const char *source,
  * Converts a short int to a roman numeral.
  *
  * It allocates a string with the roman numerals long just as required and
- * returns a pointer to it.  If the short is outside of [NUMERUS_MIN_VALUE,
- * NUMERUS_MAX_VALUE], the conversion is impossible.
+ * returns a pointer to it.  If the short is outside of [NUMERUS_MIN_LONG_VALUE,
+ * NUMERUS_MAX_LONG_VALUE], the conversion is impossible.
  *
  * @returns pointer to a string containing the roman numeral, NULL if the short 
  * is out of range.
  */
 char *numerus_int_to_roman(long int arabic) {
     /* Out of range check */
-    if (arabic < NUMERUS_MIN_VALUE || arabic > NUMERUS_MAX_VALUE) {
+    if (arabic < NUMERUS_MIN_LONG_VALUE || arabic > NUMERUS_MAX_LONG_VALUE) {
         numerus_error_code = NUMERUS_ERROR_OUT_OF_RANGE;
         fprintf(stderr,
                 "Roman conversion error: short int %li out of range [%li, %li]\n",
-                arabic, NUMERUS_MIN_VALUE, NUMERUS_MAX_VALUE);
+                arabic, NUMERUS_MIN_LONG_VALUE, NUMERUS_MAX_LONG_VALUE);
         return NULL;
     }
 
