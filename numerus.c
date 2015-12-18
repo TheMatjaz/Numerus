@@ -197,12 +197,12 @@ static char *_num_copy_char_from_dictionary(const char *source,
  * @returns pointer to a string containing the roman numeral, NULL if the short 
  * is out of range.
  */
-char *numerus_short_to_roman(short int arabic) {
+char *numerus_int_to_roman(long int arabic) {
     /* Out of range check */
     if (arabic < NUMERUS_MIN_VALUE || arabic > NUMERUS_MAX_VALUE) {
         numerus_error_code = NUMERUS_ERROR_OUT_OF_RANGE;
         fprintf(stderr,
-                "Roman conversion error: short int %d out of range [%d, %d]\n",
+                "Roman conversion error: short int %li out of range [%li, %li]\n",
                 arabic, NUMERUS_MIN_VALUE, NUMERUS_MAX_VALUE);
         return NULL;
     }
@@ -221,8 +221,24 @@ char *numerus_short_to_roman(short int arabic) {
         return zero_string;
     }
 
+
     /* Actual conversion comparing appending chars from _NUM_DICTIONARY */
     const struct _num_char_struct *current_roman_char = &_NUM_DICTIONARY[0];
+
+    /* Treat big numerals */
+    if (arabic > 3999) {
+        *(roman_string++) = '_';
+        while (arabic > 999) {
+            while (arabic / 1000 >= current_roman_char->value) {
+                roman_string = _num_copy_char_from_dictionary(
+                        current_roman_char->chars, roman_string);
+                arabic -= current_roman_char->value * 1000;
+            }
+            current_roman_char++;
+        }
+        *(roman_string++) = '_';
+    }
+    current_roman_char = &_NUM_DICTIONARY[0];
     while (arabic > 0) {
         while (arabic >= current_roman_char->value) {
             roman_string = _num_copy_char_from_dictionary(
@@ -406,11 +422,11 @@ char **numerus_allocate_all_romans(short int include_negatives) {
     short i;
     if (include_negatives) {
         for (i = NUMERUS_MIN_VALUE; i < 0; i++) {
-            all_roman_numerals[index++] = numerus_short_to_roman(i);
+            all_roman_numerals[index++] = numerus_int_to_roman(i);
         }
     }
     for (i = 0; i <= NUMERUS_MAX_VALUE; i++) {
-        all_roman_numerals[index++] = numerus_short_to_roman(i);
+        all_roman_numerals[index++] = numerus_int_to_roman(i);
     }
     return &all_roman_numerals[0 + (include_negatives ? NUMERUS_MAX_VALUE : 0)];
 }
