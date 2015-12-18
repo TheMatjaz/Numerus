@@ -186,17 +186,46 @@ int numerus_is_long_numeral(char *roman) {
     }
 }
 
-/* Excluding the null terminator */
+
+/**
+ * Calculates the number of roman characters in the roman numeral.
+ *
+ * Includes the minus `-` and any of the following characters `MDCLXVI`.
+ * Exludes underscroes `_` and the null terminator. It does not perform a
+ * syntax check, but it stops at NUMERAL_MAX_LONG_LENGTH characters. If the
+ * string is longer, returns -1. If any non-roman character is found in the
+ * string, returns -2.
+ *
+ * @param *roman string containing a roman numeral to count the roman chars of
+ * @returns short number of roman characters in a roman numeral, -1 if the
+ * string is too long for a roman numeral, -2 if any non roman character is
+ * found.
+ */
 short numerus_numeral_length(char *roman) {
     short i = 0;
     while (*roman != '\0') {
-        if (i > NUMERUS_MAX_LENGTH) {
+        if (i > NUMERUS_MAX_LONG_LENGTH) {
             return -1;
         }
-        if (*roman == '_') {
-            roman++;
-        } else {
-            i++;
+        switch (*roman) {
+            case '_': {
+                roman++;
+                break;
+            }
+            case '-':
+            case 'M':
+            case 'D':
+            case 'C':
+            case 'L':
+            case 'X':
+            case 'V':
+            case 'I': {
+                i++;
+                break;
+            }
+            default: {
+                return -2;
+            }
         }
     }
     return i;
