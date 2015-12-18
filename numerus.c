@@ -25,12 +25,12 @@
 /**
  * Maximum value as short a roman numeral may have.
  */
-const short int NUMERUS_MAX_VALUE = 3999;
+const long int NUMERUS_MAX_VALUE = 3999999;
 
 /**
  * Minimum value as short a roman numeral may have.
  */
-const short int NUMERUS_MIN_VALUE = -3999;
+const long int NUMERUS_MIN_VALUE = -3999999;
 
 /**
  * Roman numeral of value 0 (zero).
@@ -40,10 +40,10 @@ const char *NUMERUS_ZERO = "NULLA";
 /**
  * Maximum length of a roman numeral string including the null terminator.
  *
- * The roman numeral `"-MMMDCCCLXXXVIII"` (value: -3888) + `\0` is a string long
- * 16+1 = 17 chars.
+ * The roman numeral `"-_MMMDCCCLXXXVIII_DCCCLXXXVIII"` (value: -3888888) + `\0`
+ * is a string long 30+1 = 31 chars.
  */
-const short int NUMERUS_MAX_LENGTH = 17;
+const short int NUMERUS_MAX_LENGTH = 31;
 
 /**
  * String containing a to-be-compiled regex matching any syntactiacally correct
