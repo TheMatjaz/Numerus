@@ -62,8 +62,8 @@
  */
 #define NUMERUS_ERROR_ALLOCATE_ALL 105;
 
-extern const short int NUMERUS_MAX_VALUE;
-extern const short int NUMERUS_MIN_VALUE;
+extern const long int NUMERUS_MAX_VALUE;
+extern const long int NUMERUS_MIN_VALUE;
 extern const char *NUMERUS_ZERO;
 extern const short int NUMERUS_MAX_LENGTH;
 extern const char *NUMERUS_SYNTAX_REGEX_STRING;
@@ -71,8 +71,9 @@ extern short int numerus_error_code;
 
 int numerus_is_roman(char *roman);
 int numerus_roman_is_zero(char *roman);
-char *numerus_short_to_roman(short int arabic);
+char *numerus_int_to_roman(long int arabic);
 short numerus_roman_to_short(char *roman);
 int numerus_compare_value(char *roman_bigger, char *roman_smaller);
 char **numerus_allocate_all_romans(short int include_negatives);
 int numerus_export_all_to_sqlite3(char *filename);
+int numerus_export_all_to_csv(char *filename);
