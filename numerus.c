@@ -146,6 +146,23 @@ int numerus_is_bignumeral(char *roman) {
         return false;
     }
 }
+
+/* Excluding the null terminator */
+short numerus_numeral_length(char *roman) {
+    short i = 0;
+    while (*roman != '\0') {
+        if (i > NUMERUS_MAX_LENGTH) {
+            return -1;
+        }
+        if (*roman == '_') {
+            roman++;
+        } else {
+            i++;
+        }
+    }
+    return i;
+}
+
 /**
  * Copies a string of 1 or 2 characters.
  *
