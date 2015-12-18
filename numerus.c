@@ -133,6 +133,20 @@ int numerus_roman_is_zero(char *roman) {
 }
 
 /**
+ * Verifies if the passed roman numeral is a big numeral, outside [-3999, 3999].
+ *
+ * @param *roman string containing a roman numeral to check if it is a big
+ * numeral
+ * @returns int 1 if the string is a big numeral or 0 if it's not
+ */
+int numerus_is_bignumeral(char *roman) {
+    if (*roman == '_' || *(roman+1) == '_') {
+        return true;
+    } else {
+        return false;
+    }
+}
+/**
  * Copies a string of 1 or 2 characters.
  *
  * Copies the character from the source to the destination. If there is another
