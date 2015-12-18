@@ -178,8 +178,8 @@ int numerus_roman_is_zero(char *roman) {
  * roman numeral
  * @returns int 1 if the string is a long roman numeral or 0 if it's not
  */
-int numerus_is_bignumeral(char *roman) {
-    if (*roman == '_' || *(roman+1) == '_') {
+int numerus_is_long_numeral(char *roman) {
+    if (*roman == '_' || (*roman == '-' && *(roman+1) == '_')) {
         return true;
     } else {
         return false;
