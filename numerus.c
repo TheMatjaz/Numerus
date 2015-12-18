@@ -401,29 +401,46 @@ static short int _num_begins_with(char *to_compare, const char *pattern) {
     }
 }
 
+static long _num_roman_to_short(char **roman) {
+    long arabic = 0;
+    const struct _num_char_struct *current_roman_char = &_NUM_DICTIONARY[0];
+    while (**roman != '_' && **roman != '\0') {
+        short matching_chars = _num_begins_with(*roman,
+                                                current_roman_char->chars);
+        if (matching_chars > 0) {
+            *roman += matching_chars;
+            arabic += current_roman_char->value;
+        } else {
+            current_roman_char++;
+        }
+    }
+    return arabic;
+}
+
+
 /**
  * Converts a roman numeral to a short int.
  *
  * It is case insensitive and accepts negative roman numerals. If the numeral
  * cannot be converted, it means it has wrong syntax. In that case a value
- * bigger than NUMERUS_MAX_VALUE is returned and the error code
+ * bigger than NUMERUS_MAX_LONG_VALUE is returned and the error code
  * NUMERUS_ERROR_WRONG_SYNTAX is stored in numerus_error_code.
  *
  * @param *roman string with a roman numeral
  * @returns short value of the roman numeral or a value bigger than 
- * NUMERUS_MAX_VALUE in case of error
+ * NUMERUS_MAX_LONG_VALUE in case of error
  */
-short int numerus_roman_to_short(char *roman) {
+long numerus_roman_to_long(char *roman) {
     /* Exclude nulla numerals */
     if (numerus_roman_is_zero(roman)) {
         return 0;
     }
 
     /* Return an error if the roman is not syntactically correct */
-    if (!numerus_is_roman(roman)) {
+    if (!numerus_is_roman(roman, 0)) {
         numerus_error_code = NUMERUS_ERROR_WRONG_SYNTAX;
         fprintf(stderr, "Roman conversion error: wrong syntax of numeral %s\n", roman);
-        return NUMERUS_MAX_VALUE + 1;
+        return NUMERUS_MAX_LONG_VALUE + 1;
     }
 
     /* Save sign */
@@ -434,20 +451,15 @@ short int numerus_roman_to_short(char *roman) {
     }
 
     /* Actual conversion */
-    short int arabic = 0;
-    const struct _num_char_struct *current_roman_char = &_NUM_DICTIONARY[0];
-    while (*roman != '\0') {
-        short matching_chars = _num_begins_with(roman,
-                                                current_roman_char->chars);
-        if (matching_chars > 0) {
-            roman += matching_chars;
-            arabic += current_roman_char->value;
-        } else {
-            current_roman_char++;
-        }
+    long arabic = 0;
+    if (*roman == '_') {
+        roman++; /* Skip '_' */
+        arabic += _num_roman_to_short(&roman) * 1000;
+        roman++; /* Skip '_' */
     }
+    arabic += _num_roman_to_short(&roman);
 
-    numerus_error_code = 0;
+    numerus_error_code = NUMERUS_OK;
     return sign * arabic;
 }
 
