@@ -46,11 +46,16 @@ const char *NUMERUS_ZERO = "NULLA";
 const short int NUMERUS_MAX_LENGTH = 31;
 
 /**
- * String containing a to-be-compiled regex matching any syntactiacally correct
+ * String containing a to-be-compiled regex matching any syntactically correct
  * roman numeral.
+ *
+ * The underscores are a notation used by Numerus to indicate that the numbers
+ * between them should be overlined in other notations with graphical
+ * capabilities. The overlined characters have their value multiplied by 1000.
  */
-const char *NUMERUS_SYNTAX_REGEX_STRING
-                 = "^-?M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$";
+const char *NUMERUS_SYNTAX_REGEX_STRING =
+        "^-?((_M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})_)"
+                "|M{0,3})(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$";
 
 /**
  * Compiled regex matching any syntactically correct roman numeral.
