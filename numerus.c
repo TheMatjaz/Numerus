@@ -254,6 +254,23 @@ static char *_num_copy_char_from_dictionary(const char *source,
     return ++destination;
 }
 
+
+/**
+ * Converts just the internal part of the underscores or the part after them. Stores it into *roman_string. Returns position after the inserted string.
+ */
+static char *_num_short_to_roman(long int arabic, char *roman_string) {
+    const struct _num_char_struct *current_roman_char = &_NUM_DICTIONARY[0];
+    while (arabic > 0) {
+        while (arabic >= current_roman_char->value) {
+            roman_string = _num_copy_char_from_dictionary(
+                    current_roman_char->chars, roman_string);
+            arabic -= current_roman_char->value;
+        }
+        current_roman_char++;
+    }
+    return roman_string;
+}
+
 /**
  * Converts a short int to a roman numeral.
  *
@@ -261,10 +278,10 @@ static char *_num_copy_char_from_dictionary(const char *source,
  * returns a pointer to it.  If the short is outside of [NUMERUS_MIN_LONG_VALUE,
  * NUMERUS_MAX_LONG_VALUE], the conversion is impossible.
  *
- * @returns pointer to a string containing the roman numeral, NULL if the short 
+ * @returns pointer to a string containing the roman numeral, NULL if the short
  * is out of range.
  */
-char *numerus_int_to_roman(long int arabic) {
+char *numerus_long_to_roman(long int arabic) {
     /* Out of range check */
     if (arabic < NUMERUS_MIN_LONG_VALUE || arabic > NUMERUS_MAX_LONG_VALUE) {
         numerus_error_code = NUMERUS_ERROR_OUT_OF_RANGE;
@@ -292,33 +309,20 @@ char *numerus_int_to_roman(long int arabic) {
     /* Actual conversion comparing appending chars from _NUM_DICTIONARY */
     const struct _num_char_struct *current_roman_char = &_NUM_DICTIONARY[0];
 
-    /* Treat big numerals */
-    if (arabic > 3999) {
+    /* Create part between underscores */
+    if (arabic > NUMERUS_MAX_SHORT_VALUE) {
         *(roman_string++) = '_';
-        while (arabic > 999) {
-            while (arabic / 1000 >= current_roman_char->value) {
-                roman_string = _num_copy_char_from_dictionary(
-                        current_roman_char->chars, roman_string);
-                arabic -= current_roman_char->value * 1000;
-            }
-            current_roman_char++;
-        }
+        roman_string = _num_short_to_roman(arabic / 1000, roman_string);
+        arabic -= (arabic / 1000) * 1000; /* Keep just the 3 right-most digits because of the integer division */
         *(roman_string++) = '_';
     }
-    current_roman_char = &_NUM_DICTIONARY[0];
-    while (arabic > 0) {
-        while (arabic >= current_roman_char->value) {
-            roman_string = _num_copy_char_from_dictionary(
-                    current_roman_char->chars, roman_string);
-            arabic -= current_roman_char->value;
-        }
-        current_roman_char++;
-    }
+    /* Create part after underscores */
+    roman_string = _num_short_to_roman(arabic, roman_string);
     *roman_string = '\0';
 
     /* Copy out of the buffer and return it */
     char *returnable_roman_string =
-          malloc(roman_string - _num_numeral_build_buffer);
+            malloc(roman_string - _num_numeral_build_buffer);
     strcpy(returnable_roman_string, _num_numeral_build_buffer);
     return returnable_roman_string;
 }
