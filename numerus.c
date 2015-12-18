@@ -67,20 +67,36 @@ const short int NUMERUS_MAX_SHORT_LENGTH = 17;
  * String containing a to-be-compiled regex matching any syntactically correct
  * roman numeral, including long roman numerals.
  *
- * The underscores are a notation used by Numerus to indicate that the numbers
- * between them should be overlined in other notations with graphical
- * capabilities. The overlined characters have their value multiplied by 1000.
+ * The underscores are a notation used by Numerus to indicate so called "long roman numerals": the numbers
+ * between them should be overlined (the line is called "vinculum") in other notations with graphical
+ * capabilities, such as handwriting. The overlined characters have their value multiplied by 1000.
  */
-const char *NUMERUS_SYNTAX_REGEX_STRING =
+const char *NUMERUS_LONG_SYNTAX_REGEX_STRING =
         "^-?((_M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})_)"
                 "|M{0,3})(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$";
 
 /**
- * Compiled regex matching any syntactically correct roman numeral.
+ * String containing a to-be-compiled regex matching only short syntactically correct
+ * roman numerals.
  *
- * Obtained by compiling NUMERUS_SYNTAX_REGEX_STRING.
+ * The so called "short roman numerals" don't have underscores and use normal syntax.
  */
-static regex_t NUMERUS_SYNTAX_REGEX;
+const char *NUMERUS_SHORT_SYNTAX_REGEX_STRING =
+        "^-?M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$";
+
+/**
+ * Compiled regex matching any syntactically correct roman numeral, including long numerals.
+ *
+ * Obtained by compiling NUMERUS_LONG_SYNTAX_REGEX_STRING.
+ */
+static regex_t NUMERUS_LONG_SYNTAX_REGEX;
+
+/**
+ * Compiled regex matching any syntactically correct short roman numeral.
+ *
+ * Obtained by compiling NUMERUS_SHORT_SYNTAX_REGEX_STRING.
+ */
+static regex_t NUMERUS_SHORT_SYNTAX_REGEX;
 
 /**
  * Buffer where the strings with roman numerals are build an then copied from.
@@ -282,18 +298,28 @@ char *numerus_int_to_roman(long int arabic) {
  * Verifies if the passed string is a correct roman numeral.
  *
  * Performs syntax check of the passed roman numeral by checking it against a
- * regex compiled from NUMERUS_SYNTAX_REGEX_STRING. It is case insensitive. The
+ * regex compiled from NUMERUS_LONG_SYNTAX_REGEX_STRING. It is case insensitive. The
  * compilation is once for all subsequent calls of the function during
  * runtime. The regex compilation status is dropped since
- * NUMERUS_SYNTAX_REGEX_STRING is a correct hard coded constant.
+ * NUMERUS_LONG_SYNTAX_REGEX_STRING is a correct hard coded constant.
  *
  * @param *roman string containing a roman numeral to check
+ * @param is_short_numeral set it to non-zero to check the numeral only if it's a short numeral.
  * @returns int 1 if has correct roman syntax, 0 if it does not and  in case
  * of regex errors.
  */
-int numerus_is_roman(char *roman) {
+int numerus_is_roman(char *roman, int is_short_numeral) {
+    regex_t *regex_to_use;
+    const char *regex_string_to_use;
+    if (is_short_numeral != 0) {
+        regex_to_use = &NUMERUS_SHORT_SYNTAX_REGEX;
+        regex_string_to_use = NUMERUS_SHORT_SYNTAX_REGEX_STRING;
+    } else {
+        regex_to_use = &NUMERUS_LONG_SYNTAX_REGEX;
+        regex_string_to_use = NUMERUS_LONG_SYNTAX_REGEX_STRING;
+    }
     /* Compile the regex if it has not been done yet */
-    if (NUMERUS_SYNTAX_REGEX.re_magic == 0) {
+    if (regex_to_use->re_magic == 0) {
         /**
          * Flags in regcomp():
          * - REG_NOSUB:    does not save subexpressions (groups), only
@@ -302,17 +328,17 @@ int numerus_is_roman(char *roman) {
          * - REG_EXTENDED: uses the extended POSIX standard regular expressions,
          *                 which are required for the regex structure
          */
-        regcomp(&NUMERUS_SYNTAX_REGEX, NUMERUS_SYNTAX_REGEX_STRING,
+        regcomp(regex_to_use, regex_string_to_use,
                 REG_NOSUB | REG_ICASE | REG_EXTENDED);
     }
-    int match_result = regexec(&NUMERUS_SYNTAX_REGEX, roman, 0, NULL, 0);
+    int match_result = regexec(regex_to_use, roman, 0, NULL, 0);
     if (match_result == 0) { /* Matches regex */
         return true;
     } else if (match_result == REG_NOMATCH) { /* Does not match regex */
         return false;
     } else { /* Other errors */
         char msgbuf[100];
-        regerror(match_result, &NUMERUS_SYNTAX_REGEX, msgbuf, sizeof(msgbuf));
+        regerror(match_result, regex_to_use, msgbuf, sizeof(msgbuf));
         fprintf(stderr, "Roman syntax regex matching internal error.");
         return NUMERUS_ERROR_REGEXEC;
     }
