@@ -507,42 +507,63 @@ int numerus_export_all_to_sqlite3(char *filename) {
         return NUMERUS_ERROR_SQLITE;
     }
 
+    /* OPTIMIZE */
+    sqlite3_exec(db_connection, "PRAGMA synchronous = OFF", NULL, NULL, &sqlite_error_msg);
+    sqlite3_exec(db_connection, "PRAGMA journal_mode = MEMORY", NULL, NULL, &sqlite_error_msg);
+
     /* Create table query */
-    char *query = "DROP TABLE IF EXISTS roman_numerals; "
+    char *query_table = "DROP TABLE IF EXISTS roman_numerals; "
                   "CREATE TABLE roman_numerals ("
-                      "value INT PRIMARY KEY,"
+                      "value BIGINT,"
                       "numeral TEXT"
                   ");";
-    sqlite3_resp_code = sqlite3_exec(db_connection, query, 0, 0,
+    sqlite3_resp_code = sqlite3_exec(db_connection, query_table, 0, 0,
                                      &sqlite_error_msg);
     if (sqlite3_resp_code != SQLITE_OK) {
         fprintf(stderr, "SQL error: %s\n", sqlite_error_msg);
         sqlite3_free(sqlite_error_msg);
-        sqlite3_free(query);
+        sqlite3_free(query_table);
         sqlite3_close(db_connection);
         return NUMERUS_ERROR_SQLITE;
     }
-
+    //free(query_table);
     /* Insert all roman numerals */
-    short i;
+
+    /* Prepare statement */
+    //char *query = malloc(150 * sizeof(char));
+    char *query = "INSERT INTO roman_numerals VALUES (@i, @s);";
+    sqlite3_stmt *stmt;
+    sqlite3_prepare_v2(db_connection, query, 150, &stmt, NULL);
+
+    /* Start transaction */
+    sqlite3_resp_code = sqlite3_exec(db_connection, "BEGIN TRANSACTION", 0, 0,
+                                     &sqlite_error_msg);
+    long int i;
     for (i = NUMERUS_MIN_VALUE; i <= NUMERUS_MAX_VALUE; i++) {
-        query = sqlite3_mprintf(
-                "INSERT INTO roman_numerals VALUES (%d, '%q');", i,
-                numerus_short_to_roman(i));
-        sqlite3_resp_code = sqlite3_exec(db_connection, query, 0, 0,
-                                         &sqlite_error_msg);
-        if (sqlite3_resp_code != SQLITE_OK) {
-            fprintf(stderr, "SQL error: %s\n", sqlite_error_msg);
-            sqlite3_free(sqlite_error_msg);
-            sqlite3_free(query);
-            sqlite3_close(db_connection);
-            return NUMERUS_ERROR_SQLITE;
+        if (i % 100000 == 0) {
+            printf("Inserting to SQLite: %5.2f%%\n", 100*(i-NUMERUS_MIN_VALUE)/(NUMERUS_MAX_VALUE*2.0+1));
         }
+        char *roman = numerus_int_to_roman(i);
+        /* Fill statement */
+        sqlite3_bind_int64(stmt, 1, i);
+        sqlite3_bind_text(stmt, 2, roman, -1, SQLITE_TRANSIENT);
+
+        /* Execute statement */
+        sqlite3_step(stmt);
+
+        /* Cleanup memory */
+        free(roman);
+        sqlite3_clear_bindings(stmt);
+        sqlite3_reset(stmt);
     }
+    sqlite3_resp_code = sqlite3_exec(db_connection, "END TRANSACTION", 0, 0,
+                                     &sqlite_error_msg);
+    sqlite3_resp_code = sqlite3_exec(db_connection, "CREATE INDEX 'idx_roman_value' ON roman_numerals (value);", 0, 0,
+                                     &sqlite_error_msg);
 
     /* Cleanup and return */
+    sqlite3_finalize(stmt);
     sqlite3_free(sqlite_error_msg);
-    sqlite3_free(query);
     sqlite3_close(db_connection);
     return NUMERUS_OK;
 }
