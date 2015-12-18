@@ -74,6 +74,5 @@ int numerus_roman_is_zero(char *roman);
 char *numerus_long_to_roman(long int arabic);
 long numerus_roman_to_long(char *roman);
 int numerus_compare_value(char *roman_bigger, char *roman_smaller);
-char **numerus_allocate_all_romans(short int include_negatives);
 int numerus_export_all_to_sqlite3(char *filename);
 int numerus_export_all_to_csv(char *filename);

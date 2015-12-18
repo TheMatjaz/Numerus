@@ -464,67 +464,6 @@ long numerus_roman_to_long(char *roman) {
 }
 
 /**
- * Allocates all roman numerals and their values in memory for fast conversions
- * from value to roman numeral.
- *
- * It creates an array of pointers to strings, char*. Each char* points to the
- * roman numeral with the same value as the index of the char* in the array. The
- * returned pointer to the array points to the value 0.
- *
- * Example structure:
- *
- * \verbatim
- *  i  | p --> numeral
- * ----|---------------------
- * -1  | * --> "-I"
- *  0  | * --> "NULLA"
- *  1  | * --> "I"
- * \endverbatim
- *
- * Example usage:
- *
- * \code{.c}
- * char **all_romans = numerus_allocate_all_romans(1);
- * char *fortytwo = all_romans[42];
- * \endcode
- *
- * @param include_negatives set it to 0 to create the array from 0 to 
- * NUMERUS_MAX_VALUE or to anything else to create it from NUMERUS_MIN_VALUE to
- * NUMERUS_MAX_VALUE
- * @returns the address of the value 0 (which points to NUMERUS_ZERO) in the
- * array or NULL if malloc() fails to allocate the array
- */
-char **numerus_allocate_all_romans(short int include_negatives) {
-    short int num_of_romans = NUMERUS_MAX_VALUE;
-    if (include_negatives != 0) {
-        include_negatives = 1;
-        num_of_romans *= 2;
-    }
-    num_of_romans += 1; /* Include NUMERUS_ZERO */
-
-    /* Allocate an array of pointers to strings */
-    char **all_roman_numerals = malloc(num_of_romans * sizeof(char *));
-    if (all_roman_numerals == NULL) {
-        numerus_error_code = NUMERUS_ERROR_ALLOCATE_ALL;
-        fprintf(stderr, "All romans allocation error in malloc()\n");
-        return NULL;
-    }
-
-    /* Fill the array */
-    int index = 0;
-    short i;
-    if (include_negatives) {
-        for (i = NUMERUS_MIN_VALUE; i < 0; i++) {
-            all_roman_numerals[index++] = numerus_int_to_roman(i);
-        }
-    }
-    for (i = 0; i <= NUMERUS_MAX_VALUE; i++) {
-        all_roman_numerals[index++] = numerus_int_to_roman(i);
-    }
-    return &all_roman_numerals[0 + (include_negatives ? NUMERUS_MAX_VALUE : 0)];
-}
-
-/**
  * Compares the value of two roman numerals, emulating the operator '>'.
  *
  * @param *roman_bigger string with a roman numeral to compare with the second 
