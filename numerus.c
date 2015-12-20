@@ -30,7 +30,7 @@ const long int NUMERUS_MAX_LONG_VALUE = 3999999;
 /**
  * Minimum value a long a roman numeral (with '_') may have.
  */
-const long int NUMERUS_MIN_LONG_VALUE = -3999999;
+const long int NUMERUS_MIN_LONG_VALUE = -NUMERUS_MAX_LONG_VALUE;
 
 /**
  * Maximum value a short roman numeral (without '_') may have.
@@ -40,7 +40,7 @@ const short int NUMERUS_MAX_SHORT_VALUE = 3999;
 /**
  * Minimum value a short roman numeral (without '_') may have.
  */
-const short int NUMERUS_MIN_SHORT_VALUE = -3999;
+const short int NUMERUS_MIN_SHORT_VALUE = -NUMERUS_MAX_SHORT_VALUE;
 
 /**
  * Roman numeral of value 0 (zero).
