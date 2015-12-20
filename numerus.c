@@ -214,6 +214,7 @@ short numerus_numeral_length(char *roman) {
         switch (toupper(*roman)) {
             case '_': {
                 roman++;
+                i++;
                 break;
             }
             case '-':
