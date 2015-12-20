@@ -70,7 +70,7 @@ extern const char *NUMERUS_LONG_SYNTAX_REGEX_STRING;
 extern short int numerus_error_code;
 
 int numerus_is_roman(char *roman, int is_short_numeral);
-int numerus_roman_is_zero(char *roman);
+int numerus_is_zero(char *roman);
 char *numerus_long_to_roman(long int arabic);
 long numerus_roman_to_long(char *roman);
 int numerus_compare_value(char *roman_bigger, char *roman_smaller);

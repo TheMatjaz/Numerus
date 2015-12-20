@@ -156,7 +156,7 @@ static const struct _num_char_struct _NUM_DICTIONARY[] = {
  * NUMERUS_ZERO
  * @returns int 1 if the string is (-)NUMERUS_ZERO or 0 if it's not
  */
-int numerus_roman_is_zero(char *roman) {
+int numerus_is_zero(char *roman) {
     if (*roman == '-') {
         roman++;
     }
@@ -432,7 +432,7 @@ static long _num_roman_to_short(char **roman) {
  */
 long numerus_roman_to_long(char *roman) {
     /* Exclude nulla numerals */
-    if (numerus_roman_is_zero(roman)) {
+    if (numerus_is_zero(roman)) {
         return 0;
     }
 
