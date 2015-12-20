@@ -560,7 +560,7 @@ int numerus_export_to_csv(char *filename, long min_value, long max_value,
  * @returns response code as int: NUMERUS_OK if everything went OK, 
  * NUMERUS_ERROR_SQLITE if something went wrong.
  */
-int numerus_export_all_to_sqlite3(char *filename) {
+int numerus_export_to_sqlite3(char *filename, long min_value, long max_value) {
     if (filename == NULL) {
         filename = "file:numerus.db";
     }
@@ -597,11 +597,9 @@ int numerus_export_all_to_sqlite3(char *filename) {
         sqlite3_close(db_connection);
         return NUMERUS_ERROR_SQLITE;
     }
-    //free(query_table);
     /* Insert all roman numerals */
 
     /* Prepare statement */
-    //char *query = malloc(150 * sizeof(char));
     char *query = "INSERT INTO roman_numerals VALUES (@i, @s);";
     sqlite3_stmt *stmt;
     sqlite3_prepare_v2(db_connection, query, 150, &stmt, NULL);
@@ -610,12 +608,8 @@ int numerus_export_all_to_sqlite3(char *filename) {
     sqlite3_resp_code = sqlite3_exec(db_connection, "BEGIN TRANSACTION", 0, 0,
                                      &sqlite_error_msg);
     long int i;
-    for (i = NUMERUS_MIN_LONG_VALUE; i <= NUMERUS_MAX_LONG_VALUE; i++) {
-        if (i % 100000 == 0) {
-            printf("Inserting to SQLite: %5.2f%%\n", 100 * (i -
-                                                            NUMERUS_MIN_LONG_VALUE) / (
-                    NUMERUS_MAX_LONG_VALUE * 2.0 + 1));
-        }
+    printf("Insering to SQLite...\n");
+    for (i = min_value; i <= max_value; i++) {
         char *roman = numerus_long_to_roman(i);
         /* Fill statement */
         sqlite3_bind_int64(stmt, 1, i);
