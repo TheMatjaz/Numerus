@@ -13,6 +13,7 @@
  * - http://stackoverflow.com/a/30816418/5292928
  */
 
+#include <ctype.h>    /* For `upcase()` */
 #include <stdio.h>    /* To `fprintf()` to `stderr` */
 #include <stdlib.h>   /* For `malloc()` */
 #include <string.h>   /* For `strcmp()` */
@@ -30,7 +31,7 @@ const long int NUMERUS_MAX_LONG_VALUE = 3999999;
 /**
  * Minimum value a long a roman numeral (with '_') may have.
  */
-const long int NUMERUS_MIN_LONG_VALUE = -3999999;
+const long int NUMERUS_MIN_LONG_VALUE = -NUMERUS_MAX_LONG_VALUE;
 
 /**
  * Maximum value a short roman numeral (without '_') may have.
@@ -40,7 +41,7 @@ const short int NUMERUS_MAX_SHORT_VALUE = 3999;
 /**
  * Minimum value a short roman numeral (without '_') may have.
  */
-const short int NUMERUS_MIN_SHORT_VALUE = -3999;
+const short int NUMERUS_MIN_SHORT_VALUE = -NUMERUS_MAX_SHORT_VALUE;
 
 /**
  * Roman numeral of value 0 (zero).
@@ -156,7 +157,7 @@ static const struct _num_char_struct _NUM_DICTIONARY[] = {
  * NUMERUS_ZERO
  * @returns int 1 if the string is (-)NUMERUS_ZERO or 0 if it's not
  */
-int numerus_roman_is_zero(char *roman) {
+int numerus_is_zero(char *roman) {
     if (*roman == '-') {
         roman++;
     }
@@ -190,11 +191,11 @@ int numerus_is_long_numeral(char *roman) {
 /**
  * Calculates the number of roman characters in the roman numeral.
  *
- * Includes the minus `-` and any of the following characters `MDCLXVI`.
- * Exludes underscroes `_` and the null terminator. It does not perform a
- * syntax check, but it stops at NUMERAL_MAX_LONG_LENGTH characters. If the
- * string is longer, returns -1. If any non-roman character is found in the
- * string, returns -2.
+ * It's case insensitive. Includes the minus `-` and any of the following
+ * characters `MDCLXVI`. Exludes underscroes `_` and the null terminator. It
+ * does not perform a syntax check, but it stops at NUMERAL_MAX_LONG_LENGTH
+ * characters. If the string is longer, returns -1. If any non-roman character
+ * is found in the string, returns -2.
  *
  * @param *roman string containing a roman numeral to count the roman chars of
  * @returns short number of roman characters in a roman numeral, -1 if the
@@ -202,14 +203,18 @@ int numerus_is_long_numeral(char *roman) {
  * found.
  */
 short numerus_numeral_length(char *roman) {
+    if (numerus_is_zero(roman)) {
+        return (short) strlen(NUMERUS_ZERO);
+    }
     short i = 0;
     while (*roman != '\0') {
         if (i > NUMERUS_MAX_LONG_LENGTH) {
             return -1;
         }
-        switch (*roman) {
+        switch (toupper(*roman)) {
             case '_': {
                 roman++;
+                i++;
                 break;
             }
             case '-':
@@ -220,6 +225,7 @@ short numerus_numeral_length(char *roman) {
             case 'X':
             case 'V':
             case 'I': {
+                roman++;
                 i++;
                 break;
             }
@@ -304,10 +310,6 @@ char *numerus_long_to_roman(long int arabic) {
         strcpy(zero_string, NUMERUS_ZERO);
         return zero_string;
     }
-
-
-    /* Actual conversion comparing appending chars from _NUM_DICTIONARY */
-    const struct _num_char_struct *current_roman_char = &_NUM_DICTIONARY[0];
 
     /* Create part between underscores */
     if (arabic > NUMERUS_MAX_SHORT_VALUE) {
@@ -432,7 +434,7 @@ static long _num_roman_to_short(char **roman) {
  */
 long numerus_roman_to_long(char *roman) {
     /* Exclude nulla numerals */
-    if (numerus_roman_is_zero(roman)) {
+    if (numerus_is_zero(roman)) {
         return 0;
     }
 
@@ -461,67 +463,6 @@ long numerus_roman_to_long(char *roman) {
 
     numerus_error_code = NUMERUS_OK;
     return sign * arabic;
-}
-
-/**
- * Allocates all roman numerals and their values in memory for fast conversions
- * from value to roman numeral.
- *
- * It creates an array of pointers to strings, char*. Each char* points to the
- * roman numeral with the same value as the index of the char* in the array. The
- * returned pointer to the array points to the value 0.
- *
- * Example structure:
- *
- * \verbatim
- *  i  | p --> numeral
- * ----|---------------------
- * -1  | * --> "-I"
- *  0  | * --> "NULLA"
- *  1  | * --> "I"
- * \endverbatim
- *
- * Example usage:
- *
- * \code{.c}
- * char **all_romans = numerus_allocate_all_romans(1);
- * char *fortytwo = all_romans[42];
- * \endcode
- *
- * @param include_negatives set it to 0 to create the array from 0 to 
- * NUMERUS_MAX_VALUE or to anything else to create it from NUMERUS_MIN_VALUE to
- * NUMERUS_MAX_VALUE
- * @returns the address of the value 0 (which points to NUMERUS_ZERO) in the
- * array or NULL if malloc() fails to allocate the array
- */
-char **numerus_allocate_all_romans(short int include_negatives) {
-    short int num_of_romans = NUMERUS_MAX_VALUE;
-    if (include_negatives != 0) {
-        include_negatives = 1;
-        num_of_romans *= 2;
-    }
-    num_of_romans += 1; /* Include NUMERUS_ZERO */
-
-    /* Allocate an array of pointers to strings */
-    char **all_roman_numerals = malloc(num_of_romans * sizeof(char *));
-    if (all_roman_numerals == NULL) {
-        numerus_error_code = NUMERUS_ERROR_ALLOCATE_ALL;
-        fprintf(stderr, "All romans allocation error in malloc()\n");
-        return NULL;
-    }
-
-    /* Fill the array */
-    int index = 0;
-    short i;
-    if (include_negatives) {
-        for (i = NUMERUS_MIN_VALUE; i < 0; i++) {
-            all_roman_numerals[index++] = numerus_int_to_roman(i);
-        }
-    }
-    for (i = 0; i <= NUMERUS_MAX_VALUE; i++) {
-        all_roman_numerals[index++] = numerus_int_to_roman(i);
-    }
-    return &all_roman_numerals[0 + (include_negatives ? NUMERUS_MAX_VALUE : 0)];
 }
 
 /**
@@ -554,20 +495,53 @@ int numerus_compare_value(char *roman_bigger, char *roman_smaller) {
     }
 }
 
-int numerus_export_all_to_csv(char *filename) {
+int numerus_export_to_csv(char *filename, long min_value, long max_value,
+                          int numerals_first, char *separator, char *newline,
+                          char *quotes) {
     if (filename == NULL) {
         filename = "/tmp/numerus.csv";
     }
-    FILE *csv = fopen(filename, "w");
+    if (min_value < NUMERUS_MIN_LONG_VALUE || max_value > NUMERUS_MAX_LONG_VALUE) {
+        return -1;
+    }
+    if (separator == NULL) {
+        separator = ",";
+    }
+    if (newline == NULL) {
+        newline = "\n";
+    }
+    if (quotes == NULL) {
+        quotes = "\0";
+    }
+
+    FILE *csv_file = fopen(filename, "w");
     long int i;
-    for (i = NUMERUS_MIN_LONG_VALUE; i <= NUMERUS_MAX_LONG_VALUE; i++) {
-            fprintf(csv, "%li, %s\n", i, numerus_long_to_roman(i));
+    if (numerals_first == 0) {
+        for (i = min_value; i <= max_value; i++) {
+            fprintf(csv_file,
+                    "%li%s%s%s%s%s",
+                    i,
+                    separator,
+                    quotes,
+                    numerus_long_to_roman(i),
+                    quotes,
+                    newline);
         }
-    fclose(csv);
+    } else {
+        for (i = min_value; i <= max_value; i++) {
+            fprintf(csv_file,
+                    "%s%s%s%s%li%s",
+                    quotes,
+                    numerus_long_to_roman(i),
+                    quotes,
+                    separator,
+                    i,
+                    newline);
+        }
+    }
+    fclose(csv_file);
     return 0;
 }
-
-
 
 /**
  * Saves all roman numerals with their values to a SQLite3 file in a table
@@ -583,83 +557,125 @@ int numerus_export_all_to_csv(char *filename) {
  * @returns response code as int: NUMERUS_OK if everything went OK, 
  * NUMERUS_ERROR_SQLITE if something went wrong.
  */
-int numerus_export_all_to_sqlite3(char *filename) {
+int numerus_export_to_sqlite3(char *filename, long min_value, long max_value) {
     if (filename == NULL) {
         filename = "file:numerus.db";
     }
-    sqlite3 *db_connection;
-    char *sqlite_error_msg = 0;
+    sqlite3 *db;
+    char *err_msg;
 
     /* Open the database in read-write mode, create it if not exists yet */
-    int sqlite3_resp_code = sqlite3_open_v2(filename, &db_connection,
-                             SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE,
-                                            NULL);
-    if (sqlite3_resp_code != SQLITE_OK) {
-        fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(
-                db_connection));
-        sqlite3_close(db_connection);
+    int resp_code = sqlite3_open_v2(filename, &db,
+                                    SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE,
+                                    NULL);
+    if (resp_code != SQLITE_OK) {
+        fprintf(stderr, "SQLite error: cannot open database %s, %s\n", filename,
+                sqlite3_errmsg(db));
+        sqlite3_close(db);
         return NUMERUS_ERROR_SQLITE;
     }
 
-    /* OPTIMIZE */
-    sqlite3_exec(db_connection, "PRAGMA synchronous = OFF", NULL, NULL, &sqlite_error_msg);
-    sqlite3_exec(db_connection, "PRAGMA journal_mode = MEMORY", NULL, NULL, &sqlite_error_msg);
+    /* Database settings for insecure but faster insertions */
+    resp_code = sqlite3_exec(db, "PRAGMA synchronous = OFF", NULL, NULL,
+                             &err_msg);
+    if (resp_code != SQLITE_OK) {
+        fprintf(stderr, "SQLite error: %s\n",
+                sqlite3_errmsg(db));
+        sqlite3_free(err_msg);
+        sqlite3_close(db);
+        return NUMERUS_ERROR_SQLITE;
+    }
+    resp_code = sqlite3_exec(db, "PRAGMA journal_mode = MEMORY", NULL, NULL,
+                             &err_msg);
+    if (resp_code != SQLITE_OK) {
+        fprintf(stderr, "SQLite error: %s\n",
+                sqlite3_errmsg(db));
+        sqlite3_free(err_msg);
+        sqlite3_close(db);
+        return NUMERUS_ERROR_SQLITE;
+    }
 
-    /* Create table query */
+    /* Create table */
     char *query_table = "DROP TABLE IF EXISTS roman_numerals; "
-                  "CREATE TABLE roman_numerals ("
-                      "value BIGINT,"
-                      "numeral TEXT"
-                  ");";
-    sqlite3_resp_code = sqlite3_exec(db_connection, query_table, 0, 0,
-                                     &sqlite_error_msg);
-    if (sqlite3_resp_code != SQLITE_OK) {
-        fprintf(stderr, "SQL error: %s\n", sqlite_error_msg);
-        sqlite3_free(sqlite_error_msg);
-        sqlite3_free(query_table);
-        sqlite3_close(db_connection);
+                        "CREATE TABLE roman_numerals "
+                        "(value BIGINT, numeral TEXT);";
+    resp_code = sqlite3_exec(db, query_table, 0, 0, &err_msg);
+    if (resp_code != SQLITE_OK) {
+        fprintf(stderr, "SQLite error: %s\n", err_msg);
+        sqlite3_free(err_msg);
+        sqlite3_close(db);
         return NUMERUS_ERROR_SQLITE;
     }
-    //free(query_table);
-    /* Insert all roman numerals */
 
     /* Prepare statement */
-    //char *query = malloc(150 * sizeof(char));
     char *query = "INSERT INTO roman_numerals VALUES (@i, @s);";
     sqlite3_stmt *stmt;
-    sqlite3_prepare_v2(db_connection, query, 150, &stmt, NULL);
+    resp_code = sqlite3_prepare_v2(db, query, 150, &stmt, NULL);
+    if (resp_code != SQLITE_OK) {
+        fprintf(stderr, "SQLite error: %s\n", err_msg);
+        sqlite3_free(err_msg);
+        sqlite3_close(db);
+        return NUMERUS_ERROR_SQLITE;
+    }
 
     /* Start transaction */
-    sqlite3_resp_code = sqlite3_exec(db_connection, "BEGIN TRANSACTION", 0, 0,
-                                     &sqlite_error_msg);
+    resp_code = sqlite3_exec(db, "BEGIN TRANSACTION", 0, 0, &err_msg);
+    if (resp_code != SQLITE_OK) {
+        fprintf(stderr, "SQLite error: %s\n", err_msg);
+        sqlite3_free(err_msg);
+        sqlite3_close(db);
+        return NUMERUS_ERROR_SQLITE;
+    }
+
+    /* Insert into SQLite table */
     long int i;
-    for (i = NUMERUS_MIN_LONG_VALUE; i <= NUMERUS_MAX_LONG_VALUE; i++) {
-        if (i % 100000 == 0) {
-            printf("Inserting to SQLite: %5.2f%%\n", 100 * (i -
-                                                            NUMERUS_MIN_LONG_VALUE) / (
-                    NUMERUS_MAX_LONG_VALUE * 2.0 + 1));
-        }
+    printf("Insering into SQLite...\n");
+    for (i = min_value; i <= max_value; i++) {
         char *roman = numerus_long_to_roman(i);
-        /* Fill statement */
+        /* Fill prepared statement */
         sqlite3_bind_int64(stmt, 1, i);
         sqlite3_bind_text(stmt, 2, roman, -1, SQLITE_TRANSIENT);
 
         /* Execute statement */
-        sqlite3_step(stmt);
+        resp_code = sqlite3_step(stmt);
+        if (resp_code != SQLITE_OK) {
+            fprintf(stderr, "SQLite error: %s\n", err_msg);
+            sqlite3_free(err_msg);
+            sqlite3_finalize(stmt);
+            sqlite3_close(db);
+            return NUMERUS_ERROR_SQLITE;
+        }
 
-        /* Cleanup memory */
+        /* Cleanup memory and prepared statement */
         free(roman);
         sqlite3_clear_bindings(stmt);
         sqlite3_reset(stmt);
     }
-    sqlite3_resp_code = sqlite3_exec(db_connection, "END TRANSACTION", 0, 0,
-                                     &sqlite_error_msg);
-    sqlite3_resp_code = sqlite3_exec(db_connection, "CREATE INDEX 'idx_roman_value' ON roman_numerals (value);", 0, 0,
-                                     &sqlite_error_msg);
+
+    /* Commit transaction */
+    resp_code = sqlite3_exec(db, "END TRANSACTION", 0, 0, &err_msg);
+    if (resp_code != SQLITE_OK) {
+        fprintf(stderr, "SQLite error: %s\n", err_msg);
+        sqlite3_free(err_msg);
+        sqlite3_finalize(stmt);
+        sqlite3_close(db);
+        return NUMERUS_ERROR_SQLITE;
+    }
+
+    /* Add index on the value column */
+    resp_code = sqlite3_exec(db, "CREATE INDEX 'idx_roman_value' "
+                                 "ON roman_numerals (value);", 0, 0, &err_msg);
+    if (resp_code != SQLITE_OK) {
+        fprintf(stderr, "SQLite error: %s\n", err_msg);
+        sqlite3_free(err_msg);
+        sqlite3_finalize(stmt);
+        sqlite3_close(db);
+        return NUMERUS_ERROR_SQLITE;
+    }
 
     /* Cleanup and return */
     sqlite3_finalize(stmt);
-    sqlite3_free(sqlite_error_msg);
-    sqlite3_close(db_connection);
+    sqlite3_free(err_msg);
+    sqlite3_close(db);
     return NUMERUS_OK;
 }
