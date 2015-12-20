@@ -498,20 +498,53 @@ int numerus_compare_value(char *roman_bigger, char *roman_smaller) {
     }
 }
 
-int numerus_export_all_to_csv(char *filename) {
+int numerus_export_to_csv(char *filename, long min_value, long max_value,
+                          int numerals_first, char *separator, char *newline,
+                          char *quotes) {
     if (filename == NULL) {
         filename = "/tmp/numerus.csv";
     }
-    FILE *csv = fopen(filename, "w");
+    if (min_value < NUMERUS_MIN_LONG_VALUE || max_value > NUMERUS_MAX_LONG_VALUE) {
+        return -1;
+    }
+    if (separator == NULL) {
+        separator = ",";
+    }
+    if (newline == NULL) {
+        newline = "\n";
+    }
+    if (quotes == NULL) {
+        quotes = "\0";
+    }
+
+    FILE *csv_file = fopen(filename, "w");
     long int i;
-    for (i = NUMERUS_MIN_LONG_VALUE; i <= NUMERUS_MAX_LONG_VALUE; i++) {
-            fprintf(csv, "%li, %s\n", i, numerus_long_to_roman(i));
+    if (numerals_first == 0) {
+        for (i = min_value; i <= max_value; i++) {
+            fprintf(csv_file,
+                    "%li%s%s%s%s%s",
+                    i,
+                    separator,
+                    quotes,
+                    numerus_long_to_roman(i),
+                    quotes,
+                    newline);
         }
-    fclose(csv);
+    } else {
+        for (i = min_value; i <= max_value; i++) {
+            fprintf(csv_file,
+                    "%s%s%s%s%li%s",
+                    quotes,
+                    numerus_long_to_roman(i),
+                    quotes,
+                    separator,
+                    i,
+                    newline);
+        }
+    }
+    fclose(csv_file);
     return 0;
 }
-
-
 
 /**
  * Saves all roman numerals with their values to a SQLite3 file in a table
