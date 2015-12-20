@@ -76,3 +76,4 @@ long numerus_roman_to_long(char *roman);
 int numerus_compare_value(char *roman_bigger, char *roman_smaller);
 int numerus_export_all_to_sqlite3(char *filename);
 int numerus_export_all_to_csv(char *filename);
+short numerus_numeral_length(char *roman);

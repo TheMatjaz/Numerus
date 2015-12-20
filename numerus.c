@@ -13,6 +13,7 @@
  * - http://stackoverflow.com/a/30816418/5292928
  */
 
+#include <ctype.h>    /* For `upcase()` */
 #include <stdio.h>    /* To `fprintf()` to `stderr` */
 #include <stdlib.h>   /* For `malloc()` */
 #include <string.h>   /* For `strcmp()` */
@@ -190,11 +191,11 @@ int numerus_is_long_numeral(char *roman) {
 /**
  * Calculates the number of roman characters in the roman numeral.
  *
- * Includes the minus `-` and any of the following characters `MDCLXVI`.
- * Exludes underscroes `_` and the null terminator. It does not perform a
- * syntax check, but it stops at NUMERAL_MAX_LONG_LENGTH characters. If the
- * string is longer, returns -1. If any non-roman character is found in the
- * string, returns -2.
+ * It's case insensitive. Includes the minus `-` and any of the following
+ * characters `MDCLXVI`. Exludes underscroes `_` and the null terminator. It
+ * does not perform a syntax check, but it stops at NUMERAL_MAX_LONG_LENGTH
+ * characters. If the string is longer, returns -1. If any non-roman character
+ * is found in the string, returns -2.
  *
  * @param *roman string containing a roman numeral to count the roman chars of
  * @returns short number of roman characters in a roman numeral, -1 if the
@@ -202,12 +203,15 @@ int numerus_is_long_numeral(char *roman) {
  * found.
  */
 short numerus_numeral_length(char *roman) {
+    if (numerus_is_zero(roman)) {
+        return (short) strlen(NUMERUS_ZERO);
+    }
     short i = 0;
     while (*roman != '\0') {
         if (i > NUMERUS_MAX_LONG_LENGTH) {
             return -1;
         }
-        switch (*roman) {
+        switch (toupper(*roman)) {
             case '_': {
                 roman++;
                 break;
@@ -220,6 +224,7 @@ short numerus_numeral_length(char *roman) {
             case 'X':
             case 'V':
             case 'I': {
+                roman++;
                 i++;
                 break;
             }
