@@ -679,3 +679,50 @@ int numerus_export_to_sqlite3(char *filename, long min_value, long max_value) {
     sqlite3_close(db);
     return NUMERUS_OK;
 }
+
+int _num_pretty_print_malloc_size(char *roman) {
+    int alloc_size = 0;
+    while (*roman != '\0') {
+        if (*roman != '_') {
+            alloc_size++;
+        }
+        roman++;
+    }
+    alloc_size++; /* For \n at end of "____" line */
+    return alloc_size;
+}
+
+char *numerus_pretty_print_long_numerals(char *roman) {
+    if (roman == NULL) {
+        return NULL;
+    }
+    if (numerus_is_long_numeral(roman)) {
+        char *roman_start = roman;
+        char *pretty_roman = malloc(_num_pretty_print_malloc_size(roman));
+        char *pretty_roman_start = pretty_roman;
+        if (*roman == '-') {
+            *(pretty_roman++) = ' ';
+            roman++;
+        }
+        roman++; /* Skip first underscore */
+        while (*roman != '_') {
+            *(pretty_roman++) = '_';
+            roman++;
+        }
+        roman++; /* Skip second underscore */
+        *(pretty_roman++) = '\n';
+        roman = roman_start;
+        while (*roman != '\0') {
+            if (*roman == '_') {
+                roman++;
+            } else {
+                *(pretty_roman++) = *roman;
+                roman++;
+            }
+        }
+        *pretty_roman = '\0';
+        return pretty_roman_start;
+    } else {
+        return roman;
+    }
+}
