@@ -104,7 +104,7 @@ const char *SYNTAX_TEXT = "\n"
 const char *UNKNOWN_COMMAND_TEXT = "Unknown command or wrong roman numeral syntax.\n";
 const char *PRETTY_ON_TEXT = "Pretty printing is enabled.\n";
 const char *PRETTY_OFF_TEXT = "Pretty printing is disabled.\n";
-static int pretty_printing = 1;
+static int pretty_printing = 0;
 
 /**
  * Do not free a string after it has been trimmed, free the original pointer to it.
@@ -234,14 +234,26 @@ void numerus_repl(int argc, char **args) {
     size_t line_buffer_size = 50; /* Suffices for every command, gets
                                    * reallocated by getline() if not enough */
     char *line = malloc(line_buffer_size);
-    printf("%s", WELCOME_TEXT);
-    while (cycle_repl) {
-        printf("%s", PROMPT_TEXT);
-        if (getline(&line, &line_buffer_size, stdin) == -1) {
-            break;
-        } else {
-            command = trim_lowercase_get_first_word(line);
-            cycle_repl = _num_parse_command(command);
+    if (argc > 1) { /* Command line arguments to interprete and exit */
+        args++;
+        pretty_printing = 0;
+        while (argc > 1) {
+            command = trim_lowercase_get_first_word(*args);
+             _num_parse_command(command);
+            args++;
+            argc--;
+        }
+    } else { /* Enter shell */
+        pretty_printing = 1;
+        printf("%s", WELCOME_TEXT);
+        while (cycle_repl) {
+            printf("%s", PROMPT_TEXT);
+            if (getline(&line, &line_buffer_size, stdin) == -1) {
+                break;
+            } else {
+                command = trim_lowercase_get_first_word(line);
+                cycle_repl = _num_parse_command(command);
+            }
         }
     }
     free(line);
