@@ -160,7 +160,8 @@ int string_is_zero(char *zero_as_string) {
  * Command should be already trimmed and lowercased
  */
 int _num_parse_command(char *command) {
-    if (strcmp(command, "?") == 0 || strcmp(command, "help") == 0) {
+    if (strcmp(command, "?") == 0
+        || strcmp(command, "help") == 0) {
         printf("%s", HELP_TEXT);
         return 1;
     } else if (strcmp(command, "moo") == 0) {
@@ -169,7 +170,8 @@ int _num_parse_command(char *command) {
     } else if (strcmp(command, "ascii") == 0) {
         printf("%s", ASCII_TEXT);
         return 1;
-    } else if (strcmp(command, "info") == 0 || strcmp(command, "about") == 0) {
+    } else if (strcmp(command, "info") == 0
+               || strcmp(command, "about") == 0) {
         printf("%s", INFO_TEXT);
         return 1;
     } else if (strcmp(command, "syntax") == 0) {
@@ -194,7 +196,8 @@ int _num_parse_command(char *command) {
     } else if (strcmp(command, "ping") == 0) {
         printf("%s", PING_TEXT);
         return 1;
-    } else if (strcmp(command, "quit") == 0 || strcmp(command, "exit") == 0) {
+    } else if (strcmp(command, "exit") == 0
+               || strcmp(command, "quit") == 0) {
         printf("%s", QUIT_TEXT);
         return 0; /* 0 to stop the REPL */
     } else if (strcmp(command, "") == 0) {
@@ -214,7 +217,8 @@ int _num_parse_command(char *command) {
                 printf("%s\n", numerus_long_to_roman(value));
                 return 1;
             }
-        } else if ((value = numerus_roman_to_long(command)) != NUMERUS_MAX_LONG_VALUE + 1) {
+        } else if ((value = numerus_roman_to_long(command))
+                   != NUMERUS_MAX_LONG_VALUE + 1) {
             printf("%li\n", value);
             return 1;
         } else {
@@ -227,7 +231,8 @@ int _num_parse_command(char *command) {
 void numerus_repl(int argc, char **args) {
     int cycle_repl = 1;
     char *command;
-    size_t line_buffer_size = 100;
+    size_t line_buffer_size = 50; /* Suffices for every command, gets
+                                   * reallocated by getline() if not enough */
     char *line = malloc(line_buffer_size);
     printf("%s", WELCOME_TEXT);
     while (cycle_repl) {
