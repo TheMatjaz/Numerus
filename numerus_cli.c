@@ -109,35 +109,6 @@ static int pretty_printing = 1;
 /**
  * Do not free a string after it has been trimmed, free the original pointer to it.
  */
-char *trim_and_lowercase(char *string) {
-    char *start;
-
-    /* Trim leading space */
-    while(isspace(*string)) {
-        string++;
-    }
-
-    if(*string == 0) { /* All spaces */
-        return string;
-    }
-    start = string;
-
-    /* Lowercase any other characters */
-    while (*string != '\0') {
-        *string = (char) tolower(*string);
-        string++;
-    }
-
-    /* Reached end of string, go bacwards and trim trailing space */
-    string--;
-    while (isspace(*string)) {
-        string--;
-    }
-    *(string+1) = '\0';
-
-    return start;
-}
-
 char *trim_lowercase_get_first_word(char *string) {
     char *start;
 
