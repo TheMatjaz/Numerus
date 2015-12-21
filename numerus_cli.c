@@ -74,6 +74,9 @@ const char *SYNTAX_TEXT = ""
 " * 0-1 IX or 0-1 IV or ( 0-1 V and 0-3 I )\n"
 " * or \"NULLA\" instead of any other symbol.\n";
 const char *UNKNOWN_COMMAND_TEXT = "Unknown command or wrong roman numeral syntax.\n";
+const char *PRETTY_ON_TEXT = "Pretty printing is enabled.\n";
+const char *PRETTY_OFF_TEXT = "Pretty printing is disabled.\n";
+static int pretty_printing = 1;
 
 /**
  * Do not free a string after it has been trimmed, free the original pointer to it.
@@ -179,6 +182,16 @@ int _num_parse_command(char *command) {
     } else if (strcmp(command, "ave") == 0) {
         printf("%s", AVE_TEXT);
         return 1;
+    } else if (strcmp(command, "pretty") == 0) {
+        if (pretty_printing == 1) {
+            pretty_printing = 0;
+            printf("%s", PRETTY_OFF_TEXT);
+            return 1;
+        } else {
+            pretty_printing = 1;
+            printf("%s", PRETTY_ON_TEXT);
+            return 1;
+        }
     } else if (strcmp(command, "ping") == 0) {
         printf("%s", PING_TEXT);
         return 1;
@@ -194,8 +207,14 @@ int _num_parse_command(char *command) {
             printf("%s\n", numerus_long_to_roman(0));
             return 1;
         } else if ((value = strtol(command, NULL, 10)) != 0){
-            printf("%s\n", numerus_long_to_roman(value));
-            return 1;
+            if (pretty_printing == 1) {
+                printf("%s\n", numerus_pretty_print_long_numerals(
+                        numerus_long_to_roman(value)));
+                return 1;
+            } else {
+                printf("%s\n", numerus_long_to_roman(value));
+                return 1;
+            }
         } else if ((value = numerus_roman_to_long(command)) != NUMERUS_MAX_LONG_VALUE + 1) {
             printf("%li\n", value);
             return 1;
