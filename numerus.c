@@ -124,7 +124,7 @@ static regex_t NUMERUS_SHORT_SYNTAX_REGEX;
  * roman numerals have variable length and can be returned as a string copied
  * from the buffer with just the right amount of space allocated.
  */
-static char _num_numeral_build_buffer[NUMERUS_MAX_LONG_LENGTH];
+static char _num_numeral_build_buffer[NUMERUS_MAX_DOUBLE_LENGTH];
 
 /**
  * Global error code variable to store any errors during conversions.
