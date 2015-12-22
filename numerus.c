@@ -359,6 +359,21 @@ static char *_num_long_to_roman(long int arabic, int copy_out_of_buffer) {
         return roman_string;
     }
 }
+
+static double _num_round_to_nearest_12th(double decimal) {
+    if (decimal < 0) {
+        decimal *= -1;
+    }
+    decimal = round(decimal * 12) / 12; /* Round to nearest twelfth */
+    return decimal;
+}
+
+/* pass it values in [0, 1[ to round to the nearest twelfth. Returns the numerator from 0 to 11 */
+static short _num_nearest_12th_numerator(double decimal) {
+    decimal = _num_round_to_nearest_12th(decimal);
+    decimal = round(decimal * 12);
+    return (short) decimal;
+}
     return returnable_roman_string;
 }
 
