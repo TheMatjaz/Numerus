@@ -13,6 +13,7 @@
  * - http://stackoverflow.com/a/30816418/5292928
  */
 
+#include <math.h>
 #include <ctype.h>    /* For `upcase()` */
 #include <stdio.h>    /* To `fprintf()` to `stderr` */
 #include <stdlib.h>   /* For `malloc()` */
@@ -555,6 +556,58 @@ long numerus_roman_to_long(char *roman) {
     return sign * arabic;
 }
 
+// Checks for an S or . and returns the index of the first found, else 0
+short numerus_is_double_numeral(char *roman) {
+    short i = 0;
+    while (*roman != '\0') {
+        if (*roman == 'S' || *roman == 's' || *roman == '.') {
+            return i;
+        } else {
+            i++;
+        }
+        roman++;
+    }
+    return -1;
+}
+
+double _num_decimal_part_to_double(char *roman_decimal_part) {
+    double value = 0;
+    if (*roman_decimal_part == 'S' || *roman_decimal_part == 's') {
+        value += 0.5;
+        roman_decimal_part++;
+    }
+    while (*roman_decimal_part == '.') {
+        value += 1.0/12.0;
+        roman_decimal_part++;
+    }
+    if (*roman_decimal_part != '\0') {
+        return NUMERUS_MAX_DOUBLE_VALUE + 1;
+    }
+    return value;
+}
+
+double numerus_roman_to_double(char *roman) {
+    short decimal_part_index = numerus_is_double_numeral(roman);
+    if (decimal_part_index == -1) {
+        // just a short or long roman numeral
+        return (double) numerus_roman_to_long(roman);
+    } else {
+        char *roman_decimal_part = roman + decimal_part_index;
+        double decimal_part_value = _num_decimal_part_to_double(roman_decimal_part);
+        if (decimal_part_value > NUMERUS_MAX_DOUBLE_VALUE) {
+            return decimal_part_value;
+        }
+        *roman_decimal_part = '\0';
+        double whole_value = (double) numerus_roman_to_long(roman);
+        if (whole_value > 0) {
+            whole_value += decimal_part_value;
+        } else {
+            whole_value -= decimal_part_value;
+        }
+        return whole_value;
+    }
+}
+
 /**
  * Compares the value of two roman numerals, emulating the operator '>'.
  *
@@ -770,8 +823,8 @@ int numerus_export_to_sqlite3(char *filename, long min_value, long max_value) {
     return NUMERUS_OK;
 }
 
-int _num_pretty_print_malloc_size(char *roman) {
-    int alloc_size = 0;
+size_t _num_pretty_print_malloc_size(char *roman) {
+    size_t alloc_size = 0;
     while (*roman != '\0') {
         if (*roman != '_') {
             alloc_size++;

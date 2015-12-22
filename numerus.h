@@ -83,3 +83,5 @@ int numerus_export_to_csv(char *filename, long min_value, long max_value,
                           char *quotes);
 short numerus_numeral_length(char *roman);
 char *numerus_pretty_print_long_numerals(char *roman);
+char *numerus_double_to_roman(double value);
+double numerus_roman_to_double(char *roman);
