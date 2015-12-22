@@ -374,6 +374,48 @@ static short _num_nearest_12th_numerator(double decimal) {
     decimal = round(decimal * 12);
     return (short) decimal;
 }
+
+char *numerus_double_to_roman(double value) {
+    double integer_part_double;
+    double decimal_part = modf(value, &integer_part_double);
+    long integer_part = (long) integer_part_double;
+    char *roman;
+    char *roman_start;
+    if (integer_part != 0) {
+        roman = _num_long_to_roman(integer_part, 0);
+        if (roman == NULL) {
+            return NULL;
+        }
+        roman_start = roman;
+    } else {
+        roman = malloc(8); /* '-' + 'S' + 5x '.' + '\0' */
+        roman_start = roman;
+        if (decimal_part < 0) {
+            decimal_part *= -1;
+            *(roman++) = '-';
+        }
+    }
+    short twelfth = _num_nearest_12th_numerator(decimal_part);
+    if (twelfth != 0) { /* It's not just a long */
+        if (twelfth > 5) { /* At least one half */
+            *(roman++) = 'S';
+            twelfth -= 6;
+        }
+        while (twelfth > 0) {
+            *(roman++) = '.';
+            twelfth--;
+        }
+    }
+    *roman = '\0';
+    char *returnable_roman_string;
+    if (integer_part != 0) { /* Copy from buffer */
+        returnable_roman_string = malloc(roman - _num_numeral_build_buffer);
+        strcpy(returnable_roman_string, _num_numeral_build_buffer);
+    } else { /* Copy the values in smaller string */
+        returnable_roman_string = malloc(strlen(roman));
+        strcpy(returnable_roman_string, roman_start);
+        free(roman_start);
+    }
     return returnable_roman_string;
 }
 
