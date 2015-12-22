@@ -31,7 +31,11 @@ const char *HELP_TEXT = ""
 "info, about   shows version, credits, licence, repository of Numerus\n"
 "exit, quit    ends this shell\n\n"
 ""
-"We also have: moo, hello, ping, ave.\n";
+"We also have: moo, hello, ping, ave.\n\n"
+""
+"For ANY other information, check the documentation available on\n"
+"https://thematjaz.github.io/Numerus/ or the man page\n"
+"(close this program and run the command `man numerus`).\n";
 const char *QUIT_TEXT = "Vale!\n";
 const char *ASCII_TEXT = ""
 " ____  _____   ____   ____   ____    ____   _________   _______    ____   ____    _______ \n"
