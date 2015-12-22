@@ -27,11 +27,13 @@
  * Maximum value a long roman numeral (with '_') may have.
  */
 const long int NUMERUS_MAX_LONG_VALUE = 3999999;
+const double NUMERUS_MAX_DOUBLE_VALUE = NUMERUS_MAX_LONG_VALUE + 11/12;
 
 /**
  * Minimum value a long a roman numeral (with '_') may have.
  */
 const long int NUMERUS_MIN_LONG_VALUE = -NUMERUS_MAX_LONG_VALUE;
+const double NUMERUS_MIN_DOUBLE_VALUE = -NUMERUS_MAX_DOUBLE_VALUE;
 
 /**
  * Maximum value a short roman numeral (without '_') may have.
@@ -47,6 +49,14 @@ const short int NUMERUS_MIN_SHORT_VALUE = -NUMERUS_MAX_SHORT_VALUE;
  * Roman numeral of value 0 (zero).
  */
 const char *NUMERUS_ZERO = "NULLA";
+
+/**
+ * Maximum length of a double roman numeral string including the null terminator.
+ *
+ * The roman numeral `"-_MMMDCCCLXXXVIII_DCCCLXXXVIIIS....."`
+ * (value: -3888888 - 11+12) + `\0` is a string long 36+1 = 37 chars.
+ */
+const short int NUMERUS_MAX_DOUBLE_LENGTH = 37;
 
 /**
  * Maximum length of a long roman numeral string including the null terminator.
@@ -76,6 +86,10 @@ const char *NUMERUS_LONG_SYNTAX_REGEX_STRING =
         "^-?((_M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})_)"
                 "|M{0,3})(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$";
 
+const char *NUMERUS_DOUBLE_SYNTAX_REGEX_STRING =
+        "^-?((_M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})_)"
+                "|M{0,3})(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})"
+                "S?\\.{0,5}$";
 /**
  * String containing a to-be-compiled regex matching only short syntactically correct
  * roman numerals.
@@ -84,6 +98,9 @@ const char *NUMERUS_LONG_SYNTAX_REGEX_STRING =
  */
 const char *NUMERUS_SHORT_SYNTAX_REGEX_STRING =
         "^-?M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$";
+
+
+static regex_t NUMERUS_DOUBLE_SYNTAX_REGEX;
 
 /**
  * Compiled regex matching any syntactically correct roman numeral, including long numerals.
