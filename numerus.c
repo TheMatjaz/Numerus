@@ -225,7 +225,7 @@ short numerus_numeral_length(char *roman) {
     }
     short i = 0;
     while (*roman != '\0') {
-        if (i > NUMERUS_MAX_LONG_LENGTH) {
+        if (i > NUMERUS_MAX_DOUBLE_LENGTH) {
             return -1;
         }
         switch (toupper(*roman)) {
@@ -241,7 +241,9 @@ short numerus_numeral_length(char *roman) {
             case 'L':
             case 'X':
             case 'V':
-            case 'I': {
+            case 'I':
+            case 'S':
+            case '.': {
                 roman++;
                 i++;
                 break;
