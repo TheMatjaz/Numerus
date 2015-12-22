@@ -296,6 +296,8 @@ static char *_num_short_to_roman(long int arabic, char *roman_string) {
     return roman_string;
 }
 
+static char *_num_long_to_roman(long int arabic, int copy_out_of_buffer);
+
 /**
  * Converts a short int to a roman numeral.
  *
@@ -307,6 +309,12 @@ static char *_num_short_to_roman(long int arabic, char *roman_string) {
  * is out of range.
  */
 char *numerus_long_to_roman(long int arabic) {
+    return _num_long_to_roman(arabic, true);
+}
+
+/* Just to be able to call it with more details and parameters
+ * returns \0 position in the buffer (the start is easy to find, it's the buffer start itself) */
+static char *_num_long_to_roman(long int arabic, int copy_out_of_buffer) {
     /* Out of range check */
     if (arabic < NUMERUS_MIN_LONG_VALUE || arabic > NUMERUS_MAX_LONG_VALUE) {
         numerus_error_code = NUMERUS_ERROR_OUT_OF_RANGE;
@@ -342,9 +350,15 @@ char *numerus_long_to_roman(long int arabic) {
     *roman_string = '\0';
 
     /* Copy out of the buffer and return it */
-    char *returnable_roman_string =
-            malloc(roman_string - _num_numeral_build_buffer);
-    strcpy(returnable_roman_string, _num_numeral_build_buffer);
+    if (copy_out_of_buffer) {
+        char *returnable_roman_string =
+                malloc(roman_string - _num_numeral_build_buffer);
+        strcpy(returnable_roman_string, _num_numeral_build_buffer);
+        return returnable_roman_string;
+    } else {
+        return roman_string;
+    }
+}
     return returnable_roman_string;
 }
 
