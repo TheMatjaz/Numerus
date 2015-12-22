@@ -204,22 +204,27 @@ int _num_parse_command(char *command) {
         /* No inserted command, just <enter> */
         return 1;
     } else {
-        long value;
+        double value;
+        long l;
+        char *roman;
         if (string_is_zero(command)) {
-            printf("%s\n", numerus_long_to_roman(0));
+            printf("%s\n", roman = numerus_long_to_roman(0));
+            free(roman);
             return 1;
-        } else if ((value = strtol(command, NULL, 10)) != 0){
+        } else if ((value = strtod(command, NULL)) != 0){
             if (pretty_printing == 1) {
-                printf("%s\n", numerus_pretty_print_long_numerals(
-                        numerus_long_to_roman(value)));
+                printf("%s\n", roman = numerus_pretty_print_long_numerals(
+                        numerus_double_to_roman(value)));
+                free(roman);
                 return 1;
             } else {
-                printf("%s\n", numerus_long_to_roman(value));
+                printf("%s\n", roman = numerus_double_to_roman(value));
+                free(roman);
                 return 1;
             }
-        } else if ((value = numerus_roman_to_long(command))
-                   != NUMERUS_MAX_LONG_VALUE + 1) {
-            printf("%li\n", value);
+        } else if ((value = numerus_roman_to_double(command))
+                   <= NUMERUS_MAX_DOUBLE_VALUE) {
+            printf("%f\n", value);
             return 1;
         } else {
             printf("%s", UNKNOWN_COMMAND_TEXT);
