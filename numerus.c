@@ -445,23 +445,10 @@ static short _num_nearest_12th_numerator(double decimal) {
     return (short) decimal;
 }
 
-char *numerus_double_to_roman(double value) {
-    double integer_part_double;
-    double decimal_part = modf(value, &integer_part_double);
-    long integer_part = (long) integer_part_double;
-    char *roman;
-    char *roman_start;
-    if (integer_part != 0) {
-        roman = _num_long_to_roman(integer_part, 0);
-        if (roman == NULL) {
-            return NULL;
-        }
-        roman_start = roman;
-    } else {
-        roman = malloc(8); /* '-' + 'S' + 5x '.' + '\0' */
-        roman_start = roman;
-        if (decimal_part < 0) {
-            decimal_part *= -1;
+static void _num_append_decimal_part_to_numeral(double decimal_part, char *roman, short insert_minus) {
+    if (decimal_part < 0) {
+        decimal_part *= -1;
+        if (insert_minus != 0) {
             *(roman++) = '-';
         }
     }
@@ -477,14 +464,37 @@ char *numerus_double_to_roman(double value) {
         }
     }
     *roman = '\0';
+}
+
+char *numerus_double_to_roman(double value) {
+    /* Extract integer and decimal part from parameter */
+    double integer_part_double;
+    double decimal_part = modf(value, &integer_part_double);
+    long integer_part = (long) integer_part_double;
+    char *roman;
     char *returnable_roman_string;
-    if (integer_part != 0) { /* Copy from buffer */
+
+    if (decimal_part == 0.0) {
+        /* It's just a long */
+        return _num_long_to_roman(integer_part, 0);
+    }
+
+    if (integer_part != 0) { /* Example 2.7 or -2.7 */
+        roman = _num_long_to_roman(integer_part, 0);
+        if (roman == NULL) {
+            return NULL;
+        }
+        _num_append_decimal_part_to_numeral(decimal_part, roman + strlen(roman), 0);
+        /* Copy from build buffer */
         returnable_roman_string = malloc(roman - _num_numeral_build_buffer);
         strcpy(returnable_roman_string, _num_numeral_build_buffer);
-    } else { /* Copy the values in smaller string */
+    } else { /* Example 0.7 or -0.7 */
+        roman = malloc(8); /* '-' + 'S' + 5x '.' + '\0' */
+        _num_append_decimal_part_to_numeral(decimal_part, roman, 1);
+        /* Copy the values in smaller string */
         returnable_roman_string = malloc(strlen(roman));
-        strcpy(returnable_roman_string, roman_start);
-        free(roman_start);
+        strcpy(returnable_roman_string, roman);
+        free(roman);
     }
     return returnable_roman_string;
 }
