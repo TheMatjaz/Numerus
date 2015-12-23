@@ -240,13 +240,13 @@ short numerus_numeral_length(char *roman) {
     }
     short i = 0;
     while (*roman != '\0') {
-        if (i > NUMERUS_MAX_FLOAT_LENGTH) {
-            return -1;
+        if (i > NUMERUS_MAX_LENGTH) {
+            numerus_error_code = NUMERUS_ERROR_TOO_LONG_NUMERAL;
+            return NUMERUS_ERROR_TOO_LONG_NUMERAL;
         }
         switch (toupper(*roman)) {
             case '_': {
-                roman++;
-                i++;
+                roman++; // ignore underscores
                 break;
             }
             case '-':
@@ -260,11 +260,12 @@ short numerus_numeral_length(char *roman) {
             case 'S':
             case '.': {
                 roman++;
-                i++;
+                i++; // cound every other roman char
                 break;
             }
             default: {
-                return -2;
+                numerus_error_code = NUMERUS_ERROR_ILLEGAL_CHARACTER;
+                return NUMERUS_ERROR_ILLEGAL_CHARACTER;
             }
         }
     }
