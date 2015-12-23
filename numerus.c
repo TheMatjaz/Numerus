@@ -220,6 +220,15 @@ short numerus_is_float_numeral(char *roman) {
     return false;
 }
 
+short numerus_sign(char *roman) {
+    if (*roman == '-') {
+        return -1;
+    } else {
+        return 1;
+    }
+}
+
+
 /**
  * Calculates the number of roman characters in the roman numeral.
  *
