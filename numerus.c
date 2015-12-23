@@ -23,7 +23,7 @@
 #include <stdbool.h>  /* To use booleans `true` and `false` */
 #include "numerus.h"
 
-
+#define _NUM_WRONG_DECIMAL_PART_SYNTAX -300
 /**
  * Maximum value a long roman numeral (with '_') may have.
  */
@@ -585,12 +585,17 @@ static double _num_decimal_part_to_double(char *roman_decimal_part) {
         value += 0.5;
         roman_decimal_part++;
     }
+    short reps = 0;
     while (*roman_decimal_part == '.') {
+        if (reps > 5) {
+            return _NUM_WRONG_DECIMAL_PART_SYNTAX;
+        }
         value += 1.0/12.0;
         roman_decimal_part++;
+        reps++;
     }
     if (*roman_decimal_part != '\0') {
-        return NUMERUS_ERROR_NOT_ROMAN;
+        return _NUM_WRONG_DECIMAL_PART_SYNTAX;
     }
     return value;
 }
@@ -603,8 +608,8 @@ double numerus_roman_to_double(char *roman) {
     } else {
         char *roman_decimal_part = roman + decimal_part_index;
         double decimal_part_value = _num_decimal_part_to_double(roman_decimal_part);
-        if (decimal_part_value == NUMERUS_ERROR_NOT_ROMAN) {
-            return decimal_part_value;
+        if (decimal_part_value == _NUM_WRONG_DECIMAL_PART_SYNTAX) {
+            return NUMERUS_ERROR_NOT_ROMAN;
         }
         *roman_decimal_part = '\0';
         double whole_value = (double) numerus_roman_to_long(roman);
