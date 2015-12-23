@@ -204,7 +204,7 @@ short numerus_is_long_numeral(char *roman) {
     }
 }
 
-// Checks for an S or . and returns the index of the first found, else 0 (false)
+// Checks for an S or . and returns the index of the first found, else -1
 short numerus_is_float_numeral(char *roman) {
     short i = 0;
     while (*roman != '\0') {
@@ -218,7 +218,7 @@ short numerus_is_float_numeral(char *roman) {
         }
         roman++;
     }
-    return false;
+    return -1;
 }
 
 short numerus_sign(char *roman) {
