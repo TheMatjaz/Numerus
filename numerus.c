@@ -568,7 +568,8 @@ long numerus_roman_to_long(char *roman) {
 }
 
 
-double _num_decimal_part_to_double(char *roman_decimal_part) {
+
+static double _num_decimal_part_to_double(char *roman_decimal_part) {
     double value = 0;
     if (*roman_decimal_part == 'S' || *roman_decimal_part == 's') {
         value += 0.5;
@@ -821,7 +822,7 @@ int numerus_export_to_sqlite3(char *filename, long min_value, long max_value) {
     return NUMERUS_OK;
 }
 
-size_t _num_pretty_print_malloc_size(char *roman) {
+static size_t _num_pretty_print_malloc_size(char *roman) {
     size_t alloc_size = 0;
     while (*roman != '\0') {
         if (*roman != '_') {
