@@ -541,10 +541,10 @@ long numerus_roman_to_long(char *roman) {
     }
 
     /* Return an error if the roman is not syntactically correct */
-    if (!numerus_is_roman(roman, 0)) {
+    if (!numerus_is_roman(roman)) {
         numerus_error_code = NUMERUS_ERROR_WRONG_SYNTAX;
         fprintf(stderr, "Roman conversion error: wrong syntax of numeral %s\n", roman);
-        return NUMERUS_MAX_LONG_VALUE + 1;
+        return NUMERUS_ERROR_NOT_ROMAN;
     }
 
     /* Save sign */
@@ -580,7 +580,7 @@ static double _num_decimal_part_to_double(char *roman_decimal_part) {
         roman_decimal_part++;
     }
     if (*roman_decimal_part != '\0') {
-        return NUMERUS_MAX_FLOAT_VALUE + 1;
+        return NUMERUS_ERROR_NOT_ROMAN;
     }
     return value;
 }
@@ -593,7 +593,7 @@ double numerus_roman_to_double(char *roman) {
     } else {
         char *roman_decimal_part = roman + decimal_part_index;
         double decimal_part_value = _num_decimal_part_to_double(roman_decimal_part);
-        if (decimal_part_value > NUMERUS_MAX_FLOAT_VALUE) {
+        if (decimal_part_value == NUMERUS_ERROR_NOT_ROMAN) {
             return decimal_part_value;
         }
         *roman_decimal_part = '\0';
