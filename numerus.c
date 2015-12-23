@@ -552,6 +552,11 @@ static long _num_roman_to_short(char **roman) {
  * NUMERUS_MAX_LONG_VALUE in case of error
  */
 long numerus_roman_to_long(char *roman) {
+    /* Exclude empty strings */
+    if (*roman == '\0') {
+        return NUMERUS_ERROR_NOT_ROMAN;
+    }
+
     /* Exclude nulla numerals */
     if (numerus_is_zero(roman)) {
         return 0;
@@ -620,7 +625,12 @@ double numerus_roman_to_double(char *roman) {
         }
         *roman_decimal_part = '\0';
         double whole_value = (double) numerus_roman_to_long(roman);
-        if (whole_value > 0) {
+        if (decimal_part_index == 0) {
+            whole_value = 0;
+        } else if (whole_value == NUMERUS_ERROR_NOT_ROMAN) {
+            return NUMERUS_ERROR_NOT_ROMAN;
+        }
+        if (whole_value >= 0) {
             whole_value += decimal_part_value;
         } else {
             whole_value -= decimal_part_value;
