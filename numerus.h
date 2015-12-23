@@ -65,24 +65,39 @@
 #define NUMERUS_ERROR_NOT_ROMAN (long)(NUMERUS_MAX_VALUE + 1)
 #define NUMERUS_IS_ZERO 111
 
+/* Constants with particular values and extremes */
 extern const double NUMERUS_MAX_VALUE;
 extern const double NUMERUS_MIN_VALUE;
 extern const short int NUMERUS_MAX_LENGTH;
 extern const char *NUMERUS_ZERO;
+extern const char *NUMERUS_FLOAT_SYNTAX_REGEX_STRING;
 
-extern const char *NUMERUS_LONG_SYNTAX_REGEX_STRING;
+/**
+ * Error code global variable
+ */
 extern short int numerus_error_code;
 
-int numerus_is_roman(char *roman);
-int numerus_is_zero(char *roman);
-char *numerus_long_to_roman(long int arabic);
+/* Numeral analysis functions */
+short numerus_is_zero(char *roman);
+short numerus_is_long_numeral(char *roman);
+short numerus_is_float_numeral(char *roman);
+short numerus_sign(char *roman);
+short numerus_numeral_length(char *roman);
+short numerus_is_roman(char *roman);
+
+/* Conversion function from value to roman numeral */
+char *numerus_long_to_roman(long arabic);
+char *numerus_double_to_roman(double value);
+
+/* Conversion function from roman numeral to value */
 long numerus_roman_to_long(char *roman);
+double numerus_roman_to_double(char *roman);
+
+/* Utility functions */
 int numerus_compare_value(char *roman_bigger, char *roman_smaller);
 int numerus_export_to_sqlite3(char *filename, long min_value, long max_value);
 int numerus_export_to_csv(char *filename, long min_value, long max_value,
                           int numerals_first, char *separator, char *newline,
                           char *quotes);
-short numerus_numeral_length(char *roman);
 char *numerus_pretty_print_long_numerals(char *roman);
-char *numerus_double_to_roman(double value);
-double numerus_roman_to_double(char *roman);
+ // FIXME: IF I DONT PUT THIS ; HERE, IT GIVES ME A SYNTAX ERROR

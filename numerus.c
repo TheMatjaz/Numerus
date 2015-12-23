@@ -89,6 +89,7 @@ const char *NUMERUS_FLOAT_SYNTAX_REGEX_STRING =
         "^-?((_M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})_)"
                 "|M{0,3})(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})"
                 "S?\\.{0,5}$";
+
 /**
  * String containing a to-be-compiled regex matching only short syntactically correct
  * roman numerals.
@@ -173,7 +174,7 @@ static const struct _num_char_struct _NUM_DICTIONARY[] = {
  * NUMERUS_ZERO
  * @returns int 1 if the string is (-)NUMERUS_ZERO or 0 if it's not
  */
-int numerus_is_zero(char *roman) {
+short numerus_is_zero(char *roman) {
     if (*roman == '-') {
         roman++;
     }
@@ -195,7 +196,7 @@ int numerus_is_zero(char *roman) {
  * roman numeral
  * @returns int 1 if the string is a long roman numeral or 0 if it's not
  */
-int numerus_is_long_numeral(char *roman) {
+short numerus_is_long_numeral(char *roman) {
     if (*roman == '_' || (*roman == '-' && *(roman+1) == '_')) {
         return true;
     } else {
@@ -296,7 +297,7 @@ short numerus_numeral_length(char *roman) {
  * @returns int 1 if has correct roman syntax, 0 if it does not and  in case
  * of regex errors.
  */
-int numerus_is_roman(char *roman) {
+short numerus_is_roman(char *roman) {
     regex_t *regex_to_use;
     const char *regex_string_to_use;
     /* Compile the regex if it has not been done yet */
