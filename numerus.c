@@ -28,7 +28,7 @@
  * Maximum value a long roman numeral (with '_') may have.
  */
 const long int NUMERUS_MAX_LONG_VALUE = 3999999;
-const double NUMERUS_MAX_FLOAT_VALUE = NUMERUS_MAX_LONG_VALUE + 11 / 12;
+const double NUMERUS_MAX_FLOAT_VALUE = NUMERUS_MAX_LONG_VALUE + 11.0 / 12.0;
 
 /**
  * Minimum value a long a roman numeral (with '_') may have.
@@ -52,26 +52,24 @@ const short int NUMERUS_MIN_SHORT_VALUE = -NUMERUS_MAX_SHORT_VALUE;
 const char *NUMERUS_ZERO = "NULLA";
 
 /**
- * Maximum length of a double roman numeral string including the null terminator.
+ * Maximum length of a float roman numeral string including the null terminator.
  *
  * The roman numeral `"-_MMMDCCCLXXXVIII_DCCCLXXXVIIIS....."`
  * (value: -3888888 - 11+12) + `\0` is a string long 36+1 = 37 chars.
  */
-const short int NUMERUS_MAX_FLOAT_LENGTH = 37;
-
+const short int NUMERUS_MAX_LENGTH = 37;
 /**
- * Maximum length of a long roman numeral string including the null terminator.
+ * Maximum length of a long non-float roman numeral string including the null terminator.
  *
- * The roman numeral `"-_MMMDCCCLXXXVIII_DCCCLXXXVIII"` (value: -3888888) + `\0`
- * is a string long 30+1 = 31 chars.
+ * The roman numeral `"-_MMMDCCCLXXXVIII_DCCCLXXXVIII"`
+ * (value: -3888888) + `\0` is a string long 30+1 = 31 chars.
  */
 const short int NUMERUS_MAX_LONG_LENGTH = 31;
-
 /**
- * Maximum length of a short roman numeral string including the null terminator.
+ * Maximum length of a short non-long non-float roman numeral string including the null terminator.
  *
- * The roman numeral `"-MMMDCCCLXXXVIII"` (value: -3888) + `\0` is a string
- * long 16+1 = 17 chars.
+ * The roman numeral `"-MMMDCCCLXXXVIII"`
+ * (value: -3888) + `\0` is a string long 16+1 = 17 chars.
  */
 const short int NUMERUS_MAX_SHORT_LENGTH = 17;
 
@@ -125,7 +123,7 @@ static regex_t NUMERUS_SHORT_SYNTAX_REGEX;
  * roman numerals have variable length and can be returned as a string copied
  * from the buffer with just the right amount of space allocated.
  */
-static char _num_numeral_build_buffer[NUMERUS_MAX_FLOAT_LENGTH];
+static char _num_numeral_build_buffer[NUMERUS_MAX_LENGTH];
 
 /**
  * Global error code variable to store any errors during conversions.
