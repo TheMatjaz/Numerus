@@ -203,6 +203,22 @@ int numerus_is_long_numeral(char *roman) {
     }
 }
 
+// Checks for an S or . and returns the index of the first found, else 0 (false)
+short numerus_is_float_numeral(char *roman) {
+    short i = 0;
+    while (*roman != '\0') {
+        if (i > NUMERUS_MAX_LENGTH) {
+            return NUMERUS_ERROR_TOO_LONG_NUMERAL;
+        }
+        if (*roman == 'S' || *roman == 's' || *roman == '.') {
+            return i;
+        } else {
+            i++;
+        }
+        roman++;
+    }
+    return false;
+}
 
 /**
  * Calculates the number of roman characters in the roman numeral.
@@ -255,6 +271,52 @@ short numerus_numeral_length(char *roman) {
     return i;
 }
 
+
+/**
+ * Verifies if the passed string is a correct roman numeral.
+ *
+ * Performs syntax check of the passed roman numeral by checking it against a
+ * regex compiled from NUMERUS_LONG_SYNTAX_REGEX_STRING. It is case insensitive. The
+ * compilation is once for all subsequent calls of the function during
+ * runtime. The regex compilation status is dropped since
+ * NUMERUS_LONG_SYNTAX_REGEX_STRING is a correct hard coded constant.
+ *
+ * @param *roman string containing a roman numeral to check
+ * @param is_short_numeral set it to non-zero to check the numeral only if it's a short numeral.
+ * @returns int 1 if has correct roman syntax, 0 if it does not and  in case
+ * of regex errors.
+ */
+int numerus_is_roman(char *roman) {
+    regex_t *regex_to_use;
+    const char *regex_string_to_use;
+    /* Compile the regex if it has not been done yet */
+    if (NUMERUS_FLOAT_SYNTAX_REGEX.re_magic == 0) {
+        /**
+         * Flags in regcomp():
+         * - REG_NOSUB:    does not save subexpressions (groups), only
+         *                 reports the success or failure of compiling the regex
+         * - REG_ICASE:    ignores the case, making the regex case insensitive
+         * - REG_EXTENDED: uses the extended POSIX standard regular expressions,
+         *                 which are required for the regex structure
+         */
+        regcomp(&NUMERUS_FLOAT_SYNTAX_REGEX, NUMERUS_FLOAT_SYNTAX_REGEX_STRING,
+                REG_NOSUB | REG_ICASE | REG_EXTENDED);
+    }
+    int match_result = regexec(&NUMERUS_FLOAT_SYNTAX_REGEX, roman, 0, NULL, 0);
+    if (match_result == 0) { /* Matches regex */
+        return true;
+    } else if (match_result == REG_NOMATCH) { /* Does not match regex */
+        return false;
+    } else { /* Other regex errors */
+        char msgbuf[100];
+        regerror(match_result, &NUMERUS_FLOAT_SYNTAX_REGEX, msgbuf, sizeof(msgbuf));
+        numerus_error_code = NUMERUS_ERROR_REGEXEC;
+        fprintf(stderr, "Roman syntax regex matching internal error.");
+        return NUMERUS_ERROR_REGEXEC;
+    }
+}
+
+
 /**
  * Copies a string of 1 or 2 characters.
  *
@@ -293,22 +355,6 @@ static char *_num_short_to_roman(long int arabic, char *roman_string) {
         current_roman_char++;
     }
     return roman_string;
-}
-
-static char *_num_long_to_roman(long int arabic, int copy_out_of_buffer);
-
-/**
- * Converts a short int to a roman numeral.
- *
- * It allocates a string with the roman numerals long just as required and
- * returns a pointer to it.  If the short is outside of [NUMERUS_MIN_LONG_VALUE,
- * NUMERUS_MAX_LONG_VALUE], the conversion is impossible.
- *
- * @returns pointer to a string containing the roman numeral, NULL if the short
- * is out of range.
- */
-char *numerus_long_to_roman(long int arabic) {
-    return _num_long_to_roman(arabic, true);
 }
 
 /* Just to be able to call it with more details and parameters
@@ -357,6 +403,20 @@ static char *_num_long_to_roman(long int arabic, int copy_out_of_buffer) {
     } else {
         return roman_string;
     }
+}
+
+/**
+ * Converts a short int to a roman numeral.
+ *
+ * It allocates a string with the roman numerals long just as required and
+ * returns a pointer to it.  If the short is outside of [NUMERUS_MIN_LONG_VALUE,
+ * NUMERUS_MAX_LONG_VALUE], the conversion is impossible.
+ *
+ * @returns pointer to a string containing the roman numeral, NULL if the short
+ * is out of range.
+ */
+char *numerus_long_to_roman(long int arabic) {
+    return _num_long_to_roman(arabic, true);
 }
 
 static double _num_round_to_nearest_12th(double decimal) {
@@ -418,55 +478,7 @@ char *numerus_double_to_roman(double value) {
     return returnable_roman_string;
 }
 
-/**
- * Verifies if the passed string is a correct roman numeral.
- *
- * Performs syntax check of the passed roman numeral by checking it against a
- * regex compiled from NUMERUS_LONG_SYNTAX_REGEX_STRING. It is case insensitive. The
- * compilation is once for all subsequent calls of the function during
- * runtime. The regex compilation status is dropped since
- * NUMERUS_LONG_SYNTAX_REGEX_STRING is a correct hard coded constant.
- *
- * @param *roman string containing a roman numeral to check
- * @param is_short_numeral set it to non-zero to check the numeral only if it's a short numeral.
- * @returns int 1 if has correct roman syntax, 0 if it does not and  in case
- * of regex errors.
- */
-int numerus_is_roman(char *roman, int is_short_numeral) {
-    regex_t *regex_to_use;
-    const char *regex_string_to_use;
-    if (is_short_numeral != 0) {
-        regex_to_use = &NUMERUS_SHORT_SYNTAX_REGEX;
-        regex_string_to_use = NUMERUS_SHORT_SYNTAX_REGEX_STRING;
-    } else {
-        regex_to_use = &NUMERUS_LONG_SYNTAX_REGEX;
-        regex_string_to_use = NUMERUS_LONG_SYNTAX_REGEX_STRING;
-    }
-    /* Compile the regex if it has not been done yet */
-    if (regex_to_use->re_magic == 0) {
-        /**
-         * Flags in regcomp():
-         * - REG_NOSUB:    does not save subexpressions (groups), only
-         *                 reports the success or failure of compiling the regex
-         * - REG_ICASE:    ignores the case, making the regex case insensitive
-         * - REG_EXTENDED: uses the extended POSIX standard regular expressions,
-         *                 which are required for the regex structure
-         */
-        regcomp(regex_to_use, regex_string_to_use,
-                REG_NOSUB | REG_ICASE | REG_EXTENDED);
-    }
-    int match_result = regexec(regex_to_use, roman, 0, NULL, 0);
-    if (match_result == 0) { /* Matches regex */
-        return true;
-    } else if (match_result == REG_NOMATCH) { /* Does not match regex */
-        return false;
-    } else { /* Other errors */
-        char msgbuf[100];
-        regerror(match_result, regex_to_use, msgbuf, sizeof(msgbuf));
-        fprintf(stderr, "Roman syntax regex matching internal error.");
-        return NUMERUS_ERROR_REGEXEC;
-    }
-}
+
 
 /**
  * Checks if two strings match in the the next 1 or 2 characters.
@@ -554,19 +566,6 @@ long numerus_roman_to_long(char *roman) {
     return sign * arabic;
 }
 
-// Checks for an S or . and returns the index of the first found, else 0
-short numerus_is_float_numeral(char *roman) {
-    short i = 0;
-    while (*roman != '\0') {
-        if (*roman == 'S' || *roman == 's' || *roman == '.') {
-            return i;
-        } else {
-            i++;
-        }
-        roman++;
-    }
-    return -1;
-}
 
 double _num_decimal_part_to_double(char *roman_decimal_part) {
     double value = 0;
