@@ -62,13 +62,13 @@
  */
 #define NUMERUS_ERROR_ALLOCATE_ALL 105;
 
-extern const double NUMERUS_MAX_DOUBLE_VALUE;
-extern const double NUMERUS_MIN_DOUBLE_VALUE;
+extern const double NUMERUS_MAX_FLOAT_VALUE;
+extern const double NUMERUS_MIN_FLOAT_VALUE;
 extern const long int NUMERUS_MAX_LONG_VALUE;
 extern const long int NUMERUS_MIN_LONG_VALUE;
 extern const char *NUMERUS_ZERO;
 extern const short int NUMERUS_MAX_LONG_LENGTH;
-extern const short int NUMERUS_MAX_DOUBLE_LENGTH;
+extern const short int NUMERUS_MAX_FLOAT_LENGTH;
 extern const char *NUMERUS_LONG_SYNTAX_REGEX_STRING;
 extern short int numerus_error_code;
 

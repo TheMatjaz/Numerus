@@ -227,7 +227,7 @@ int _num_parse_command(char *command) {
                 return 1;
             }
         } else if ((value = numerus_roman_to_double(command))
-                   <= NUMERUS_MAX_DOUBLE_VALUE) {
+                   <= NUMERUS_MAX_FLOAT_VALUE) {
             printf("%f\n", value);
             return 1;
         } else {

@@ -28,13 +28,13 @@
  * Maximum value a long roman numeral (with '_') may have.
  */
 const long int NUMERUS_MAX_LONG_VALUE = 3999999;
-const double NUMERUS_MAX_DOUBLE_VALUE = NUMERUS_MAX_LONG_VALUE + 11/12;
+const double NUMERUS_MAX_FLOAT_VALUE = NUMERUS_MAX_LONG_VALUE + 11 / 12;
 
 /**
  * Minimum value a long a roman numeral (with '_') may have.
  */
 const long int NUMERUS_MIN_LONG_VALUE = -NUMERUS_MAX_LONG_VALUE;
-const double NUMERUS_MIN_DOUBLE_VALUE = -NUMERUS_MAX_DOUBLE_VALUE;
+const double NUMERUS_MIN_FLOAT_VALUE = -NUMERUS_MAX_FLOAT_VALUE;
 
 /**
  * Maximum value a short roman numeral (without '_') may have.
@@ -57,7 +57,7 @@ const char *NUMERUS_ZERO = "NULLA";
  * The roman numeral `"-_MMMDCCCLXXXVIII_DCCCLXXXVIIIS....."`
  * (value: -3888888 - 11+12) + `\0` is a string long 36+1 = 37 chars.
  */
-const short int NUMERUS_MAX_DOUBLE_LENGTH = 37;
+const short int NUMERUS_MAX_FLOAT_LENGTH = 37;
 
 /**
  * Maximum length of a long roman numeral string including the null terminator.
@@ -87,7 +87,7 @@ const char *NUMERUS_LONG_SYNTAX_REGEX_STRING =
         "^-?((_M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})_)"
                 "|M{0,3})(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$";
 
-const char *NUMERUS_DOUBLE_SYNTAX_REGEX_STRING =
+const char *NUMERUS_FLOAT_SYNTAX_REGEX_STRING =
         "^-?((_M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})_)"
                 "|M{0,3})(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})"
                 "S?\\.{0,5}$";
@@ -101,7 +101,7 @@ const char *NUMERUS_SHORT_SYNTAX_REGEX_STRING =
         "^-?M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$";
 
 
-static regex_t NUMERUS_DOUBLE_SYNTAX_REGEX;
+static regex_t NUMERUS_FLOAT_SYNTAX_REGEX;
 
 /**
  * Compiled regex matching any syntactically correct roman numeral, including long numerals.
@@ -125,7 +125,7 @@ static regex_t NUMERUS_SHORT_SYNTAX_REGEX;
  * roman numerals have variable length and can be returned as a string copied
  * from the buffer with just the right amount of space allocated.
  */
-static char _num_numeral_build_buffer[NUMERUS_MAX_DOUBLE_LENGTH];
+static char _num_numeral_build_buffer[NUMERUS_MAX_FLOAT_LENGTH];
 
 /**
  * Global error code variable to store any errors during conversions.
@@ -226,7 +226,7 @@ short numerus_numeral_length(char *roman) {
     }
     short i = 0;
     while (*roman != '\0') {
-        if (i > NUMERUS_MAX_DOUBLE_LENGTH) {
+        if (i > NUMERUS_MAX_FLOAT_LENGTH) {
             return -1;
         }
         switch (toupper(*roman)) {
@@ -557,7 +557,7 @@ long numerus_roman_to_long(char *roman) {
 }
 
 // Checks for an S or . and returns the index of the first found, else 0
-short numerus_is_double_numeral(char *roman) {
+short numerus_is_float_numeral(char *roman) {
     short i = 0;
     while (*roman != '\0') {
         if (*roman == 'S' || *roman == 's' || *roman == '.') {
@@ -581,20 +581,20 @@ double _num_decimal_part_to_double(char *roman_decimal_part) {
         roman_decimal_part++;
     }
     if (*roman_decimal_part != '\0') {
-        return NUMERUS_MAX_DOUBLE_VALUE + 1;
+        return NUMERUS_MAX_FLOAT_VALUE + 1;
     }
     return value;
 }
 
 double numerus_roman_to_double(char *roman) {
-    short decimal_part_index = numerus_is_double_numeral(roman);
+    short decimal_part_index = numerus_is_float_numeral(roman);
     if (decimal_part_index == -1) {
         // just a short or long roman numeral
         return (double) numerus_roman_to_long(roman);
     } else {
         char *roman_decimal_part = roman + decimal_part_index;
         double decimal_part_value = _num_decimal_part_to_double(roman_decimal_part);
-        if (decimal_part_value > NUMERUS_MAX_DOUBLE_VALUE) {
+        if (decimal_part_value > NUMERUS_MAX_FLOAT_VALUE) {
             return decimal_part_value;
         }
         *roman_decimal_part = '\0';
