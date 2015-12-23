@@ -298,8 +298,6 @@ short numerus_numeral_length(char *roman) {
  * of regex errors.
  */
 short numerus_is_roman(char *roman) {
-    regex_t *regex_to_use;
-    const char *regex_string_to_use;
     /* Compile the regex if it has not been done yet */
     if (NUMERUS_FLOAT_SYNTAX_REGEX.re_magic == 0) {
         /**
@@ -476,7 +474,7 @@ char *numerus_double_to_roman(double value) {
 
     if (decimal_part == 0.0) {
         /* It's just a long */
-        return _num_long_to_roman(integer_part, 0);
+        return _num_long_to_roman(integer_part, true);
     }
 
     if (integer_part != 0) { /* Example 2.7 or -2.7 */
@@ -540,7 +538,6 @@ static long _num_roman_to_short(char **roman) {
     }
     return arabic;
 }
-
 
 /**
  * Converts a roman numeral to a short int.
