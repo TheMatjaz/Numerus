@@ -28,13 +28,13 @@
  * Maximum value a long roman numeral (with '_') may have.
  */
 const long int NUMERUS_MAX_LONG_VALUE = 3999999;
-const double NUMERUS_MAX_FLOAT_VALUE = NUMERUS_MAX_LONG_VALUE + 11.0 / 12.0;
+const double NUMERUS_MAX_VALUE = NUMERUS_MAX_LONG_VALUE + 11.0 / 12.0;
 
 /**
  * Minimum value a long a roman numeral (with '_') may have.
  */
 const long int NUMERUS_MIN_LONG_VALUE = -NUMERUS_MAX_LONG_VALUE;
-const double NUMERUS_MIN_FLOAT_VALUE = -NUMERUS_MAX_FLOAT_VALUE;
+const double NUMERUS_MIN_VALUE = -NUMERUS_MAX_VALUE;
 
 /**
  * Maximum value a short roman numeral (without '_') may have.

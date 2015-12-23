@@ -62,20 +62,14 @@
 #define NUMERUS_IS_LONG 108
 #define NUMERUS_IS_NOT_FLOAT 109
 #define NUMERUS_IS_NOT_LONG 110
-#define NUMERUS_ERROR_NOT_ROMAN (long)(NUMERUS_MAX_FLOAT_VALUE + 1)
+#define NUMERUS_ERROR_NOT_ROMAN (long)(NUMERUS_MAX_VALUE + 1)
 #define NUMERUS_IS_ZERO 111
 
-
-
-
-
-extern const double NUMERUS_MAX_FLOAT_VALUE;
-extern const double NUMERUS_MIN_FLOAT_VALUE;
-extern const long int NUMERUS_MAX_LONG_VALUE;
-extern const long int NUMERUS_MIN_LONG_VALUE;
-extern const char *NUMERUS_ZERO;
-extern const short int NUMERUS_MAX_LONG_LENGTH;
+extern const double NUMERUS_MAX_VALUE;
+extern const double NUMERUS_MIN_VALUE;
 extern const short int NUMERUS_MAX_LENGTH;
+extern const char *NUMERUS_ZERO;
+
 extern const char *NUMERUS_LONG_SYNTAX_REGEX_STRING;
 extern short int numerus_error_code;
 
