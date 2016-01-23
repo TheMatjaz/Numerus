@@ -13,7 +13,7 @@
  * - http://stackoverflow.com/a/30816418/5292928
  */
 
-#include <math.h>
+#include <math.h>     /* For `round()`  */
 #include <ctype.h>    /* For `upcase()` */
 #include <stdio.h>    /* To `fprintf()` to `stderr` */
 #include <stdlib.h>   /* For `malloc()` */
@@ -874,10 +874,14 @@ char *numerus_pretty_print_long_numerals(char *roman) {
         char *roman_start = roman;
         char *pretty_roman = malloc(_num_pretty_print_malloc_size(roman));
         char *pretty_roman_start = pretty_roman;
+
+        /* Skip minus sign */
         if (*roman == '-') {
             *(pretty_roman++) = ' ';
             roman++;
         }
+
+        /* Write the overline */
         roman++; /* Skip first underscore */
         while (*roman != '_') {
             *(pretty_roman++) = '_';
@@ -885,6 +889,8 @@ char *numerus_pretty_print_long_numerals(char *roman) {
         }
         roman++; /* Skip second underscore */
         *(pretty_roman++) = '\n';
+
+        /* Copy the numeral in the second line */
         roman = roman_start;
         while (*roman != '\0') {
             if (*roman == '_') {
