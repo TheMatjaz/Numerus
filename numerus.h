@@ -64,10 +64,13 @@
 #define NUMERUS_IS_NOT_LONG 110
 #define NUMERUS_ERROR_NOT_ROMAN (long)(NUMERUS_MAX_VALUE + 1)
 #define NUMERUS_IS_ZERO 111
+#define NUMERUS_ERROR_TOO_MANY_REPETITIONS 112
 
 /* Constants with particular values and extremes */
 extern const double NUMERUS_MAX_VALUE;
+extern const long NUMERUS_MAX_LONG_VALUE;
 extern const double NUMERUS_MIN_VALUE;
+extern const long NUMERUS_MIN_LONG_VALUE;
 extern const short int NUMERUS_MAX_LENGTH;
 extern const char *NUMERUS_ZERO;
 extern const char *NUMERUS_FLOAT_SYNTAX_REGEX_STRING;
