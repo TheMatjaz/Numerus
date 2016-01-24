@@ -287,6 +287,34 @@ int numerus_numeral_length(char *roman, short *length) {
     return NUMERUS_OK;
 }
 
+struct _num_single_char_struct {
+    const double value;
+    const char *characters;
+    const short max_repetitions;
+};
+
+/**
+ * Dictionary of basic roman chars and their values used by conversion
+ * functions.
+ */
+static const struct _num_single_char_struct _NUM_SINGLE_DICTIONARY[] = {
+    { 1000.0, "M",  3 },
+    {  900.0, "CM", 1 },
+    {  500.0, "D",  1 },
+    {  400.0, "CD", 1 },
+    {  100.0, "C",  3 },
+    {   90.0, "XC", 1 },
+    {   50.0, "L",  1 },
+    {   40.0, "XL", 1 },
+    {   10.0, "X",  3 },
+    {    9.0, "IX", 1 },
+    {    5.0, "V",  1 },
+    {    4.0, "IV", 1 },
+    {    1.0, "I",  3 },
+    {    0.5, "S",  1 },
+    { 1/12.0, ".",  5 },
+    {    0.0, NULL, 0 }
+};
 }
 
 
