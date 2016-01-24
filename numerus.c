@@ -75,49 +75,6 @@ const short int NUMERUS_MAX_LONG_LENGTH = 31;
 const short int NUMERUS_MAX_SHORT_LENGTH = 17;
 
 /**
- * String containing a to-be-compiled regex matching any syntactically correct
- * roman numeral, including long roman numerals.
- *
- * The underscores are a notation used by Numerus to indicate so called "long roman numerals": the numbers
- * between them should be overlined (the line is called "vinculum") in other notations with graphical
- * capabilities, such as handwriting. The overlined characters have their value multiplied by 1000.
- */
-const char *NUMERUS_LONG_SYNTAX_REGEX_STRING =
-        "^-?((_M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})_)"
-                "|M{0,3})(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$";
-
-const char *NUMERUS_FLOAT_SYNTAX_REGEX_STRING =
-        "^-?((_M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})_)"
-                "|M{0,3})(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})"
-                "S?\\.{0,5}$";
-
-/**
- * String containing a to-be-compiled regex matching only short syntactically correct
- * roman numerals.
- *
- * The so called "short roman numerals" don't have underscores and use normal syntax.
- */
-const char *NUMERUS_SHORT_SYNTAX_REGEX_STRING =
-        "^-?M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$";
-
-
-static regex_t NUMERUS_FLOAT_SYNTAX_REGEX;
-
-/**
- * Compiled regex matching any syntactically correct roman numeral, including long numerals.
- *
- * Obtained by compiling NUMERUS_LONG_SYNTAX_REGEX_STRING.
- */
-static regex_t NUMERUS_LONG_SYNTAX_REGEX;
-
-/**
- * Compiled regex matching any syntactically correct short roman numeral.
- *
- * Obtained by compiling NUMERUS_SHORT_SYNTAX_REGEX_STRING.
- */
-static regex_t NUMERUS_SHORT_SYNTAX_REGEX;
-
-/**
  * Buffer where the strings with roman numerals are build an then copied from.
  *
  * This buffer is as long as the longest roman numeral. The usage of this buffer
@@ -458,49 +415,6 @@ int numerus_roman_to_double_norogex(char *roman, double *value) {
 
 
 /**
- * Verifies if the passed string is a correct roman numeral.
- *
- * Performs syntax check of the passed roman numeral by checking it against a
- * regex compiled from NUMERUS_LONG_SYNTAX_REGEX_STRING. It is case insensitive. The
- * compilation is once for all subsequent calls of the function during
- * runtime. The regex compilation status is dropped since
- * NUMERUS_LONG_SYNTAX_REGEX_STRING is a correct hard coded constant.
- *
- * @param *roman string containing a roman numeral to check
- * @param is_short_numeral set it to non-zero to check the numeral only if it's a short numeral.
- * @returns int 1 if has correct roman syntax, 0 if it does not and  in case
- * of regex errors.
- */
-short numerus_is_roman(char *roman) {
-    /* Compile the regex if it has not been done yet */
-    if (NUMERUS_FLOAT_SYNTAX_REGEX.re_magic == 0) {
-        /**
-         * Flags in regcomp():
-         * - REG_NOSUB:    does not save subexpressions (groups), only
-         *                 reports the success or failure of compiling the regex
-         * - REG_ICASE:    ignores the case, making the regex case insensitive
-         * - REG_EXTENDED: uses the extended POSIX standard regular expressions,
-         *                 which are required for the regex structure
-         */
-        regcomp(&NUMERUS_FLOAT_SYNTAX_REGEX, NUMERUS_FLOAT_SYNTAX_REGEX_STRING,
-                REG_NOSUB | REG_ICASE | REG_EXTENDED);
-    }
-    int match_result = regexec(&NUMERUS_FLOAT_SYNTAX_REGEX, roman, 0, NULL, 0);
-    if (match_result == 0) { /* Matches regex */
-        return true;
-    } else if (match_result == REG_NOMATCH) { /* Does not match regex */
-        return false;
-    } else { /* Other regex errors */
-        char msgbuf[100];
-        regerror(match_result, &NUMERUS_FLOAT_SYNTAX_REGEX, msgbuf, sizeof(msgbuf));
-        numerus_error_code = NUMERUS_ERROR_REGEXEC;
-        fprintf(stderr, "Roman syntax regex matching internal error.");
-        return NUMERUS_ERROR_REGEXEC;
-    }
-}
-
-
-/**
  * Copies a string of 1 or 2 characters.
  *
  * Copies the character from the source to the destination. If there is another
@@ -697,22 +611,6 @@ static short int _num_begins_with(char *to_compare, const char *pattern) {
     }
 }
 
-static long _num_roman_to_short(char **roman) {
-    long arabic = 0;
-    const struct _num_char_struct *current_roman_char = &_NUM_DICTIONARY[0];
-    while (**roman != '_' && **roman != '\0') {
-        short matching_chars = _num_begins_with(*roman,
-                                                current_roman_char->chars);
-        if (matching_chars > 0) {
-            *roman += matching_chars;
-            arabic += current_roman_char->value;
-        } else {
-            current_roman_char++;
-        }
-    }
-    return arabic;
-}
-
 /**
  * Converts a roman numeral to a short int.
  *
@@ -725,93 +623,7 @@ static long _num_roman_to_short(char **roman) {
  * @returns short value of the roman numeral or a value bigger than 
  * NUMERUS_MAX_LONG_VALUE in case of error
  */
-long numerus_roman_to_long(char *roman) {
-    /* Exclude empty strings */
-    if (*roman == '\0') {
-        return NUMERUS_ERROR_NOT_ROMAN;
-    }
 
-    /* Exclude nulla numerals */
-    if (numerus_is_zero(roman)) {
-        return 0;
-    }
-
-    /* Return an error if the roman is not syntactically correct */
-    if (!numerus_is_roman(roman)) {
-        numerus_error_code = NUMERUS_ERROR_WRONG_SYNTAX;
-        fprintf(stderr, "Roman conversion error: wrong syntax of numeral %s\n", roman);
-        return NUMERUS_ERROR_NOT_ROMAN;
-    }
-
-    /* Save sign */
-    short int sign = 1;
-    if (*roman == '-') {
-        sign = -1;
-        roman++;
-    }
-
-    /* Actual conversion */
-    long arabic = 0;
-    if (*roman == '_') {
-        roman++; /* Skip '_' */
-        arabic += _num_roman_to_short(&roman) * 1000;
-        roman++; /* Skip '_' */
-    }
-    arabic += _num_roman_to_short(&roman);
-
-    numerus_error_code = NUMERUS_OK;
-    return sign * arabic;
-}
-
-#define _NUM_WRONG_DECIMAL_PART_SYNTAX -300
-
-static double _num_decimal_part_to_double(char *roman_decimal_part) {
-    double value = 0;
-    if (*roman_decimal_part == 'S' || *roman_decimal_part == 's') {
-        value += 0.5;
-        roman_decimal_part++;
-    }
-    short reps = 0;
-    while (*roman_decimal_part == '.') {
-        if (reps > 5) {
-            return _NUM_WRONG_DECIMAL_PART_SYNTAX;
-        }
-        value += 1.0/12.0;
-        roman_decimal_part++;
-        reps++;
-    }
-    if (*roman_decimal_part != '\0') {
-        return _NUM_WRONG_DECIMAL_PART_SYNTAX;
-    }
-    return value;
-}
-
-double numerus_roman_to_double(char *roman) {
-    short decimal_part_index = numerus_is_float_numeral(roman);
-    if (decimal_part_index == -1) {
-        // just a short or long roman numeral
-        return (double) numerus_roman_to_long(roman);
-    } else {
-        char *roman_decimal_part = roman + decimal_part_index;
-        double decimal_part_value = _num_decimal_part_to_double(roman_decimal_part);
-        if (decimal_part_value == _NUM_WRONG_DECIMAL_PART_SYNTAX) {
-            return NUMERUS_ERROR_NOT_ROMAN;
-        }
-        *roman_decimal_part = '\0';
-        double whole_value = (double) numerus_roman_to_long(roman);
-        if (decimal_part_index == 0) {
-            whole_value = 0;
-        } else if (whole_value == NUMERUS_ERROR_NOT_ROMAN) {
-            return NUMERUS_ERROR_NOT_ROMAN;
-        }
-        if (whole_value >= 0) {
-            whole_value += decimal_part_value;
-        } else {
-            whole_value -= decimal_part_value;
-        }
-        return whole_value;
-    }
-}
 
 /**
  * Compares the value of two roman numerals, emulating the operator '>'.
@@ -1039,6 +851,8 @@ static size_t _num_pretty_print_malloc_size(char *roman) {
     alloc_size++; /* For \n at end of "____" line */
     return alloc_size;
 }
+
+/* TODO: USE THE LENGTH MEASURING FUNCTION TO FIND ANY ILLEGAL CHARACTERS? */
 
 char *numerus_pretty_print_long_numerals(char *roman) {
     if (roman == NULL) {
