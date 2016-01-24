@@ -417,6 +417,43 @@ static int _num_analyze_short_part(struct _num_numeral_analyzer_data *analyzer_d
 }
 
 
+int numerus_roman_to_double_norogex(char *roman, double *value) {
+    short length = 0;
+    int response_code = numerus_numeral_length(roman, &length);
+    if (response_code != NUMERUS_OK) {
+        return response_code;
+    }
+    struct _num_numeral_analyzer_data analyzer_data;
+    _num_init_analyzer_data(&analyzer_data, roman);
+    if (*roman == '-') {
+        analyzer_data.sign = -1;
+        analyzer_data.current_numeral_char++;
+        analyzer_data.length++;
+    }
+    if (*roman == '_') {
+        analyzer_data.current_numeral_char++;
+        analyzer_data.length++;
+        analyzer_data.is_long = 1;
+    }
+    if (analyzer_data.is_long) {
+        response_code = _num_analyze_long_part(&analyzer_data);
+        if (response_code != NUMERUS_OK) {
+            return response_code;
+        }
+        analyzer_data.current_numeral_char++; // skip second underscore
+        analyzer_data.value *= 1000;
+        analyzer_data.current_dictionary_char = &_NUM_SINGLE_DICTIONARY[1]; // reset back to "CM", "M" is excluded for long numerals
+    }
+    response_code = _num_analyze_short_part(&analyzer_data);
+    if (response_code != NUMERUS_OK) {
+        return response_code;
+    }
+    *value = analyzer_data.sign * analyzer_data.value;
+    return NUMERUS_OK;
+    /*if (analyzer_data.value % 1 <  ) {
+        IF THE DOUBLE IS ACTUALLY AN INT, CAST IT TO INT??
+    }
+     */
 }
 
 
