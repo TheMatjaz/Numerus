@@ -315,7 +315,7 @@ static int _num_analyze_roman_char(struct _num_numeral_analyzer_data *analyzer_d
     if (matching_chars > 0) {
         analyzer_data->repetitions++;
         if (analyzer_data->repetitions > analyzer_data->current_dictionary_char->max_repetitions) {
-            return NUMERUS_ERROR_TOO_MANY_REPETITIONS;
+            return NUMERUS_ERROR_TOO_MANY_REPEATED_CHARS;
         }
         analyzer_data->current_numeral_char += matching_chars;
         analyzer_data->value += analyzer_data->current_dictionary_char->value;
@@ -327,8 +327,8 @@ static int _num_analyze_roman_char(struct _num_numeral_analyzer_data *analyzer_d
     } else { // chars don't match
         analyzer_data->repetitions = 0;
         analyzer_data->current_dictionary_char++;
-        if (analyzer_data->current_dictionary_char->characters == '\0') {
-            return NUMERUS_ERROR_ILLEGAL_CHAR_ORDER;
+        if (analyzer_data->current_dictionary_char->max_repetitions == 0) {
+            return NUMERUS_ERROR_ILLEGAL_CHAR_SEQUENCE;
         }
     }
     return NUMERUS_OK;
@@ -348,7 +348,7 @@ static int _num_analyze_long_part(struct _num_numeral_analyzer_data *analyzer_da
         return NUMERUS_ERROR_DECIMALS_IN_LONG_PART;
     }
     if (*(analyzer_data->current_numeral_char) == '-') {
-        return NUMERUS_ERROR_TOO_MANY_MINUSES;
+        return NUMERUS_ERROR_ILLEGAL_MINUS;
     }
     return NUMERUS_OK;
 }
@@ -373,7 +373,7 @@ static int _num_analyze_short_part(struct _num_numeral_analyzer_data *analyzer_d
         return NUMERUS_ERROR_M_IN_SHORT_PART;
     }
     if (*(analyzer_data->current_numeral_char) == '-') {
-        return NUMERUS_ERROR_TOO_MANY_MINUSES;
+        return NUMERUS_ERROR_ILLEGAL_MINUS;
     }
     return NUMERUS_OK;
 }
