@@ -409,6 +409,7 @@ int numerus_roman_to_double(char *roman, double *value) {
         analyzer_data.current_numeral_char++; // skip second underscore
         analyzer_data.value *= 1000;
         analyzer_data.current_dictionary_char = &_NUM_SINGLE_DICTIONARY[1]; // reset back to "CM", "M" is excluded for long numerals
+        analyzer_data.repetitions = 0;
     }
     response_code = _num_analyze_short_part(&analyzer_data);
     if (response_code != NUMERUS_OK) {
