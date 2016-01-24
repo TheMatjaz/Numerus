@@ -352,6 +352,31 @@ static bool _num_char_in_string(char current, char *terminating_chars) {
     }
     return false;
 }
+
+static int _num_analyze_roman_char(struct _num_numeral_analyzer_data *analyzer_data) {
+    short matching_chars = _num_begins_with(analyzer_data->current_numeral_char,
+                                            analyzer_data->current_dictionary_char->characters);
+    if (matching_chars > 0) {
+        analyzer_data->repetitions++;
+        if (analyzer_data->repetitions > analyzer_data->current_dictionary_char->max_repetitions) {
+            return NUMERUS_ERROR_TOO_MANY_REPETITIONS;
+        }
+        analyzer_data->current_numeral_char += matching_chars;
+        analyzer_data->value += analyzer_data->current_dictionary_char->value;
+        // jump to next non-unique dictionary char (those who can be repeated)
+        // if current dictionary char has to be unique (like CM)
+        while (analyzer_data->current_dictionary_char->max_repetitions == 1) {
+            analyzer_data->current_dictionary_char++;
+        }
+    } else { // chars don't match
+        analyzer_data->repetitions = 0;
+        analyzer_data->current_dictionary_char++;
+        if (analyzer_data->current_dictionary_char->characters == '\0') {
+            return NUMERUS_ERROR_ILLEGAL_CHAR_ORDER;
+        }
+    }
+    return NUMERUS_OK;
+}
 }
 
 
