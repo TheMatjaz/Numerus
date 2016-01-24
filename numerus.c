@@ -381,12 +381,12 @@ int numerus_roman_to_double(char *roman, double *value) {
     }
     struct _num_numeral_analyzer_data analyzer_data;
     _num_init_analyzer_data(&analyzer_data, roman);
-    if (*roman == '-') {
+    if (*analyzer_data.current_numeral_char == '-') {
         analyzer_data.sign = -1;
         analyzer_data.current_numeral_char++;
         analyzer_data.length++;
     }
-    if (*roman == '_') {
+    if (*analyzer_data.current_numeral_char == '_') {
         analyzer_data.current_numeral_char++;
         analyzer_data.length++;
         analyzer_data.is_long = 1;
