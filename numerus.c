@@ -23,7 +23,8 @@
 #include <stdbool.h>  /* To use booleans `true` and `false` */
 #include "numerus.h"
 
-#define _NUM_WRONG_DECIMAL_PART_SYNTAX -300
+static short int _num_begins_with(char *to_compare, const char *pattern);
+
 /**
  * Maximum value a long roman numeral (with '_') may have.
  */
@@ -244,13 +245,15 @@ short numerus_sign(char *roman) {
  * string is too long for a roman numeral, -2 if any non roman character is
  * found.
  */
-short numerus_numeral_length(char *roman) {
+int numerus_numeral_length(char *roman, short *length) {
     if (numerus_is_zero(roman)) {
-        return (short) strlen(NUMERUS_ZERO);
+        *length = (short) strlen(NUMERUS_ZERO);
+        return NUMERUS_OK;
     }
     short i = 0;
     while (*roman != '\0') {
         if (i > NUMERUS_MAX_LENGTH) {
+            *length = -1;
             numerus_error_code = NUMERUS_ERROR_TOO_LONG_NUMERAL;
             return NUMERUS_ERROR_TOO_LONG_NUMERAL;
         }
@@ -270,16 +273,20 @@ short numerus_numeral_length(char *roman) {
             case 'S':
             case '.': {
                 roman++;
-                i++; // cound every other roman char
+                i++; // count every other roman char
                 break;
             }
             default: {
+                *length = -1;
                 numerus_error_code = NUMERUS_ERROR_ILLEGAL_CHARACTER;
                 return NUMERUS_ERROR_ILLEGAL_CHARACTER;
             }
         }
     }
-    return i;
+    *length = i;
+    return NUMERUS_OK;
+}
+
 }
 
 
@@ -589,7 +596,7 @@ long numerus_roman_to_long(char *roman) {
     return sign * arabic;
 }
 
-
+#define _NUM_WRONG_DECIMAL_PART_SYNTAX -300
 
 static double _num_decimal_part_to_double(char *roman_decimal_part) {
     double value = 0;

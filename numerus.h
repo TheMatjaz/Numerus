@@ -85,7 +85,7 @@ short numerus_is_zero(char *roman);
 short numerus_is_long_numeral(char *roman);
 short numerus_is_float_numeral(char *roman);
 short numerus_sign(char *roman);
-short numerus_numeral_length(char *roman);
+int numerus_numeral_length(char *roman, short *length);
 short numerus_is_roman(char *roman);
 
 /* Conversion function from value to roman numeral */
