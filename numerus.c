@@ -338,6 +338,20 @@ static void _num_init_analyzer_data(struct _num_numeral_analyzer_data *analyzer_
     analyzer_data->value = 0.0;
     analyzer_data->repetitions = 0;
 }
+
+static bool _num_char_in_string(char current, char *terminating_chars) {
+    if (current == '\0') {
+        return true;
+    }
+    while (*terminating_chars != '\0') {
+        if (current == *terminating_chars) {
+            return true;
+        } else {
+            terminating_chars++;
+        }
+    }
+    return false;
+}
 }
 
 
