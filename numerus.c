@@ -384,6 +384,10 @@ static int _num_analyze_short_part(struct _num_numeral_analyzer_data *analyzer_d
 
 
 int numerus_roman_to_double(char *roman, double *value) {
+    if (numerus_is_zero(roman)) {
+        *value = 0.0;
+        return NUMERUS_OK;
+    }
     short length = 0;
     int response_code = numerus_numeral_length(roman, &length);
     if (response_code != NUMERUS_OK) {
