@@ -211,6 +211,7 @@ int _num_parse_command(char *command) {
         double value;
         long l;
         char *roman;
+        int errcode = 0;
         if (string_is_zero(command)) {
             printf("%s\n", roman = numerus_long_to_roman(0));
             free(roman);
@@ -226,7 +227,7 @@ int _num_parse_command(char *command) {
                 free(roman);
                 return 1;
             }
-        } else if ((value = numerus_roman_to_double(command)) != NUMERUS_ERROR_NOT_ROMAN) {
+        } else if ((errcode = numerus_roman_to_double(command, &value)) == NUMERUS_OK) {
             printf("%f\n", value);
             return 1;
         } else {

@@ -278,7 +278,6 @@ struct _num_numeral_analyzer_data {
     char *current_numeral_char;
     const struct _num_single_char_struct *current_dictionary_char;
     bool is_long;
-    bool is_float;
     short length;
     short sign;
     double value;
@@ -374,7 +373,7 @@ static int _num_analyze_short_part(struct _num_numeral_analyzer_data *analyzer_d
 }
 
 
-int numerus_roman_to_double_norogex(char *roman, double *value) {
+int numerus_roman_to_double(char *roman, double *value) {
     short length = 0;
     int response_code = numerus_numeral_length(roman, &length);
     if (response_code != NUMERUS_OK) {
@@ -637,10 +636,11 @@ static short int _num_begins_with(char *to_compare, const char *pattern) {
  * two numerals has wrong syntax and cannot be compared.
  */
 int numerus_compare_value(char *roman_bigger, char *roman_smaller) {
-    long value_bigger = numerus_roman_to_long(roman_bigger);
-    long value_smaller = numerus_roman_to_long(roman_smaller);
-    if (value_bigger > NUMERUS_MAX_LONG_VALUE || value_smaller >
-                                                 NUMERUS_MAX_LONG_VALUE) {
+    double value_bigger;
+    int errcode_bigger = numerus_roman_to_double(roman_bigger, &value_bigger);
+    double value_smaller;
+    int errcode_smaller = numerus_roman_to_double(roman_smaller, &value_smaller);
+    if (errcode_bigger != NUMERUS_OK || errcode_smaller != NUMERUS_OK) {
         fprintf(stderr, "Roman comparition error: "
                         "cannot compare syntactically wrong numerals\n");
         numerus_error_code = NUMERUS_ERROR_CANNOT_COMPARE;
