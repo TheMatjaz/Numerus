@@ -925,22 +925,23 @@ struct _num_error_codes {
 };
 
 struct _num_error_codes _NUM_ERROR_CODES[] = {
-    {NUMERUS_ERROR_WRONG_SYNTAX, "Wrong syntax"},
-    {NUMERUS_ERROR_OUT_OF_RANGE, "Out of range"},
-    {NUMERUS_ERROR_REGEXEC, "Regex compilation error"},
-    {NUMERUS_ERROR_SQLITE, "Generic SQLite3 error"},
-    {NUMERUS_ERROR_CANNOT_COMPARE, "Cannot compare two romans because they have other errors"},
-    {NUMERUS_ERROR_ILLEGAL_CHARACTER, "Illegal character"},
-    {NUMERUS_ERROR_TOO_LONG_NUMERAL, "Too long numeral"},
-    {NUMERUS_ERROR_TOO_MANY_REPETITIONS, "Too many repetitions of a character"},
-    {NUMERUS_ERROR_ILLEGAL_CHAR_ORDER, "Illegal order of roman characters"},
+    {NUMERUS_ERROR_WRONG_SYNTAX,                "Wrong syntax"},
+    {NUMERUS_ERROR_OUT_OF_RANGE,                "Out of range"},
+    {NUMERUS_ERROR_REGEXEC,                   "Regex compilation error"},
+    {NUMERUS_ERROR_SQLITE,                    "Generic SQLite3 error"},
+    {NUMERUS_ERROR_CANNOT_COMPARE,            "Cannot compare two romans because they have other errors"},
+    {NUMERUS_ERROR_ILLEGAL_CHARACTER,         "Illegal character"},
+    {NUMERUS_ERROR_TOO_LONG_NUMERAL,          "Too long numeral"},
+    {NUMERUS_ERROR_TOO_MANY_REPEATED_CHARS,   "Too many repetitions of a >repeatable< character, like MMMM or IIII"},
+    {NUMERUS_ERROR_ILLEGAL_CHAR_SEQUENCE,     "Illegal sequence or order of roman characters"},
     {NUMERUS_ERROR_MISSING_SECOND_UNDERSCORE, "Missing second underscore"},
-    {NUMERUS_ERROR_UNDERSCORE_IN_SHORT_PART, "Underscore after second one"},
-    {NUMERUS_ERROR_DECIMALS_IN_LONG_PART, "Decimals between underscores"},
-    {NUMERUS_ERROR_TOO_MANY_MINUSES, "More than one minus"},
-    {NUMERUS_ERROR_M_IN_SHORT_PART, "`M` symbol after underscores"},
-    {NUMERUS_OK, "OK"},
-    {0, "End reached"}
+    {NUMERUS_ERROR_UNDERSCORE_IN_SHORT_PART,  "Underscore after second one"},
+    {NUMERUS_ERROR_DECIMALS_IN_LONG_PART,     "Decimals between underscores"},
+    {NUMERUS_ERROR_ILLEGAL_MINUS,             "Minus sign (-) in illegal position"},
+    {NUMERUS_ERROR_M_IN_SHORT_PART,           "`M` symbol after underscores"},
+    {NUMERUS_ERROR_UNDERSCORE_IN_NON_LONG,    "Underscore in non long numeral"},
+    {NUMERUS_OK,                              "OK"},
+    {0,                                       "End reached"}
 };
 
 const char *numerus_explain_error(int error_code) {
