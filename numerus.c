@@ -377,6 +377,46 @@ static int _num_analyze_roman_char(struct _num_numeral_analyzer_data *analyzer_d
     }
     return NUMERUS_OK;
 }
+
+static int _num_analyze_long_part(struct _num_numeral_analyzer_data *analyzer_data) {
+    while (!_num_char_in_string(*(analyzer_data->current_numeral_char), "_Ss.-")) {
+        int result_code = _num_analyze_roman_char(analyzer_data);
+        if (result_code != NUMERUS_OK) {
+            return result_code;
+        }
+    }
+    if (*(analyzer_data->current_numeral_char) == '\0') {
+       return NUMERUS_ERROR_MISSING_SECOND_UNDERSCORE;
+    }
+    if (_num_char_in_string(*(analyzer_data->current_numeral_char), "sS.")) {
+        return NUMERUS_ERROR_DECIMALS_IN_LONG_PART;
+    }
+    if (*(analyzer_data->current_numeral_char) == '-') {
+        return NUMERUS_ERROR_TOO_MANY_MINUSES;
+    }
+    return NUMERUS_OK;
+}
+
+static int _num_analyze_short_part(struct _num_numeral_analyzer_data *analyzer_data) {
+    while (!_num_char_in_string(*(analyzer_data->current_numeral_char), "M_-")) {
+        int result_code = _num_analyze_roman_char(analyzer_data);
+        if (result_code != NUMERUS_OK) {
+            return result_code;
+        }
+    }
+    if (*(analyzer_data->current_numeral_char) == '_') {
+        return NUMERUS_ERROR_UNDERSCORE_IN_SHORT_PART;
+    }
+    if (*(analyzer_data->current_numeral_char) == 'M') {
+        return NUMERUS_ERROR_M_IN_SHORT_PART;
+    }
+    if (*(analyzer_data->current_numeral_char) == '-') {
+        return NUMERUS_ERROR_TOO_MANY_MINUSES;
+    }
+    return NUMERUS_OK;
+}
+
+
 }
 
 
