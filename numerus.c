@@ -367,7 +367,11 @@ static int _num_analyze_short_part(struct _num_numeral_analyzer_data *analyzer_d
         }
     }
     if (*(analyzer_data->current_numeral_char) == '_') {
-        return NUMERUS_ERROR_UNDERSCORE_IN_SHORT_PART;
+        if (analyzer_data->is_long) {
+            return NUMERUS_ERROR_UNDERSCORE_IN_SHORT_PART;
+        } else {
+            return NUMERUS_ERROR_UNDERSCORE_IN_NON_LONG;
+        }
     }
     if (*(analyzer_data->current_numeral_char) == 'M') {
         return NUMERUS_ERROR_M_IN_SHORT_PART;
