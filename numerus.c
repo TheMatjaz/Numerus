@@ -315,6 +315,29 @@ static const struct _num_single_char_struct _NUM_SINGLE_DICTIONARY[] = {
     { 1/12.0, ".",  5 },
     {    0.0, NULL, 0 }
 };
+
+struct _num_numeral_analyzer_data {
+    char *numeral_start;
+    char *current_numeral_char;
+    const struct _num_single_char_struct *current_dictionary_char;
+    bool is_long;
+    bool is_float;
+    short length;
+    short sign;
+    double value;
+    short repetitions;
+};
+
+static void _num_init_analyzer_data(struct _num_numeral_analyzer_data *analyzer_data, char *roman) {
+    analyzer_data->numeral_start = roman;
+    analyzer_data->current_numeral_char = roman;
+    analyzer_data->current_dictionary_char = &_NUM_SINGLE_DICTIONARY[0];
+    analyzer_data->is_long = false;
+    analyzer_data->length = -1;
+    analyzer_data->sign = 1;
+    analyzer_data->value = 0.0;
+    analyzer_data->repetitions = 0;
+}
 }
 
 
