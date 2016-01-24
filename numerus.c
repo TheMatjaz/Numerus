@@ -354,7 +354,13 @@ static int _num_analyze_long_part(struct _num_numeral_analyzer_data *analyzer_da
 }
 
 static int _num_analyze_short_part(struct _num_numeral_analyzer_data *analyzer_data) {
-    while (!_num_char_in_string(*(analyzer_data->current_numeral_char), "M_-")) {
+    char *stop_chars;
+    if (analyzer_data->is_long) {
+        stop_chars = "M_-";
+    } else {
+        stop_chars = "_-";
+    }
+    while (!_num_char_in_string(*(analyzer_data->current_numeral_char), stop_chars)) {
         int result_code = _num_analyze_roman_char(analyzer_data);
         if (result_code != NUMERUS_OK) {
             return result_code;
