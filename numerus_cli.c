@@ -3,6 +3,7 @@
 #include <ctype.h>
 #include <string.h>
 #include "numerus.h"
+#include "numerus_test.c"
 
 const char *PROMPT_TEXT = "numerus> ";
 const char *WELCOME_TEXT = ""
@@ -269,6 +270,8 @@ void numerus_repl(int argc, char **args) {
 }
 
 int main(int argc, char **args) {
-    numerus_repl(argc, args);
+    //numerus_repl(argc, args);
+    //numtest_convert_all_romans();
+    numtest_all();
     return 0;
 }
