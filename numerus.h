@@ -108,4 +108,5 @@ int numerus_export_to_csv(char *filename, long min_value, long max_value,
                           int numerals_first, char *separator, char *newline,
                           char *quotes);
 char *numerus_pretty_print_long_numerals(char *roman);
- // FIXME: IF I DONT PUT THIS ; HERE, IT GIVES ME A SYNTAX ERROR
+const char *numerus_explain_error(int error_code);
+// FIXME: IF I DONT PUT THIS ; HERE, IT GIVES ME A SYNTAX ERROR
