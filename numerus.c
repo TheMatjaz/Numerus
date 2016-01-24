@@ -319,9 +319,18 @@ static int _num_analyze_roman_char(struct _num_numeral_analyzer_data *analyzer_d
         }
         analyzer_data->current_numeral_char += matching_chars;
         analyzer_data->value += analyzer_data->current_dictionary_char->value;
+
         // jump to next non-unique dictionary char (those who can be repeated)
         // if current dictionary char has to be unique (like CM)
+        short current_char_is_multiple_of_five = false;
+        if (strlen(analyzer_data->current_dictionary_char->characters) == 1) {
+            current_char_is_multiple_of_five = true;
+        }
         while (analyzer_data->current_dictionary_char->max_repetitions == 1) {
+            analyzer_data->current_dictionary_char++;
+            analyzer_data->repetitions = 0;
+        }
+        if (!current_char_is_multiple_of_five) {
             analyzer_data->current_dictionary_char++;
         }
     } else { // chars don't match
