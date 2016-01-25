@@ -67,7 +67,8 @@ const short int NUMERUS_MAX_LENGTH = 37;
 
 
 /**
- * Maximum length of a long non-float roman numeral string including the null terminator.
+ * Maximum length of a long non-float roman numeral string including the null
+ * terminator.
  *
  * The roman numeral `"-_MMMDCCCLXXXVIII_DCCCLXXXVIII"`
  * (value: -3888888) + `\0` is a string long 30+1 = 31 chars.
@@ -76,7 +77,8 @@ const short int NUMERUS_MAX_LONG_LENGTH = 31;
 
 
 /**
- * Maximum length of a short non-long non-float roman numeral string including the null terminator.
+ * Maximum length of a short non-long non-float roman numeral string including
+ * the null terminator.
  *
  * The roman numeral `"-MMMDCCCLXXXVIII"`
  * (value: -3888) + `\0` is a string long 16+1 = 17 chars.
@@ -130,22 +132,22 @@ struct _num_dictionary_char {
  * understand that the array has been parsed.
  */
 static const struct _num_dictionary_char _NUM_DICTIONARY[] = {
-    { 1000.0, "M" , 3 },
-    {  900.0, "CM", 1 },
-    {  500.0, "D" , 1 },
-    {  400.0, "CD", 1 },
-    {  100.0, "C" , 3 },
-    {   90.0, "XC", 1 },
-    {   50.0, "L" , 1 },
-    {   40.0, "XL", 1 },
-    {   10.0, "X" , 3 },
-    {    9.0, "IX", 1 },
-    {    5.0, "V" , 1 },
-    {    4.0, "IV", 1 },
-    {    1.0, "I" , 3 },
-    {    0.5, "S" , 1 },
-    { 1/12.0, "." , 5 },
-    {    0.0, NULL, 0 }
+    { 1000.0, "M" ,  3 },
+    {  900.0, "CM",  1 },
+    {  500.0, "D" ,  1 },
+    {  400.0, "CD",  1 },
+    {  100.0, "C" ,  3 },
+    {   90.0, "XC",  1 },
+    {   50.0, "L" ,  1 },
+    {   40.0, "XL",  1 },
+    {   10.0, "X" ,  3 },
+    {    9.0, "IX",  1 },
+    {    5.0, "V" ,  1 },
+    {    4.0, "IV",  1 },
+    {    1.0, "I" ,  3 },
+    {    0.5, "S" ,  1 },
+    { 1/12.0, "." ,  5 },
+    {    0.0, NULL,  0 }
 };
 
 
@@ -157,9 +159,9 @@ static const struct _num_dictionary_char _NUM_DICTIONARY[] = {
 /**
  * Checks if two strings match in the the next 1 or 2 characters.
  *
- * It is case insensitive. This functions is used by numerus_roman_to_short() and is
- * missing many security check since is internal and is meant to be called on
- * _NUM_DICTIONARY.
+ * It is case insensitive. This functions is used by numerus_roman_to_short()
+ * and is missing many security check since is internal and is meant to be
+ * called on _NUM_DICTIONARY.
  *
  * @param *to_compare the current position in the string to check against the
  * pattern
@@ -168,7 +170,8 @@ static const struct _num_dictionary_char _NUM_DICTIONARY[] = {
  * @returns length of the match as short: 0 if they don't match or 1 or 2
  * if they match.
  */
-static short _num_string_begins_with(char *to_be_compared, const char *pattern) {
+static short _num_string_begins_with(char *to_be_compared,
+                                     const char *pattern) {
     size_t pattern_length = strlen(pattern);
     if (strncasecmp(to_be_compared, pattern, pattern_length) == 0) {
         /* Compare the first pattern_length characters */
@@ -177,7 +180,6 @@ static short _num_string_begins_with(char *to_be_compared, const char *pattern) 
         return 0;
     }
 }
-
 
 
 /**
@@ -209,7 +211,8 @@ struct _num_numeral_parser_data {
  *
  * @see numerus_roman_to_value()
  */
-static void _num_init_parser_data(struct _num_numeral_parser_data *parser_data, char *roman) {
+static void _num_init_parser_data(struct _num_numeral_parser_data *parser_data,
+                                  char *roman) {
     parser_data->current_numeral_position = roman;
     parser_data->current_dictionary_char = &_NUM_DICTIONARY[0];
     parser_data->numeral_is_long = false;
@@ -223,9 +226,11 @@ static void _num_init_parser_data(struct _num_numeral_parser_data *parser_data, 
 /**
  * Finds if the passed char appears in the passed string.
  *
- * Used by _num_parse_part_after_underscores() and _num_parse_part_in_underscores()
+ * Used by _num_parse_part_after_underscores() and
+ * _num_parse_part_in_underscores()
  *
- * @returns `true` if the char `current` is `\0` or appears in the string `*terminating_chars`. `false` otherwise.
+ * @returns `true` if the char `current` is `\0` or appears in the string
+ * `*terminating_chars`. `false` otherwise.
  */
 static bool _num_char_is_in_string(char current, char *terminating_chars) {
     if (current == '\0') {
@@ -261,7 +266,8 @@ static int _num_compare_numeral_position_with_dictionary(
             parser_data->current_dictionary_char->characters);
     if (num_of_matching_chars > 0) {
         parser_data->char_repetitions++;
-        if (parser_data->char_repetitions > parser_data->current_dictionary_char->max_repetitions) {
+        if (parser_data->char_repetitions >
+            parser_data->current_dictionary_char->max_repetitions) {
             return NUMERUS_ERROR_TOO_MANY_REPEATED_CHARS;
         }
         parser_data->current_numeral_position += num_of_matching_chars;
@@ -305,9 +311,10 @@ static int _num_parse_part_in_underscores(
         }
     }
     if (*(parser_data->current_numeral_position) == '\0') {
-       return NUMERUS_ERROR_MISSING_SECOND_UNDERSCORE;
+        return NUMERUS_ERROR_MISSING_SECOND_UNDERSCORE;
     }
-    if (_num_char_is_in_string(*(parser_data->current_numeral_position), "sS.")) {
+    if (_num_char_is_in_string(*(parser_data->current_numeral_position),
+                               "sS.")) {
         return NUMERUS_ERROR_DECIMALS_IN_LONG_PART;
     }
     if (*(parser_data->current_numeral_position) == '-') {
@@ -378,7 +385,8 @@ int numerus_roman_to_value(char *roman, double *value) {
         }
         parser_data.current_numeral_position++; // skip second underscore
         parser_data.numeral_value *= 1000;
-        parser_data.current_dictionary_char = &_NUM_DICTIONARY[1]; // reset back to "CM", "M" is excluded for long numerals
+        // reset back to "CM", "M" is excluded for long numerals
+        parser_data.current_dictionary_char = &_NUM_DICTIONARY[1];
         parser_data.char_repetitions = 0;
     }
     response_code = _num_parse_part_after_underscores(&parser_data);
@@ -396,8 +404,8 @@ int numerus_roman_to_value(char *roman, double *value) {
  * Copies the character from the source to the destination. If there is another
  * character after that, that is not the null terminator, copies that as well.
  * Everything is performed without security checks for faster performance. This
- * function is used by numerus_short_to_roman() and it's meant to be used just on the
- * _num_char_struct in the dictionary _NUM_DICTIONARY.
+ * function is used by numerus_short_to_roman() and it's meant to be used just
+ * on the _num_char_struct in the dictionary _NUM_DICTIONARY.
  *
  * @param *source the string of 1-2 characters to copy
  * @param *destination the string, already allocated, to copy the *source into
@@ -464,7 +472,8 @@ static char *_num_long_to_roman(long int arabic, int copy_out_of_buffer) {
     if (arabic > NUMERUS_MAX_SHORT_VALUE) {
         *(roman_string++) = '_';
         roman_string = _num_short_to_roman(arabic / 1000, roman_string);
-        arabic -= (arabic / 1000) * 1000; /* Keep just the 3 right-most digits because of the integer division */
+        arabic -= (arabic / 1000) *
+                  1000; /* Keep just the 3 right-most digits because of the integer division */
         *(roman_string++) = '_';
     }
     /* Create part after underscores */
@@ -511,7 +520,9 @@ static short _num_nearest_12th_numerator(double decimal) {
     return (short) decimal;
 }
 
-static void _num_append_decimal_part_to_numeral(double decimal_part, char *roman, short insert_minus) {
+static void _num_append_decimal_part_to_numeral(double decimal_part,
+                                                char *roman,
+                                                short insert_minus) {
     if (decimal_part < 0) {
         decimal_part *= -1;
         if (insert_minus != 0) {
@@ -550,7 +561,8 @@ char *numerus_double_to_roman(double value) {
         if (roman == NULL) {
             return NULL;
         }
-        _num_append_decimal_part_to_numeral(decimal_part, roman + strlen(roman), 0);
+        _num_append_decimal_part_to_numeral(decimal_part, roman + strlen(roman),
+                                            0);
         /* Copy from build buffer */
         returnable_roman_string = malloc(roman - _num_numeral_build_buffer);
         strcpy(returnable_roman_string, _num_numeral_build_buffer);
