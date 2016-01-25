@@ -79,7 +79,9 @@ extern const double NUMERUS_MAX_VALUE;
 extern const long NUMERUS_MAX_LONG_VALUE;
 extern const double NUMERUS_MIN_VALUE;
 extern const long NUMERUS_MIN_LONG_VALUE;
-extern const short int NUMERUS_MAX_LENGTH;
+extern const short NUMERUS_MAX_SHORT_VALUE;
+extern const short NUMERUS_MIN_SHORT_VALUE;
+extern const short NUMERUS_MAX_LENGTH;
 extern const char *NUMERUS_ZERO;
 extern const char *NUMERUS_FLOAT_SYNTAX_REGEX_STRING;
 
