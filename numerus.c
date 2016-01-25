@@ -88,6 +88,7 @@ short int numerus_error_code = NUMERUS_OK;
  */
 static char _num_numeral_build_buffer[NUMERUS_MAX_LENGTH];
 
+
 /**
  * Struct containing a basic roman char, its double value and the maximum
  * consecutive repetition of it that a roman numeral may have.
@@ -101,6 +102,7 @@ struct _num_dictionary_char {
     const char *characters;
     const short max_repetitions;
 };
+
 
 /**
  * Dictionary of _num_dictionary_char used by conversion functions.
@@ -127,6 +129,7 @@ static const struct _num_dictionary_char _NUM_DICTIONARY[] = {
     {    0.0, NULL, 0 }
 };
 
+
 /**
  * Checks if two strings match in the the next 1 or 2 characters.
  *
@@ -152,6 +155,18 @@ static short _num_string_begins_with(char *to_be_compared, const char *pattern) 
 }
 
 
+
+/**
+ * Structure containing data about the numeral that is being converted to value.
+ *
+ * Used by `numerus_roman_to_value()` and other static functions. Contains info
+ * about the currently parsed part of the numeral, the dictionary char that the
+ * numeral is confronted with, the value, sign, length of the numeral, if it has
+ * underscore and counts the number of consecutive repetitions a single roman
+ * char has.
+ *
+ * @see numerus_roman_to_value()
+ */
 struct _num_numeral_parser_data {
     char *current_numeral_char;
     const struct _num_dictionary_char *current_dictionary_char;
@@ -162,6 +177,14 @@ struct _num_numeral_parser_data {
     short char_repetitions;
 };
 
+
+/**
+ * Initializer of the _num_numeral_parser_data data structure.
+ *
+ * Sets the fields to be ready to start the conversion from roman to value.
+ *
+ * @see numerus_roman_to_value()
+ */
 static void _num_init_parser_data(struct _num_numeral_parser_data *parser_data, char *roman) {
     parser_data->current_numeral_char = roman;
     parser_data->current_dictionary_char = &_NUM_DICTIONARY[0];
@@ -172,6 +195,14 @@ static void _num_init_parser_data(struct _num_numeral_parser_data *parser_data, 
     parser_data->char_repetitions = 0;
 }
 
+
+/**
+ * Finds if the passed char appears in the passed string.
+ *
+ * Used by _num_parse_part_after_underscores() and _num_parse_part_in_underscores()
+ *
+ * @returns `true` if the char `current` is `\0` or appears in the string `*terminating_chars`. `false` otherwise.
+ */
 static bool _num_char_is_in_string(char current, char *terminating_chars) {
     if (current == '\0') {
         return true;
@@ -187,6 +218,19 @@ static bool _num_char_is_in_string(char current, char *terminating_chars) {
 }
 
 static int _num_parse_one_roman_char(
+
+/**
+ * Analyzes one single roman character of a roman numeral.
+ *
+ * Confronts the currently pointed position of the roman numeral with the
+ * currently pointed roman character in the dictionary. If they match, advances
+ * to the next character in the numeral, up to a maximum number of repetitions.
+ * If they don't, advances to the next dictionary roman char - it has to be
+ * called again to perform the check.
+ *
+ * @returns result code as an error or NUMERUS_OK. The computation result is
+ * stored in the passed _num_numeral_parser_data
+ */
         struct _num_numeral_parser_data *parser_data) {
     short num_of_matching_chars = _num_string_begins_with(
             parser_data->current_numeral_char,
