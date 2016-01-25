@@ -3,6 +3,7 @@
 #include <ctype.h>
 #include <string.h>
 #include "numerus.h"
+#include "numerus_test.c"
 
 const char *PROMPT_TEXT = "numerus> ";
 const char *WELCOME_TEXT = ""
@@ -17,7 +18,7 @@ const char *INFO_TEXT = ""
 "Project page and source code: https://github.com/TheMatjaz/Numerus\n";
 const char *MOO_TEXT = "This is not an easter egg. Try `ascii`.\n";
 const char *PING_TEXT = "Pong.\n";
-const char *HELLO_TEXT = "Can you hear me?\n";
+const char *HELLO_TEXT = "It's me. I was wondering if you are going to type something useful.\n";
 const char *AVE_TEXT = "Ave tibi!\n";
 const char *HELP_TEXT = ""
 "To convert an (arabic) integer to a roman numeral or vice-versa,\n"
@@ -211,11 +212,13 @@ int _num_parse_command(char *command) {
         double value;
         long l;
         char *roman;
-        if (string_is_zero(command)) {
+        int errcode = 0;
+        if (string_is_zero(command)) { // a double of any form with value 0.0 is typed
             printf("%s\n", roman = numerus_long_to_roman(0));
             free(roman);
             return 1;
-        } else if ((value = strtod(command, NULL)) != 0){
+        }
+        if ((value = strtod(command, NULL)) != 0) { // a double is typed
             if (pretty_printing == 1) {
                 printf("%s\n", roman = numerus_pretty_print_long_numerals(
                         numerus_double_to_roman(value)));
@@ -226,12 +229,12 @@ int _num_parse_command(char *command) {
                 free(roman);
                 return 1;
             }
-        } else if ((value = numerus_roman_to_double(command))
-                   <= NUMERUS_MAX_DOUBLE_VALUE) {
+        }
+        if ((errcode = numerus_roman_to_value(command, &value)) == NUMERUS_OK) { // a roman is typed
             printf("%f\n", value);
             return 1;
         } else {
-            printf("%s", UNKNOWN_COMMAND_TEXT);
+            printf("%s-> %s\n", UNKNOWN_COMMAND_TEXT, numerus_explain_error(errcode));
             return 2;
         }
     }
@@ -269,6 +272,6 @@ void numerus_repl(int argc, char **args) {
 }
 
 int main(int argc, char **args) {
-    numerus_repl(argc, args);
+    //numerus_repl(argc, args);
     return 0;
 }
