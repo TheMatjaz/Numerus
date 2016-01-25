@@ -75,7 +75,7 @@ const short int NUMERUS_MAX_SHORT_LENGTH = 17;
  *
  * It may contain any of the NUMERUS_ERROR_* error codes or NUMERUS_OK.
  */
-short int numerus_error_code = NUMERUS_OK;
+int numerus_error_code = NUMERUS_OK;
 
 
 /**

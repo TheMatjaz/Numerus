@@ -273,7 +273,5 @@ void numerus_repl(int argc, char **args) {
 
 int main(int argc, char **args) {
     //numerus_repl(argc, args);
-    //numtest_convert_all_romans();
-    numtest_all();
     return 0;
 }

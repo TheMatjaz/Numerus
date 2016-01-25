@@ -86,7 +86,7 @@ extern const char *NUMERUS_FLOAT_SYNTAX_REGEX_STRING;
 /**
  * Error code global variable
  */
-extern short int numerus_error_code;
+extern int numerus_error_code;
 
 /* Numeral analysis functions */
 short numerus_is_zero(char *roman);
