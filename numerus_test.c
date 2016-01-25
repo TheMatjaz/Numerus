@@ -27,7 +27,7 @@ int numtest_convert_all_romans() {
     for (i = NUMERUS_MIN_LONG_VALUE; i <= NUMERUS_MAX_LONG_VALUE; i++) {
         for (decimal = 0.0; decimal < 1.0; decimal += 1.0/12.0) {
             roman = numerus_double_to_roman(i);
-            errcode = numerus_roman_to_double(roman, &value);
+            errcode = numerus_roman_to_value(roman, &value);
             if (errcode != NUMERUS_OK) {
                 fprintf(stderr, "%15.15f: %s: %s\n", i,
                         numerus_explain_error(errcode), roman);
@@ -57,7 +57,7 @@ int numtest_convert_all_romans() {
 void _num_test_for_error(char *roman, int error_code) {
     double value = 0.0;
     int code = NUMERUS_OK;
-    code = numerus_roman_to_double(roman, &value);
+    code = numerus_roman_to_value(roman, &value);
     if (code == error_code) {
         fprintf(stderr, "Test passed: %s raises error \"%s\"\n", roman, numerus_explain_error(code));
     } else {

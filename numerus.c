@@ -96,17 +96,19 @@ static char _num_numeral_build_buffer[NUMERUS_MAX_LENGTH];
  * functions. The "roman chars" as called in this library are strings of 1 or 2
  * chars that have a specific a priori known value.
  */
-struct _num_single_char_struct {
+struct _num_dictionary_char {
     const double value;
     const char *characters;
     const short max_repetitions;
 };
 
 /**
- * Dictionary of basic roman chars and their values used by conversion
- * functions.
+ * Dictionary of _num_dictionary_char used by conversion functions.
+ *
+ * The last value is a terminator, to be used by conversion function to
+ * understand that the array has been parsed.
  */
-static const struct _num_single_char_struct _NUM_SINGLE_DICTIONARY[] = {
+static const struct _num_dictionary_char _NUM_DICTIONARY[] = {
     { 1000.0, "M" , 3 },
     {  900.0, "CM", 1 },
     {  500.0, "D" , 1 },
@@ -139,9 +141,9 @@ static const struct _num_single_char_struct _NUM_SINGLE_DICTIONARY[] = {
  * @returns length of the match as short: 0 if they don't match or 1 or 2
  * if they match.
  */
-static short int _num_begins_with(char *to_compare, const char *pattern) {
+static short _num_string_begins_with(char *to_be_compared, const char *pattern) {
     size_t pattern_length = strlen(pattern);
-    if (strncasecmp(to_compare, pattern, pattern_length) == 0) {
+    if (strncasecmp(to_be_compared, pattern, pattern_length) == 0) {
         /* Compare the first pattern_length characters */
         return (short) pattern_length;
     } else {
@@ -150,29 +152,27 @@ static short int _num_begins_with(char *to_compare, const char *pattern) {
 }
 
 
-struct _num_numeral_analyzer_data {
-    char *numeral_start;
+struct _num_numeral_parser_data {
     char *current_numeral_char;
-    const struct _num_single_char_struct *current_dictionary_char;
-    bool is_long;
-    short length;
-    short sign;
-    double value;
-    short repetitions;
+    const struct _num_dictionary_char *current_dictionary_char;
+    bool numeral_is_long;
+    short numeral_length;
+    short numeral_sign;
+    double numeral_value;
+    short char_repetitions;
 };
 
-static void _num_init_analyzer_data(struct _num_numeral_analyzer_data *analyzer_data, char *roman) {
-    analyzer_data->numeral_start = roman;
-    analyzer_data->current_numeral_char = roman;
-    analyzer_data->current_dictionary_char = &_NUM_SINGLE_DICTIONARY[0];
-    analyzer_data->is_long = false;
-    analyzer_data->length = -1;
-    analyzer_data->sign = 1;
-    analyzer_data->value = 0.0;
-    analyzer_data->repetitions = 0;
+static void _num_init_parser_data(struct _num_numeral_parser_data *parser_data, char *roman) {
+    parser_data->current_numeral_char = roman;
+    parser_data->current_dictionary_char = &_NUM_DICTIONARY[0];
+    parser_data->numeral_is_long = false;
+    parser_data->numeral_length = -1;
+    parser_data->numeral_sign = 1;
+    parser_data->numeral_value = 0.0;
+    parser_data->char_repetitions = 0;
 }
 
-static bool _num_char_in_string(char current, char *terminating_chars) {
+static bool _num_char_is_in_string(char current, char *terminating_chars) {
     if (current == '\0') {
         return true;
     }
@@ -186,90 +186,96 @@ static bool _num_char_in_string(char current, char *terminating_chars) {
     return false;
 }
 
-static int _num_analyze_roman_char(struct _num_numeral_analyzer_data *analyzer_data) {
-    short matching_chars = _num_begins_with(analyzer_data->current_numeral_char,
-                                            analyzer_data->current_dictionary_char->characters);
-    if (matching_chars > 0) {
-        analyzer_data->repetitions++;
-        if (analyzer_data->repetitions > analyzer_data->current_dictionary_char->max_repetitions) {
+static int _num_parse_one_roman_char(
+        struct _num_numeral_parser_data *parser_data) {
+    short num_of_matching_chars = _num_string_begins_with(
+            parser_data->current_numeral_char,
+            parser_data->current_dictionary_char->characters);
+    if (num_of_matching_chars > 0) {
+        parser_data->char_repetitions++;
+        if (parser_data->char_repetitions > parser_data->current_dictionary_char->max_repetitions) {
             return NUMERUS_ERROR_TOO_MANY_REPEATED_CHARS;
         }
-        analyzer_data->current_numeral_char += matching_chars;
-        analyzer_data->value += analyzer_data->current_dictionary_char->value;
+        parser_data->current_numeral_char += num_of_matching_chars;
+        parser_data->numeral_value += parser_data->current_dictionary_char->value;
 
         // jump to next non-unique dictionary char (those who can be repeated)
         // if current dictionary char has to be unique (like CM)
         short current_char_is_multiple_of_five = false;
-        if (strlen(analyzer_data->current_dictionary_char->characters) == 1) {
+        if (strlen(parser_data->current_dictionary_char->characters) == 1) {
             current_char_is_multiple_of_five = true;
         }
-        while (analyzer_data->current_dictionary_char->max_repetitions == 1) {
-            analyzer_data->current_dictionary_char++;
-            analyzer_data->repetitions = 0;
+        while (parser_data->current_dictionary_char->max_repetitions == 1) {
+            parser_data->current_dictionary_char++;
+            parser_data->char_repetitions = 0;
         }
         if (!current_char_is_multiple_of_five) {
-            analyzer_data->current_dictionary_char++;
+            parser_data->current_dictionary_char++;
         }
     } else { // chars don't match
-        analyzer_data->repetitions = 0;
-        analyzer_data->current_dictionary_char++;
-        if (analyzer_data->current_dictionary_char->max_repetitions == 0) {
+        parser_data->char_repetitions = 0;
+        parser_data->current_dictionary_char++;
+        if (parser_data->current_dictionary_char->max_repetitions == 0) {
             return NUMERUS_ERROR_ILLEGAL_CHAR_SEQUENCE;
         }
     }
     return NUMERUS_OK;
 }
 
-static int _num_analyze_long_part(struct _num_numeral_analyzer_data *analyzer_data) {
-    while (!_num_char_in_string(*(analyzer_data->current_numeral_char), "_Ss.-")) {
-        int result_code = _num_analyze_roman_char(analyzer_data);
+static int _num_parse_part_in_underscores(
+        struct _num_numeral_parser_data *parser_data) {
+    while (!_num_char_is_in_string(*(parser_data->current_numeral_char),
+                                   "_Ss.-")) {
+        int result_code = _num_parse_one_roman_char(parser_data);
         if (result_code != NUMERUS_OK) {
             return result_code;
         }
     }
-    if (*(analyzer_data->current_numeral_char) == '\0') {
+    if (*(parser_data->current_numeral_char) == '\0') {
        return NUMERUS_ERROR_MISSING_SECOND_UNDERSCORE;
     }
-    if (_num_char_in_string(*(analyzer_data->current_numeral_char), "sS.")) {
+    if (_num_char_is_in_string(*(parser_data->current_numeral_char), "sS.")) {
         return NUMERUS_ERROR_DECIMALS_IN_LONG_PART;
     }
-    if (*(analyzer_data->current_numeral_char) == '-') {
+    if (*(parser_data->current_numeral_char) == '-') {
         return NUMERUS_ERROR_ILLEGAL_MINUS;
     }
     return NUMERUS_OK;
 }
 
-static int _num_analyze_short_part(struct _num_numeral_analyzer_data *analyzer_data) {
+static int _num_parse_part_after_underscores(
+        struct _num_numeral_parser_data *parser_data) {
     char *stop_chars;
-    if (analyzer_data->is_long) {
+    if (parser_data->numeral_is_long) {
         stop_chars = "M_-";
     } else {
         stop_chars = "_-";
     }
-    while (!_num_char_in_string(*(analyzer_data->current_numeral_char), stop_chars)) {
-        int result_code = _num_analyze_roman_char(analyzer_data);
+    while (!_num_char_is_in_string(*(parser_data->current_numeral_char),
+                                   stop_chars)) {
+        int result_code = _num_parse_one_roman_char(parser_data);
         if (result_code != NUMERUS_OK) {
             return result_code;
         }
     }
-    if (*(analyzer_data->current_numeral_char) == '_') {
-        if (analyzer_data->is_long) {
+    if (*(parser_data->current_numeral_char) == '_') {
+        if (parser_data->numeral_is_long) {
             return NUMERUS_ERROR_UNDERSCORE_IN_SHORT_PART;
         } else {
             return NUMERUS_ERROR_UNDERSCORE_IN_NON_LONG;
         }
     }
-    if (*(analyzer_data->current_numeral_char) == 'M') {
+    if (*(parser_data->current_numeral_char) == 'M') {
         return NUMERUS_ERROR_M_IN_SHORT_PART;
     }
-    if (*(analyzer_data->current_numeral_char) == '-') {
+    if (*(parser_data->current_numeral_char) == '-') {
         return NUMERUS_ERROR_ILLEGAL_MINUS;
     }
     return NUMERUS_OK;
 }
 
 
-int numerus_roman_to_double(char *roman, double *value) {
+int numerus_roman_to_value(char *roman, double *value) {
     if (numerus_is_zero(roman)) {
         *value = 0.0;
         return NUMERUS_OK;
@@ -279,38 +285,34 @@ int numerus_roman_to_double(char *roman, double *value) {
     if (response_code != NUMERUS_OK) {
         return response_code;
     }
-    struct _num_numeral_analyzer_data analyzer_data;
-    _num_init_analyzer_data(&analyzer_data, roman);
-    if (*analyzer_data.current_numeral_char == '-') {
-        analyzer_data.sign = -1;
-        analyzer_data.current_numeral_char++;
-        analyzer_data.length++;
+    struct _num_numeral_parser_data parser_data;
+    _num_init_parser_data(&parser_data, roman);
+    if (*parser_data.current_numeral_char == '-') {
+        parser_data.numeral_sign = -1;
+        parser_data.current_numeral_char++;
+        parser_data.numeral_length++;
     }
-    if (*analyzer_data.current_numeral_char == '_') {
-        analyzer_data.current_numeral_char++;
-        analyzer_data.length++;
-        analyzer_data.is_long = 1;
+    if (*parser_data.current_numeral_char == '_') {
+        parser_data.current_numeral_char++;
+        parser_data.numeral_length++;
+        parser_data.numeral_is_long = 1;
     }
-    if (analyzer_data.is_long) {
-        response_code = _num_analyze_long_part(&analyzer_data);
+    if (parser_data.numeral_is_long) {
+        response_code = _num_parse_part_in_underscores(&parser_data);
         if (response_code != NUMERUS_OK) {
             return response_code;
         }
-        analyzer_data.current_numeral_char++; // skip second underscore
-        analyzer_data.value *= 1000;
-        analyzer_data.current_dictionary_char = &_NUM_SINGLE_DICTIONARY[1]; // reset back to "CM", "M" is excluded for long numerals
-        analyzer_data.repetitions = 0;
+        parser_data.current_numeral_char++; // skip second underscore
+        parser_data.numeral_value *= 1000;
+        parser_data.current_dictionary_char = &_NUM_DICTIONARY[1]; // reset back to "CM", "M" is excluded for long numerals
+        parser_data.char_repetitions = 0;
     }
-    response_code = _num_analyze_short_part(&analyzer_data);
+    response_code = _num_parse_part_after_underscores(&parser_data);
     if (response_code != NUMERUS_OK) {
         return response_code;
     }
-    *value = analyzer_data.sign * analyzer_data.value;
+    *value = parser_data.numeral_sign * parser_data.numeral_value;
     return NUMERUS_OK;
-    /*if (analyzer_data.value % 1 <  ) {
-        IF THE DOUBLE IS ACTUALLY AN INT, CAST IT TO INT??
-    }
-     */
 }
 
 
@@ -339,14 +341,18 @@ static char *_num_copy_char_from_dictionary(const char *source,
 
 
 /**
- * Converts just the internal part of the underscores or the part after them. Stores it into *roman_string. Returns position after the inserted string.
+ * Converts just the internal part of the underscores or the part after them.
+ *
+ * Stores it into `*roman_string`.
+ *
+ * @returns position after the inserted string.
  */
 static char *_num_short_to_roman(long int arabic, char *roman_string) {
-    const struct _num_char_struct *current_roman_char = &_NUM_DICTIONARY[0];
+    const struct _num_dictionary_char *current_roman_char = &_NUM_DICTIONARY[0];
     while (arabic > 0) {
         while (arabic >= current_roman_char->value) {
             roman_string = _num_copy_char_from_dictionary(
-                    current_roman_char->chars, roman_string);
+                    current_roman_char->characters, roman_string);
             arabic -= current_roman_char->value;
         }
         current_roman_char++;

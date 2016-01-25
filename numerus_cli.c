@@ -213,11 +213,12 @@ int _num_parse_command(char *command) {
         long l;
         char *roman;
         int errcode = 0;
-        if (string_is_zero(command)) {
+        if (string_is_zero(command)) { // a double of any form with value 0.0 is typed
             printf("%s\n", roman = numerus_long_to_roman(0));
             free(roman);
             return 1;
-        } else if ((value = strtod(command, NULL)) != 0){
+        }
+        if ((value = strtod(command, NULL)) != 0) { // a double is typed
             if (pretty_printing == 1) {
                 printf("%s\n", roman = numerus_pretty_print_long_numerals(
                         numerus_double_to_roman(value)));
@@ -228,11 +229,12 @@ int _num_parse_command(char *command) {
                 free(roman);
                 return 1;
             }
-        } else if ((errcode = numerus_roman_to_double(command, &value)) == NUMERUS_OK) {
+        }
+        if ((errcode = numerus_roman_to_value(command, &value)) == NUMERUS_OK) { // a roman is typed
             printf("%f\n", value);
             return 1;
         } else {
-            printf("%s", UNKNOWN_COMMAND_TEXT);
+            printf("%s-> %s\n", UNKNOWN_COMMAND_TEXT, numerus_explain_error(errcode));
             return 2;
         }
     }
