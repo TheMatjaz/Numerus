@@ -288,15 +288,21 @@ static void _num_skip_to_next_non_unique_dictionary_char(
  * If they don't, advances to the next dictionary roman char - it has to be
  * called again to perform the check.
  *
+ * Used by: _num_parse_part_in_underscores() and
+ * _num_parse_part_after_underscores() which are used by
+ * numerus_roman_to_value()
+ *
  * @returns result code as an error or NUMERUS_OK. The computation result is
- * stored in the passed _num_numeral_parser_data
+ * stored in the passed _num_numeral_parser_data. Possible errors are
+ * NUMERUS_ERROR_TOO_MANY_REPEATED_CHARS or NUMERUS_ERROR_ILLEGAL_CHAR_SEQUENCE
  */
 static int _num_compare_numeral_position_with_dictionary(
         struct _num_numeral_parser_data *parser_data) {
+
     short num_of_matching_chars = _num_string_begins_with(
             parser_data->current_numeral_position,
             parser_data->current_dictionary_char->characters);
-    if (num_of_matching_chars > 0) {
+    if (num_of_matching_chars > 0) { /* chars match */
         parser_data->char_repetitions++;
         if (parser_data->char_repetitions >
             parser_data->current_dictionary_char->max_repetitions) {
@@ -317,10 +323,22 @@ static int _num_compare_numeral_position_with_dictionary(
 
 
 /**
+ * Parses the numeral part between underscores.
  *
+ * Parses each position in the numeral with
+ * _num_compare_numeral_position_with_dictionary() until a stopping character
+ * is found (one of "_Ss.-\0"). If an illegal stopping character is found,
+ * a specific error code is returned.
+ *
+ * Used by: numerus_roman_to_value()
+ *
+ * @returns result code as an error or NUMERUS_OK. Possible errors are
+ * NUMERUS_ERROR_MISSING_SECOND_UNDERSCORE,
+ * NUMERUS_ERROR_DECIMALS_IN_LONG_PART or NUMERUS_ERROR_ILLEGAL_MINUS.
  */
 static int _num_parse_part_in_underscores(
         struct _num_numeral_parser_data *parser_data) {
+
     while (!_num_char_is_in_string(*(parser_data->current_numeral_position),
                                    "_Ss.-")) {
         int result_code = _num_compare_numeral_position_with_dictionary(
@@ -342,6 +360,24 @@ static int _num_parse_part_in_underscores(
     return NUMERUS_OK;
 }
 
+
+/**
+ * Parses the numeral part after the second underscore, if any, or the whole
+ * numeral, if it's not a long numeral.
+ *
+ * Parses each position in the numeral with
+ * _num_compare_numeral_position_with_dictionary() until a stopping character
+ * is found (one of "M_Ss.-\0"). If an illegal stopping character is found,
+ * a specific error code is returned. "M" is an illegal character in the part
+ * after underscores only in long numerals.
+ *
+ * Used by: numerus_roman_to_value()
+ *
+ * @returns result code as an error or NUMERUS_OK. Possible errors are
+ * NUMERUS_ERROR_UNDERSCORE_IN_SHORT_PART,
+ * NUMERUS_ERROR_UNDERSCORE_IN_NON_LONG,
+ * NUMERUS_ERROR_M_IN_SHORT_PART or NUMERUS_ERROR_ILLEGAL_MINUS.
+ */
 static int _num_parse_part_after_underscores(
         struct _num_numeral_parser_data *parser_data) {
     char *stop_chars;
@@ -375,6 +411,29 @@ static int _num_parse_part_after_underscores(
 }
 
 
+/**
+ * Converts a roman numeral to its value as a double.
+ *
+ * Accepts many variations of roman numerals:
+ *
+ * - it's case INsensitive
+ * - accepts negative roman numerals (with leading minus '-')
+ * - accepts long roman numerals (with character between underscores to denote
+ *   the part that has a value multiplied by 1000)
+ * - accepts decimal value of the roman numerals, those are twelfths (with
+ *   the characters 'S' and dot '.')
+ * - all combinations of the above
+ *
+ * The value of the numeral is stored into the referenced double passed as
+ * parameter while the returning value of the functions is an error code. If
+ * it is different than NUMERUS_OK, then the roman numeral has wrong syntax and
+ * could not be parsed. The error code may help find the specific error.
+ *
+ * @param *roman string with a roman numeral
+ * @param *value double where to store the value of the numeral
+ * @returns int error code to indicate success (NUMERUS_OK) or failure
+ * (NUMERUS_ERROR_*)
+ */
 int numerus_roman_to_value(char *roman, double *value) {
     if (numerus_is_zero(roman)) {
         *value = 0.0;
@@ -600,16 +659,5 @@ char *numerus_double_to_roman(double value) {
 
 
 
-/**
- * Converts a roman numeral to a short int.
- *
- * It is case insensitive and accepts negative roman numerals. If the numeral
- * cannot be converted, it means it has wrong syntax. In that case a value
- * bigger than NUMERUS_MAX_LONG_VALUE is returned and the error code
- * NUMERUS_ERROR_WRONG_SYNTAX is stored in numerus_error_code.
- *
- * @param *roman string with a roman numeral
- * @returns short value of the roman numeral or a value bigger than 
- * NUMERUS_MAX_LONG_VALUE in case of error
- */
+
 
