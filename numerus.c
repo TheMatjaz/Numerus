@@ -15,15 +15,11 @@
 
 #include <math.h>     /* For `round()`  */
 #include <ctype.h>    /* For `upcase()` */
-#include <stdio.h>    /* To `fprintf()` to `stderr` */
+#include <stdio.h>    /* To  `fprintf()` to `stderr` */
 #include <stdlib.h>   /* For `malloc()` */
 #include <string.h>   /* For `strcmp()` */
-#include <regex.h>    /* To use regexes to match correct roman numeral syntax */
-#include <sqlite3.h>  /* To export all roman numerals to an SQLite3 file */
 #include <stdbool.h>  /* To use booleans `true` and `false` */
 #include "numerus.h"
-
-static short int _num_begins_with(char *to_compare, const char *pattern);
 
 /**
  * Maximum value a long roman numeral (with '_') may have.
@@ -75,6 +71,14 @@ const short int NUMERUS_MAX_LONG_LENGTH = 31;
 const short int NUMERUS_MAX_SHORT_LENGTH = 17;
 
 /**
+ * Global error code variable to store any errors during conversions.
+ *
+ * It may contain any of the NUMERUS_ERROR_* error codes or NUMERUS_OK.
+ */
+short int numerus_error_code = NUMERUS_OK;
+
+
+/**
  * Buffer where the strings with roman numerals are build an then copied from.
  *
  * This buffer is as long as the longest roman numeral. The usage of this buffer
@@ -85,15 +89,8 @@ const short int NUMERUS_MAX_SHORT_LENGTH = 17;
 static char _num_numeral_build_buffer[NUMERUS_MAX_LENGTH];
 
 /**
- * Global error code variable to store any errors during conversions.
- *
- * It may contain any of the NUMERUS_ERROR_* error codes or NUMERUS_OK.
- */
-short int numerus_error_code = NUMERUS_OK;
-
-
-/**
- * Struct containing a pair: basic roman char and its short integer value.
+ * Struct containing a basic roman char, its double value and the maximum
+ * consecutive repetition of it that a roman numeral may have.
  *
  * It's used to create the _NUM_DICTIONARY dictionary and used by conversion
  * functions. The "roman chars" as called in this library are strings of 1 or 2
@@ -110,23 +107,48 @@ struct _num_single_char_struct {
  * functions.
  */
 static const struct _num_single_char_struct _NUM_SINGLE_DICTIONARY[] = {
-    { 1000.0, "M",  3 },
+    { 1000.0, "M" , 3 },
     {  900.0, "CM", 1 },
-    {  500.0, "D",  1 },
+    {  500.0, "D" , 1 },
     {  400.0, "CD", 1 },
-    {  100.0, "C",  3 },
+    {  100.0, "C" , 3 },
     {   90.0, "XC", 1 },
-    {   50.0, "L",  1 },
+    {   50.0, "L" , 1 },
     {   40.0, "XL", 1 },
-    {   10.0, "X",  3 },
+    {   10.0, "X" , 3 },
     {    9.0, "IX", 1 },
-    {    5.0, "V",  1 },
+    {    5.0, "V" , 1 },
     {    4.0, "IV", 1 },
-    {    1.0, "I",  3 },
-    {    0.5, "S",  1 },
-    { 1/12.0, ".",  5 },
+    {    1.0, "I" , 3 },
+    {    0.5, "S" , 1 },
+    { 1/12.0, "." , 5 },
     {    0.0, NULL, 0 }
 };
+
+/**
+ * Checks if two strings match in the the next 1 or 2 characters.
+ *
+ * It is case insensitive. This functions is used by numerus_roman_to_short() and is
+ * missing many security check since is internal and is meant to be called on
+ * _NUM_DICTIONARY.
+ *
+ * @param *to_compare the current position in the string to check against the
+ * pattern
+ * @param *pattern the position in the string containing the 1 or 2 characters
+ * that may be in *to_compare
+ * @returns length of the match as short: 0 if they don't match or 1 or 2
+ * if they match.
+ */
+static short int _num_begins_with(char *to_compare, const char *pattern) {
+    size_t pattern_length = strlen(pattern);
+    if (strncasecmp(to_compare, pattern, pattern_length) == 0) {
+        /* Compare the first pattern_length characters */
+        return (short) pattern_length;
+    } else {
+        return 0;
+    }
+}
+
 
 struct _num_numeral_analyzer_data {
     char *numeral_start;
