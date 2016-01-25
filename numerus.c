@@ -168,7 +168,7 @@ static short _num_string_begins_with(char *to_be_compared, const char *pattern) 
  * @see numerus_roman_to_value()
  */
 struct _num_numeral_parser_data {
-    char *current_numeral_char;
+    char *current_numeral_position;
     const struct _num_dictionary_char *current_dictionary_char;
     bool numeral_is_long;
     short numeral_length;
@@ -186,7 +186,7 @@ struct _num_numeral_parser_data {
  * @see numerus_roman_to_value()
  */
 static void _num_init_parser_data(struct _num_numeral_parser_data *parser_data, char *roman) {
-    parser_data->current_numeral_char = roman;
+    parser_data->current_numeral_position = roman;
     parser_data->current_dictionary_char = &_NUM_DICTIONARY[0];
     parser_data->numeral_is_long = false;
     parser_data->numeral_length = -1;
@@ -217,7 +217,6 @@ static bool _num_char_is_in_string(char current, char *terminating_chars) {
     return false;
 }
 
-static int _num_parse_one_roman_char(
 
 /**
  * Analyzes one single roman character of a roman numeral.
@@ -231,16 +230,17 @@ static int _num_parse_one_roman_char(
  * @returns result code as an error or NUMERUS_OK. The computation result is
  * stored in the passed _num_numeral_parser_data
  */
+static int _num_compare_numeral_position_with_dictionary(
         struct _num_numeral_parser_data *parser_data) {
     short num_of_matching_chars = _num_string_begins_with(
-            parser_data->current_numeral_char,
+            parser_data->current_numeral_position,
             parser_data->current_dictionary_char->characters);
     if (num_of_matching_chars > 0) {
         parser_data->char_repetitions++;
         if (parser_data->char_repetitions > parser_data->current_dictionary_char->max_repetitions) {
             return NUMERUS_ERROR_TOO_MANY_REPEATED_CHARS;
         }
-        parser_data->current_numeral_char += num_of_matching_chars;
+        parser_data->current_numeral_position += num_of_matching_chars;
         parser_data->numeral_value += parser_data->current_dictionary_char->value;
 
         // jump to next non-unique dictionary char (those who can be repeated)
@@ -266,22 +266,24 @@ static int _num_parse_one_roman_char(
     return NUMERUS_OK;
 }
 
+
 static int _num_parse_part_in_underscores(
         struct _num_numeral_parser_data *parser_data) {
-    while (!_num_char_is_in_string(*(parser_data->current_numeral_char),
+    while (!_num_char_is_in_string(*(parser_data->current_numeral_position),
                                    "_Ss.-")) {
-        int result_code = _num_parse_one_roman_char(parser_data);
+        int result_code = _num_compare_numeral_position_with_dictionary(
+                parser_data);
         if (result_code != NUMERUS_OK) {
             return result_code;
         }
     }
-    if (*(parser_data->current_numeral_char) == '\0') {
+    if (*(parser_data->current_numeral_position) == '\0') {
        return NUMERUS_ERROR_MISSING_SECOND_UNDERSCORE;
     }
-    if (_num_char_is_in_string(*(parser_data->current_numeral_char), "sS.")) {
+    if (_num_char_is_in_string(*(parser_data->current_numeral_position), "sS.")) {
         return NUMERUS_ERROR_DECIMALS_IN_LONG_PART;
     }
-    if (*(parser_data->current_numeral_char) == '-') {
+    if (*(parser_data->current_numeral_position) == '-') {
         return NUMERUS_ERROR_ILLEGAL_MINUS;
     }
     return NUMERUS_OK;
@@ -295,24 +297,25 @@ static int _num_parse_part_after_underscores(
     } else {
         stop_chars = "_-";
     }
-    while (!_num_char_is_in_string(*(parser_data->current_numeral_char),
+    while (!_num_char_is_in_string(*(parser_data->current_numeral_position),
                                    stop_chars)) {
-        int result_code = _num_parse_one_roman_char(parser_data);
+        int result_code = _num_compare_numeral_position_with_dictionary(
+                parser_data);
         if (result_code != NUMERUS_OK) {
             return result_code;
         }
     }
-    if (*(parser_data->current_numeral_char) == '_') {
+    if (*(parser_data->current_numeral_position) == '_') {
         if (parser_data->numeral_is_long) {
             return NUMERUS_ERROR_UNDERSCORE_IN_SHORT_PART;
         } else {
             return NUMERUS_ERROR_UNDERSCORE_IN_NON_LONG;
         }
     }
-    if (*(parser_data->current_numeral_char) == 'M') {
+    if (*(parser_data->current_numeral_position) == 'M') {
         return NUMERUS_ERROR_M_IN_SHORT_PART;
     }
-    if (*(parser_data->current_numeral_char) == '-') {
+    if (*(parser_data->current_numeral_position) == '-') {
         return NUMERUS_ERROR_ILLEGAL_MINUS;
     }
     return NUMERUS_OK;
@@ -331,13 +334,13 @@ int numerus_roman_to_value(char *roman, double *value) {
     }
     struct _num_numeral_parser_data parser_data;
     _num_init_parser_data(&parser_data, roman);
-    if (*parser_data.current_numeral_char == '-') {
+    if (*parser_data.current_numeral_position == '-') {
         parser_data.numeral_sign = -1;
-        parser_data.current_numeral_char++;
+        parser_data.current_numeral_position++;
         parser_data.numeral_length++;
     }
-    if (*parser_data.current_numeral_char == '_') {
-        parser_data.current_numeral_char++;
+    if (*parser_data.current_numeral_position == '_') {
+        parser_data.current_numeral_position++;
         parser_data.numeral_length++;
         parser_data.numeral_is_long = 1;
     }
@@ -346,7 +349,7 @@ int numerus_roman_to_value(char *roman, double *value) {
         if (response_code != NUMERUS_OK) {
             return response_code;
         }
-        parser_data.current_numeral_char++; // skip second underscore
+        parser_data.current_numeral_position++; // skip second underscore
         parser_data.numeral_value *= 1000;
         parser_data.current_dictionary_char = &_NUM_DICTIONARY[1]; // reset back to "CM", "M" is excluded for long numerals
         parser_data.char_repetitions = 0;
