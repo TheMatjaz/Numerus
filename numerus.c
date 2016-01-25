@@ -1,16 +1,10 @@
 /**
  * @file numerus.c
- * @brief Numerus constants and functions for roman numerals conversion and 
- * manipulation.
+ * @brief Numerus constants and functions for roman numerals conversion.
  * @copyright Copyright © 2015-2016, Matjaž Guštin <dev@matjaz.it>
  * <http://matjaz.it>. All rights reserved.
- * @license This file is part of the Numerus project which is released under 
+ * @license This file is part of the Numerus project which is released under
  * the BSD 3-clause license.
- *
- * Inspired by:
- * 
- * - http://stackoverflow.com/a/26723344/5292928
- * - http://stackoverflow.com/a/30816418/5292928
  */
 
 #include <math.h>     /* For `round()`  */
@@ -21,32 +15,47 @@
 #include <stdbool.h>  /* To use booleans `true` and `false` */
 #include "numerus.h"
 
+
+
+
+/*  -+-+-+-+-+-+-+-+-+-+-+-+-+-{   CONSTANTS   }-+-+-+-+-+-+-+-+-+-+-+-+-+-  */
+
+
 /**
  * Maximum value a long roman numeral (with '_') may have.
  */
 const long int NUMERUS_MAX_LONG_VALUE = 3999999;
+
+
 const double NUMERUS_MAX_VALUE = NUMERUS_MAX_LONG_VALUE + 11.0 / 12.0;
+
 
 /**
  * Minimum value a long a roman numeral (with '_') may have.
  */
 const long int NUMERUS_MIN_LONG_VALUE = -NUMERUS_MAX_LONG_VALUE;
+
+
 const double NUMERUS_MIN_VALUE = -NUMERUS_MAX_VALUE;
+
 
 /**
  * Maximum value a short roman numeral (without '_') may have.
  */
 const short int NUMERUS_MAX_SHORT_VALUE = 3999;
 
+
 /**
  * Minimum value a short roman numeral (without '_') may have.
  */
 const short int NUMERUS_MIN_SHORT_VALUE = -NUMERUS_MAX_SHORT_VALUE;
 
+
 /**
  * Roman numeral of value 0 (zero).
  */
 const char *NUMERUS_ZERO = "NULLA";
+
 
 /**
  * Maximum length of a float roman numeral string including the null terminator.
@@ -55,6 +64,8 @@ const char *NUMERUS_ZERO = "NULLA";
  * (value: -3888888 - 11+12) + `\0` is a string long 36+1 = 37 chars.
  */
 const short int NUMERUS_MAX_LENGTH = 37;
+
+
 /**
  * Maximum length of a long non-float roman numeral string including the null terminator.
  *
@@ -62,6 +73,8 @@ const short int NUMERUS_MAX_LENGTH = 37;
  * (value: -3888888) + `\0` is a string long 30+1 = 31 chars.
  */
 const short int NUMERUS_MAX_LONG_LENGTH = 31;
+
+
 /**
  * Maximum length of a short non-long non-float roman numeral string including the null terminator.
  *
@@ -69,6 +82,12 @@ const short int NUMERUS_MAX_LONG_LENGTH = 31;
  * (value: -3888) + `\0` is a string long 16+1 = 17 chars.
  */
 const short int NUMERUS_MAX_SHORT_LENGTH = 17;
+
+
+
+
+/*  -+-+-+-+-+-+-+-+-{   VARIABLES and DATA STRUCTURES   }-+-+-+-+-+-+-+-+-  */
+
 
 /**
  * Global error code variable to store any errors during conversions.
@@ -128,6 +147,11 @@ static const struct _num_dictionary_char _NUM_DICTIONARY[] = {
     { 1/12.0, "." , 5 },
     {    0.0, NULL, 0 }
 };
+
+
+
+
+/*  -+-+-+-+-+-+-+-+-+-+-{   CONVERSION FUNCTIONS   }-+-+-+-+-+-+-+-+-+-+-  */
 
 
 /**
@@ -267,6 +291,9 @@ static int _num_compare_numeral_position_with_dictionary(
 }
 
 
+/**
+ *
+ */
 static int _num_parse_part_in_underscores(
         struct _num_numeral_parser_data *parser_data) {
     while (!_num_char_is_in_string(*(parser_data->current_numeral_position),
