@@ -18,7 +18,7 @@ const char *INFO_TEXT = ""
 "Project page and source code: https://github.com/TheMatjaz/Numerus\n";
 const char *MOO_TEXT = "This is not an easter egg. Try `ascii`.\n";
 const char *PING_TEXT = "Pong.\n";
-const char *HELLO_TEXT = "Can you hear me?\n";
+const char *HELLO_TEXT = "It's me. I was wondering if you are going to type something useful.\n";
 const char *AVE_TEXT = "Ave tibi!\n";
 const char *HELP_TEXT = ""
 "To convert an (arabic) integer to a roman numeral or vice-versa,\n"

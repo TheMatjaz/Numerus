@@ -7,7 +7,7 @@
  * Converts all 95999977 possible values of roman numerals to their roman form
  * and back to their value.
  *
- * The test is about two minutes long on a single core 2.4 GHz Intel Core i5
+ * The test is about 2-3 minutes long on a single core 2.4 GHz Intel Core i5
  * and verifies two things:
  *
  * - the roman numeral with a specified value should be syntactically correct

@@ -1,7 +1,7 @@
 /**
  * @file numerus.h
  * @brief Numerus roman numerals library header
- * @copyright Copyright © 2015, Matjaž Guštin <dev@matjaz.it> 
+ * @copyright Copyright © 2015-2016, Matjaž Guštin <dev@matjaz.it>
  * <http://matjaz.it>. All rights reserved.
  * @license This file is part of the Numerus project which is released under 
  * the BSD 3-clause license.
