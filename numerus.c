@@ -172,6 +172,7 @@ static const struct _num_dictionary_char _NUM_DICTIONARY[] = {
  */
 static short _num_string_begins_with(char *to_be_compared,
                                      const char *pattern) {
+
     size_t pattern_length = strlen(pattern);
     if (strncasecmp(to_be_compared, pattern, pattern_length) == 0) {
         /* Compare the first pattern_length characters */
@@ -213,6 +214,7 @@ struct _num_numeral_parser_data {
  */
 static void _num_init_parser_data(struct _num_numeral_parser_data *parser_data,
                                   char *roman) {
+
     parser_data->current_numeral_position = roman;
     parser_data->current_dictionary_char = &_NUM_DICTIONARY[0];
     parser_data->numeral_is_long = false;
@@ -233,6 +235,7 @@ static void _num_init_parser_data(struct _num_numeral_parser_data *parser_data,
  * `*terminating_chars`. `false` otherwise.
  */
 static bool _num_char_is_in_string(char current, char *terminating_chars) {
+
     if (current == '\0') {
         return true;
     }
@@ -248,7 +251,36 @@ static bool _num_char_is_in_string(char current, char *terminating_chars) {
 
 
 /**
- * Analyzes one single roman character of a roman numeral.
+ * Moves the pointer to the current dictionary character to the next that has
+ * max_repetitions more than 1.
+ *
+ * As an exception to this rule, if the dictionary character at the start of
+ * the skipping is not "V" or "L" or "D", another character is skipped, since
+ * those three are the only ones that can have an "I" or "X" or "C" appended
+ * to them.
+ *
+ * This forces just one of the characters that exclude each other. An example
+ * written as regex: (CM)|(CD)|(D?C{0,3}).
+ *
+ * Used by: _num_compare_numeral_position_with_dictionary()
+ * which is used by numerus_roman_to_value()
+ */
+static void _num_skip_to_next_non_unique_dictionary_char(
+        struct _num_numeral_parser_data *parser_data) {
+
+    short current_char_is_multiple_of_five =
+            strlen(parser_data->current_dictionary_char->characters) == 1;
+    while (parser_data->current_dictionary_char->max_repetitions == 1) {
+        parser_data->current_dictionary_char++;
+        parser_data->char_repetitions = 0;
+    }
+    if (!current_char_is_multiple_of_five) {
+        parser_data->current_dictionary_char++;
+    }
+}
+
+/**
+ * Parses one single roman character of a roman numeral.
  *
  * Confronts the currently pointed position of the roman numeral with the
  * currently pointed roman character in the dictionary. If they match, advances
@@ -272,21 +304,8 @@ static int _num_compare_numeral_position_with_dictionary(
         }
         parser_data->current_numeral_position += num_of_matching_chars;
         parser_data->numeral_value += parser_data->current_dictionary_char->value;
-
-        // jump to next non-unique dictionary char (those who can be repeated)
-        // if current dictionary char has to be unique (like CM)
-        short current_char_is_multiple_of_five = false;
-        if (strlen(parser_data->current_dictionary_char->characters) == 1) {
-            current_char_is_multiple_of_five = true;
-        }
-        while (parser_data->current_dictionary_char->max_repetitions == 1) {
-            parser_data->current_dictionary_char++;
-            parser_data->char_repetitions = 0;
-        }
-        if (!current_char_is_multiple_of_five) {
-            parser_data->current_dictionary_char++;
-        }
-    } else { // chars don't match
+        _num_skip_to_next_non_unique_dictionary_char(parser_data);
+    } else { /* chars don't match */
         parser_data->char_repetitions = 0;
         parser_data->current_dictionary_char++;
         if (parser_data->current_dictionary_char->max_repetitions == 0) {
