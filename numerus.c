@@ -526,7 +526,7 @@ static char *_num_short_to_roman(long int arabic, char *roman_string) {
 static char *_num_long_to_roman(long int arabic, int copy_out_of_buffer) {
     /* Out of range check */
     if (arabic < NUMERUS_MIN_LONG_VALUE || arabic > NUMERUS_MAX_LONG_VALUE) {
-        numerus_error_code = NUMERUS_ERROR_OUT_OF_RANGE;
+        numerus_error_code = NUMERUS_ERROR_VALUE_OUT_OF_RANGE;
         fprintf(stderr,
                 "Roman conversion error: short int %li out of range [%li, %li]\n",
                 arabic, NUMERUS_MIN_LONG_VALUE, NUMERUS_MAX_LONG_VALUE);

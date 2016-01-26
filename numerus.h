@@ -31,7 +31,7 @@
  * possible values a roman numeral may represent, which are the integers in the
  * interval [NUMERUS_MIN_LONG_VALUE, NUMERUS_MAX_LONG_VALUE].
  */
-#define NUMERUS_ERROR_OUT_OF_RANGE 101
+#define NUMERUS_ERROR_VALUE_OUT_OF_RANGE 101
 
 /**
  * regexec() internal error.

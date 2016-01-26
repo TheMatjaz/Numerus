@@ -419,14 +419,14 @@ struct _num_error_codes {
 };
 
 struct _num_error_codes _NUM_ERROR_CODES[] = {
-        {NUMERUS_ERROR_WRONG_SYNTAX,                "Wrong syntax"},
-        {NUMERUS_ERROR_OUT_OF_RANGE,                "Out of range"},
-        {NUMERUS_ERROR_REGEXEC,                   "Regex compilation error"},
-        {NUMERUS_ERROR_SQLITE,                    "Generic SQLite3 error"},
-        {NUMERUS_ERROR_CANNOT_COMPARE,            "Cannot compare two romans because they have other errors"},
-        {NUMERUS_ERROR_ILLEGAL_CHARACTER,         "Illegal character"},
-        {NUMERUS_ERROR_TOO_LONG_NUMERAL,          "Too long numeral"},
-        {NUMERUS_ERROR_TOO_MANY_REPEATED_CHARS,   "Too many repetitions of a >repeatable< character, like MMMM or IIII"},
+        {NUMERUS_ERROR_WRONG_SYNTAX,            "Wrong syntax"},
+        {NUMERUS_ERROR_VALUE_OUT_OF_RANGE,      "Out of range"},
+        {NUMERUS_ERROR_REGEXEC,                 "Regex compilation error"},
+        {NUMERUS_ERROR_SQLITE,                  "Generic SQLite3 error"},
+        {NUMERUS_ERROR_CANNOT_COMPARE,          "Cannot compare two romans because they have other errors"},
+        {NUMERUS_ERROR_ILLEGAL_CHARACTER,       "Illegal character"},
+        {NUMERUS_ERROR_TOO_LONG_NUMERAL,        "Too long numeral"},
+        {NUMERUS_ERROR_TOO_MANY_REPEATED_CHARS, "Too many repetitions of a >repeatable< character, like MMMM or IIII"},
         {NUMERUS_ERROR_ILLEGAL_CHAR_SEQUENCE,     "Illegal sequence or order of roman characters"},
         {NUMERUS_ERROR_MISSING_SECOND_UNDERSCORE, "Missing second underscore"},
         {NUMERUS_ERROR_UNDERSCORE_IN_SHORT_PART,  "Underscore after second one"},
