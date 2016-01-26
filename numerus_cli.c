@@ -114,7 +114,7 @@ static int pretty_printing = 0;
 /**
  * Do not free a string after it has been trimmed, free the original pointer to it.
  */
-char *trim_lowercase_get_first_word(char *string) {
+static char *_num_trim_lowercase_get_first_word(char *string) {
     char *start;
 
     /* Trim leading space */
@@ -137,7 +137,7 @@ char *trim_lowercase_get_first_word(char *string) {
     return start;
 }
 
-int string_is_zero(char *zero_as_string) {
+static int _num_string_is_zero(char *zero_as_string) {
     if (*zero_as_string == '-') {
         zero_as_string++;
     }
@@ -164,7 +164,7 @@ int string_is_zero(char *zero_as_string) {
 /**
  * Command should be already trimmed and lowercased
  */
-int _num_parse_command(char *command) {
+static int _num_parse_command(char *command) {
     if (strcmp(command, "?") == 0
         || strcmp(command, "help") == 0) {
         printf("%s", HELP_TEXT);
@@ -212,7 +212,7 @@ int _num_parse_command(char *command) {
         double value;
         char *roman;
         int errcode = 0;
-        if (string_is_zero(command)) { // a double of any form with value 0.0 is typed
+        if (_num_string_is_zero(command)) { // a double of any form with value 0.0 is typed
             printf("%s\n", roman = numerus_value_to_roman(0, NULL));
             free(roman);
             return 1;
@@ -256,7 +256,7 @@ void numerus_repl(int argc, char **args) {
         args++;
         pretty_printing = 0;
         while (argc > 1) {
-            command = trim_lowercase_get_first_word(*args);
+            command = _num_trim_lowercase_get_first_word(*args);
              _num_parse_command(command);
             args++;
             argc--;
@@ -269,16 +269,10 @@ void numerus_repl(int argc, char **args) {
             if (getline(&line, &line_buffer_size, stdin) == -1) {
                 break;
             } else {
-                command = trim_lowercase_get_first_word(line);
+                command = _num_trim_lowercase_get_first_word(line);
                 cycle_repl = _num_parse_command(command);
             }
         }
     }
     free(line);
-}
-
-int main(int argc, char **args) {
-    //numerus_repl(argc, args);
-    numtest_convert_all_romans();
-    return 0;
 }
