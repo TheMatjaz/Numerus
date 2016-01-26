@@ -119,7 +119,7 @@ static char _num_numeral_build_buffer[NUMERUS_MAX_LENGTH];
  * chars that have a specific a priori known value.
  */
 struct _num_dictionary_char {
-    const double value;
+    const int value;
     const char *characters;
     const short max_repetitions;
 };
@@ -132,22 +132,22 @@ struct _num_dictionary_char {
  * understand that the array has been parsed.
  */
 static const struct _num_dictionary_char _NUM_DICTIONARY[] = {
-    { 1000.0, "M" ,  3 },
-    {  900.0, "CM",  1 },
-    {  500.0, "D" ,  1 },
-    {  400.0, "CD",  1 },
-    {  100.0, "C" ,  3 },
-    {   90.0, "XC",  1 },
-    {   50.0, "L" ,  1 },
-    {   40.0, "XL",  1 },
-    {   10.0, "X" ,  3 },
-    {    9.0, "IX",  1 },
-    {    5.0, "V" ,  1 },
-    {    4.0, "IV",  1 },
-    {    1.0, "I" ,  3 },
-    {    0.5, "S" ,  1 },
-    { 1/12.0, "." ,  5 },
-    {    0.0, NULL,  0 }
+    { 1000, "M" ,  3 }, // index: 0
+    {  900, "CM",  1 }, // index: 1
+    {  500, "D" ,  1 },
+    {  400, "CD",  1 },
+    {  100, "C" ,  3 },
+    {   90, "XC",  1 },
+    {   50, "L" ,  1 },
+    {   40, "XL",  1 },
+    {   10, "X" ,  3 },
+    {    9, "IX",  1 },
+    {    5, "V" ,  1 },
+    {    4, "IV",  1 },
+    {    1, "I" ,  3 },
+    {    6, "S" ,  1 }, // index: 13
+    {    1, "." ,  5 },
+    {    0, NULL,  0 }
 };
 
 
