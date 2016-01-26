@@ -11,6 +11,7 @@
 #include <time.h>
 #include <stdlib.h>
 #include "numerus.h"
+#include "numerus_test.h"
 
 /**
  * Converts all 95999977 possible values of roman numerals to their roman form
