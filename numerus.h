@@ -9,6 +9,19 @@
 
 
 /**
+ * Internal representation of a roman numeral value with its twelfths.
+ *
+ * Contains a long representing the integer part of the value and a short with
+ * the decimal part, incating precisely the number of twelfths the value has.
+ * This is necessary to avoid rounding errors for floating point representations
+ * of the value.
+ */
+struct _num_numeral_value {
+    long integer_part;
+    short twelfths;
+};
+
+/**
  * Everything went all right.
  *
  * This is the opposite of any NUMERUS_ERROR_*.
