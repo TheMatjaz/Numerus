@@ -45,7 +45,7 @@ int numtest_convert_all_floats() {
                         to_convert, numerus_explain_error(errcode), roman);
                 return 1;
             }
-            if (to_convert != converted) {
+            if ((float) to_convert != (float) converted) {
                 fprintf(stderr, "Error at converting %20.20f -> %s -> %20.20f",
                         to_convert, roman, converted);
                 return 1;
