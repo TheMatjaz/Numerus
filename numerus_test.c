@@ -1,3 +1,12 @@
+/**
+ * @file numerus_test.c
+ * @brief Numerus test functions to verify the correctness of the library.
+ * @copyright Copyright © 2015-2016, Matjaž Guštin <dev@matjaz.it>
+ * <http://matjaz.it>. All rights reserved.
+ * @license This file is part of the Numerus project which is released under
+ * the BSD 3-clause license.
+ */
+
 #include <stdio.h>
 #include <time.h>
 #include <stdlib.h>
@@ -14,8 +23,8 @@
  * - the conversions should be bijective, which means that the value converted
  *   to roman numeral and back to value should still be the same value.
  *
- * @returns the computation time on stdout and returns 0 on success or outputs
- * any error on stderr and returns 1.
+ * @returns the *really* approximate computation time on stdout and returns 0
+ * on success or outputs any error on stderr and returns 1.
  */
 int numtest_convert_all_romans() {
     double i;
@@ -26,16 +35,16 @@ int numtest_convert_all_romans() {
     clock_t start_clock = clock();
     for (i = NUMERUS_MIN_LONG_VALUE; i <= NUMERUS_MAX_LONG_VALUE; i++) {
         for (decimal = 0.0; decimal < 1.0; decimal += 1.0/12.0) {
-            roman = numerus_double_to_roman(i);
+            roman = numerus_value_to_roman(i+decimal, NULL);
             errcode = numerus_roman_to_value(roman, &value);
             if (errcode != NUMERUS_OK) {
-                fprintf(stderr, "%15.15f: %s: %s\n", i,
-                        numerus_explain_error(errcode), roman);
+                fprintf(stderr, "%15.15f: %s: %s\n",
+                        i+decimal, numerus_explain_error(errcode), roman);
                 return 1;
             }
-            if ((float) i != (float) value) {
+            if ((float) (i+decimal) != (float) value) {
                 fprintf(stderr, "Error at converting %15.15f -> %s -> %15.15f",
-                        i, roman, value);
+                        i+decimal, roman, value);
                 return 1;
             }
             free(roman);
@@ -50,6 +59,7 @@ int numtest_convert_all_romans() {
     return 0;
 }
 
+
 /**
  * Perform a single test to verify the reaction of the roman to value
  * conversion when the syntax is correct.
@@ -59,15 +69,21 @@ void _num_test_for_error(char *roman, int error_code) {
     int code = NUMERUS_OK;
     code = numerus_roman_to_value(roman, &value);
     if (code == error_code) {
-        fprintf(stderr, "Test passed: %s raises error \"%s\"\n", roman, numerus_explain_error(code));
+        fprintf(stderr, "Test passed: %s raises error \"%s\"\n",
+                roman, numerus_explain_error(code));
     } else {
-        fprintf(stderr, "Test FAILED: %s raises \"%s\" instead of \"%s\"\n", roman, numerus_explain_error(code), numerus_explain_error(error_code));
+        fprintf(stderr, "Test FAILED: %s raises \"%s\" instead of \"%s\"\n",
+                roman, numerus_explain_error(code),
+                numerus_explain_error(error_code));
     }
 }
+
 
 /**
  * Performs a series of tests to verify the reaction of the roman to value
  * conversion when the syntax is correct.
+ *
+ * Outputs the result to to stderr.
  *
  * @see _num_test_for_error(char *roman, int error_code)
  */

@@ -210,28 +210,27 @@ int _num_parse_command(char *command) {
         return 1;
     } else {
         double value;
-        long l;
         char *roman;
         int errcode = 0;
         if (string_is_zero(command)) { // a double of any form with value 0.0 is typed
-            printf("%s\n", roman = numerus_long_to_roman(0));
+            printf("%s\n", roman = numerus_value_to_roman(0, NULL));
             free(roman);
             return 1;
         }
         if ((value = strtod(command, NULL)) != 0) { // a double is typed
             if (pretty_printing == 1) {
                 printf("%s\n", roman = numerus_pretty_print_long_numerals(
-                        numerus_double_to_roman(value)));
+                        numerus_value_to_roman(value, NULL)));
                 free(roman);
                 return 1;
             } else {
-                printf("%s\n", roman = numerus_double_to_roman(value));
+                printf("%s\n", roman = numerus_value_to_roman(value, NULL));
                 free(roman);
                 return 1;
             }
         }
         if ((errcode = numerus_roman_to_value(command, &value)) == NUMERUS_OK) { // a roman is typed
-            printf("%f\n", value);
+            printf("%15.15f\n", value);
             return 1;
         } else {
             printf("%s-> %s\n", UNKNOWN_COMMAND_TEXT, numerus_explain_error(errcode));
@@ -273,5 +272,6 @@ void numerus_repl(int argc, char **args) {
 
 int main(int argc, char **args) {
     //numerus_repl(argc, args);
+    numtest_convert_all_romans();
     return 0;
 }

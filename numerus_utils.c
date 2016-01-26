@@ -200,7 +200,7 @@ int numerus_export_to_csv(char *filename, long min_value, long max_value,
                     i,
                     separator,
                     quotes,
-                    numerus_long_to_roman(i),
+                    numerus_value_to_roman(i, NULL),
                     quotes,
                     newline);
         }
@@ -209,7 +209,7 @@ int numerus_export_to_csv(char *filename, long min_value, long max_value,
             fprintf(csv_file,
                     "%s%s%s%s%li%s",
                     quotes,
-                    numerus_long_to_roman(i),
+                    numerus_value_to_roman(i, NULL),
                     quotes,
                     separator,
                     i,
@@ -308,7 +308,7 @@ int numerus_export_to_sqlite3(char *filename, long min_value, long max_value) {
     long int i;
     printf("Insering into SQLite...\n");
     for (i = min_value; i <= max_value; i++) {
-        char *roman = numerus_long_to_roman(i);
+        char *roman = numerus_value_to_roman(i, NULL);
         /* Fill prepared statement */
         sqlite3_bind_int64(stmt, 1, i);
         sqlite3_bind_text(stmt, 2, roman, -1, SQLITE_TRANSIENT);
@@ -419,14 +419,14 @@ struct _num_error_codes {
 };
 
 struct _num_error_codes _NUM_ERROR_CODES[] = {
-        {NUMERUS_ERROR_WRONG_SYNTAX,                "Wrong syntax"},
-        {NUMERUS_ERROR_OUT_OF_RANGE,                "Out of range"},
-        {NUMERUS_ERROR_REGEXEC,                   "Regex compilation error"},
-        {NUMERUS_ERROR_SQLITE,                    "Generic SQLite3 error"},
-        {NUMERUS_ERROR_CANNOT_COMPARE,            "Cannot compare two romans because they have other errors"},
-        {NUMERUS_ERROR_ILLEGAL_CHARACTER,         "Illegal character"},
-        {NUMERUS_ERROR_TOO_LONG_NUMERAL,          "Too long numeral"},
-        {NUMERUS_ERROR_TOO_MANY_REPEATED_CHARS,   "Too many repetitions of a >repeatable< character, like MMMM or IIII"},
+        {NUMERUS_ERROR_WRONG_SYNTAX,            "Wrong syntax"},
+        {NUMERUS_ERROR_VALUE_OUT_OF_RANGE,      "Out of range"},
+        {NUMERUS_ERROR_REGEXEC,                 "Regex compilation error"},
+        {NUMERUS_ERROR_SQLITE,                  "Generic SQLite3 error"},
+        {NUMERUS_ERROR_CANNOT_COMPARE,          "Cannot compare two romans because they have other errors"},
+        {NUMERUS_ERROR_ILLEGAL_CHARACTER,       "Illegal character"},
+        {NUMERUS_ERROR_TOO_LONG_NUMERAL,        "Too long numeral"},
+        {NUMERUS_ERROR_TOO_MANY_REPEATED_CHARS, "Too many repetitions of a >repeatable< character, like MMMM or IIII"},
         {NUMERUS_ERROR_ILLEGAL_CHAR_SEQUENCE,     "Illegal sequence or order of roman characters"},
         {NUMERUS_ERROR_MISSING_SECOND_UNDERSCORE, "Missing second underscore"},
         {NUMERUS_ERROR_UNDERSCORE_IN_SHORT_PART,  "Underscore after second one"},

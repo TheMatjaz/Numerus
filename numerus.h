@@ -31,7 +31,7 @@
  * possible values a roman numeral may represent, which are the integers in the
  * interval [NUMERUS_MIN_LONG_VALUE, NUMERUS_MAX_LONG_VALUE].
  */
-#define NUMERUS_ERROR_OUT_OF_RANGE 101
+#define NUMERUS_ERROR_VALUE_OUT_OF_RANGE 101
 
 /**
  * regexec() internal error.
@@ -99,13 +99,14 @@ int numerus_numeral_length(char *roman, short *length);
 short numerus_is_roman(char *roman);
 
 /* Conversion function from value to roman numeral */
-char *numerus_long_to_roman(long arabic);
-char *numerus_double_to_roman(double value);
+char *numerus_value_to_roman(double value, int *errcode);
 
 /* Conversion function from roman numeral to value */
 int numerus_roman_to_value(char *roman, double *value);
 
+
 /* Utility functions */
+double numerus_round_to_nearest_12th(double value);
 int numerus_compare_value(char *roman_bigger, char *roman_smaller);
 int numerus_export_to_sqlite3(char *filename, long min_value, long max_value);
 int numerus_export_to_csv(char *filename, long min_value, long max_value,
