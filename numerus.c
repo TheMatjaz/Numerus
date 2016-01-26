@@ -210,7 +210,7 @@ struct _num_numeral_parser_data {
     bool numeral_is_long;
     short numeral_length;
     short numeral_sign;
-    double numeral_value;
+    struct _num_numeral_value numeral_value;
     short char_repetitions;
 };
 
@@ -230,7 +230,8 @@ static void _num_init_parser_data(struct _num_numeral_parser_data *parser_data,
     parser_data->numeral_is_long = false;
     parser_data->numeral_length = -1;
     parser_data->numeral_sign = 1;
-    parser_data->numeral_value = 0.0;
+    parser_data->numeral_value.integer_part = 0;
+    parser_data->numeral_value.twelfths = 0;
     parser_data->char_repetitions = 0;
 }
 
@@ -319,7 +320,14 @@ static int _num_compare_numeral_position_with_dictionary(
             return NUMERUS_ERROR_TOO_MANY_REPEATED_CHARS;
         }
         parser_data->current_numeral_position += num_of_matching_chars;
-        parser_data->numeral_value += parser_data->current_dictionary_char->value;
+        if (*(parser_data->current_dictionary_char->characters) == 'S'
+            || *(parser_data->current_dictionary_char->characters) == '.') {
+            // add to decimal part value
+            parser_data->numeral_value.twelfths += parser_data->current_dictionary_char->value;
+        } else {
+            // add to integer part value
+            parser_data->numeral_value.integer_part += parser_data->current_dictionary_char->value;
+        }
         _num_skip_to_next_non_unique_dictionary_char(parser_data);
     } else { /* chars don't match */
         parser_data->char_repetitions = 0;
@@ -390,11 +398,12 @@ static int _num_parse_part_in_underscores(
  */
 static int _num_parse_part_after_underscores(
         struct _num_numeral_parser_data *parser_data) {
+
     char *stop_chars;
     if (parser_data->numeral_is_long) {
-        stop_chars = "M_-";
+        stop_chars = "Ss.M_-";
     } else {
-        stop_chars = "_-";
+        stop_chars = "Ss._-";
     }
     while (!_num_char_is_in_string(*(parser_data->current_numeral_position),
                                    stop_chars)) {
@@ -413,6 +422,30 @@ static int _num_parse_part_after_underscores(
     }
     if (*(parser_data->current_numeral_position) == 'M') {
         return NUMERUS_ERROR_M_IN_SHORT_PART;
+    }
+    if (*(parser_data->current_numeral_position) == '-') {
+        return NUMERUS_ERROR_ILLEGAL_MINUS;
+    }
+    return NUMERUS_OK;
+}
+
+
+static int _num_parse_decimal_part(
+        struct _num_numeral_parser_data *parser_data) {
+    while (!_num_char_is_in_string(*(parser_data->current_numeral_position),
+                                   "_-")) {
+        int result_code = _num_compare_numeral_position_with_dictionary(
+                parser_data);
+        if (result_code != NUMERUS_OK) {
+            return result_code;
+        }
+    }
+    if (*(parser_data->current_numeral_position) == '_') {
+        if (parser_data->numeral_is_long) {
+            return NUMERUS_ERROR_UNDERSCORE_IN_SHORT_PART;
+        } else {
+            return NUMERUS_ERROR_UNDERSCORE_IN_NON_LONG;
+        }
     }
     if (*(parser_data->current_numeral_position) == '-') {
         return NUMERUS_ERROR_ILLEGAL_MINUS;
@@ -469,7 +502,7 @@ int numerus_roman_to_value(char *roman, double *value) {
             return response_code;
         }
         parser_data.current_numeral_position++; // skip second underscore
-        parser_data.numeral_value *= 1000;
+        parser_data.numeral_value.integer_part *= 1000;
         // reset back to "CM", "M" is excluded for long numerals
         parser_data.current_dictionary_char = &_NUM_DICTIONARY[1];
         parser_data.char_repetitions = 0;
@@ -478,8 +511,12 @@ int numerus_roman_to_value(char *roman, double *value) {
     if (response_code != NUMERUS_OK) {
         return response_code;
     }
-    *value = parser_data.numeral_sign * parser_data.numeral_value;
-    *value = numerus_round_to_nearest_12th(*value);
+    response_code = _num_parse_decimal_part(&parser_data);
+    if (response_code != NUMERUS_OK) {
+        return response_code;
+    }
+    *value = numerus_as_double(&parser_data.numeral_value);
+    *value *= parser_data.numeral_sign;
     return NUMERUS_OK;
 }
 
