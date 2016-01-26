@@ -200,7 +200,7 @@ int numerus_export_to_csv(char *filename, long min_value, long max_value,
                     i,
                     separator,
                     quotes,
-                    numerus_long_to_roman(i),
+                    numerus_value_to_roman(i, NULL),
                     quotes,
                     newline);
         }
@@ -209,7 +209,7 @@ int numerus_export_to_csv(char *filename, long min_value, long max_value,
             fprintf(csv_file,
                     "%s%s%s%s%li%s",
                     quotes,
-                    numerus_long_to_roman(i),
+                    numerus_value_to_roman(i, NULL),
                     quotes,
                     separator,
                     i,
@@ -308,7 +308,7 @@ int numerus_export_to_sqlite3(char *filename, long min_value, long max_value) {
     long int i;
     printf("Insering into SQLite...\n");
     for (i = min_value; i <= max_value; i++) {
-        char *roman = numerus_long_to_roman(i);
+        char *roman = numerus_value_to_roman(i, NULL);
         /* Fill prepared statement */
         sqlite3_bind_int64(stmt, 1, i);
         sqlite3_bind_text(stmt, 2, roman, -1, SQLITE_TRANSIENT);
