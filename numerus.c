@@ -547,7 +547,7 @@ char *numerus_value_to_roman(double value, int *errcode) {
     }
 
     /* Create part between underscores */
-    if (value > NUMERUS_MAX_SHORT_VALUE) { /* Underscores are needed */
+    if (value >= NUMERUS_MAX_SHORT_VALUE+1) { /* Underscores are needed */
         *(roman_numeral++) = '_';
         roman_numeral = _num_value_part_to_roman((int) value / 1000, roman_numeral, 0); /* Integer cast to avoid decimals in part between underscores */
         value -= ((int) value / 1000) * 1000; /* Remove the three left-most digits because of the integer division */
