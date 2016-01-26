@@ -221,7 +221,7 @@ int _num_parse_command(char *command) {
         if ((value = strtod(command, NULL)) != 0) { // a double is typed
             if (pretty_printing == 1) {
                 printf("%s\n", roman = numerus_pretty_print_long_numerals(
-                        numerus_double_to_roman(value)));
+                        numerus_value_to_roman(value, NULL)));
                 free(roman);
                 return 1;
             } else {
@@ -273,5 +273,6 @@ void numerus_repl(int argc, char **args) {
 
 int main(int argc, char **args) {
     //numerus_repl(argc, args);
+    numtest_convert_all_romans();
     return 0;
 }
