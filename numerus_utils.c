@@ -99,7 +99,8 @@ short numerus_sign(char *roman) {
  * found.
  */
 int numerus_numeral_length(char *roman, short *length) {
-    short *numeral_length = 0;
+    short temp = -1;
+    short *numeral_length = &temp;
     if (length != NULL) {
         *length = *numeral_length;
     }
