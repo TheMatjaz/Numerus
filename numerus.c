@@ -439,21 +439,18 @@ int numerus_roman_to_value(char *roman, double *value) {
         *value = 0.0;
         return NUMERUS_OK;
     }
-    short length = 0;
-    int response_code = numerus_numeral_length(roman, &length);
+    struct _num_numeral_parser_data parser_data;
+    _num_init_parser_data(&parser_data, roman);
+    int response_code = numerus_numeral_length(roman, &parser_data.numeral_length);
     if (response_code != NUMERUS_OK) {
         return response_code;
     }
-    struct _num_numeral_parser_data parser_data;
-    _num_init_parser_data(&parser_data, roman);
     if (*parser_data.current_numeral_position == '-') {
         parser_data.numeral_sign = -1;
         parser_data.current_numeral_position++;
-        parser_data.numeral_length++;
     }
     if (*parser_data.current_numeral_position == '_') {
         parser_data.current_numeral_position++;
-        parser_data.numeral_length++;
         parser_data.numeral_is_long = 1;
     }
     if (parser_data.numeral_is_long) {
