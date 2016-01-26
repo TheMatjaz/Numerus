@@ -198,9 +198,8 @@ static short _num_string_begins_with(char *to_be_compared,
  *
  * Used by `numerus_roman_to_value()` and other static functions. Contains info
  * about the currently parsed part of the numeral, the dictionary char that the
- * numeral is confronted with, the value, sign, length of the numeral, if it has
- * underscore and counts the number of consecutive repetitions a single roman
- * char has.
+ * numeral is confronted with, the value, sign, if it has underscore and counts
+ * the number of consecutive repetitions a single roman char has.
  *
  * @see numerus_roman_to_value()
  */
@@ -208,7 +207,6 @@ struct _num_numeral_parser_data {
     char *current_numeral_position;
     const struct _num_dictionary_char *current_dictionary_char;
     bool numeral_is_long;
-    short numeral_length;
     short numeral_sign;
     struct _num_numeral_value numeral_value;
     short char_repetitions;
@@ -228,7 +226,6 @@ static void _num_init_parser_data(struct _num_numeral_parser_data *parser_data,
     parser_data->current_numeral_position = roman;
     parser_data->current_dictionary_char = &_NUM_DICTIONARY[0];
     parser_data->numeral_is_long = false;
-    parser_data->numeral_length = -1;
     parser_data->numeral_sign = 1;
     parser_data->numeral_value.integer_part = 0;
     parser_data->numeral_value.twelfths = 0;
@@ -484,7 +481,7 @@ int numerus_roman_to_value(char *roman, double *value) {
     }
     struct _num_numeral_parser_data parser_data;
     _num_init_parser_data(&parser_data, roman);
-    int response_code = numerus_numeral_length(roman, &parser_data.numeral_length);
+    int response_code = numerus_numeral_length(roman, NULL);
     if (response_code != NUMERUS_OK) {
         return response_code;
     }
