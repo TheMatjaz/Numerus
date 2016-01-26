@@ -27,24 +27,26 @@
  * on success or outputs any error on stderr and returns 1.
  */
 int numtest_convert_all_romans() {
-    double i;
-    double value;
+    long i;
+    double converted;
     char *roman;
     int errcode;
-    double decimal;
+    double decimal = 0;
+    double to_convert;
     clock_t start_clock = clock();
     for (i = NUMERUS_MIN_LONG_VALUE; i <= NUMERUS_MAX_LONG_VALUE; i++) {
         for (decimal = 0.0; decimal < 1.0; decimal += 1.0/12.0) {
-            roman = numerus_value_to_roman(i+decimal, NULL);
-            errcode = numerus_roman_to_value(roman, &value);
+            to_convert = i + decimal;
+            roman = numerus_value_to_roman(to_convert, NULL);
+            errcode = numerus_roman_to_value(roman, &converted);
             if (errcode != NUMERUS_OK) {
                 fprintf(stderr, "%15.15f: %s: %s\n",
-                        i+decimal, numerus_explain_error(errcode), roman);
+                        to_convert, numerus_explain_error(errcode), roman);
                 return 1;
             }
-            if ((float) (i+decimal) != (float) value) {
-                fprintf(stderr, "Error at converting %15.15f -> %s -> %15.15f",
-                        i+decimal, roman, value);
+            if ((float) to_convert != (float) converted) {
+                fprintf(stderr, "Error at converting %20.20f -> %s -> %20.20f",
+                        to_convert, roman, converted);
                 return 1;
             }
             free(roman);
@@ -64,7 +66,7 @@ int numtest_convert_all_romans() {
  * Perform a single test to verify the reaction of the roman to value
  * conversion when the syntax is correct.
  */
-void _num_test_for_error(char *roman, int error_code) {
+static void _num_test_for_error(char *roman, int error_code) {
     double value = 0.0;
     int code = NUMERUS_OK;
     code = numerus_roman_to_value(roman, &value);
