@@ -151,9 +151,19 @@ static const struct _num_dictionary_char _NUM_DICTIONARY[] = {
 };
 
 
-
-
 /*  -+-+-+-+-+-+-+-+-+-+-{   CONVERSION FUNCTIONS   }-+-+-+-+-+-+-+-+-+-+-  */
+
+
+/**
+ * Converts a numeral's value stored as struct with integer and fractional
+ * part to a double.
+ *
+ * @param *value struct _num_numeral_value to express as double
+ * @returns double containing the sum of the integer part and the twelfths from the struct
+ */
+double numerus_as_double(struct _num_numeral_value *value) {
+    return (double) (value->integer_part) + value->twelfths/12.0;
+}
 
 
 /**
