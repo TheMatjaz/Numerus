@@ -112,7 +112,7 @@ int numerus_numeral_length(char *roman, short *length);
 short numerus_is_roman(char *roman);
 
 /* Conversion function from value to roman numeral */
-char *numerus_value_to_roman(double value, int *errcode);
+char *numerus_value_to_roman(double double_value, int *errcode);
 
 /* Conversion function from roman numeral to value */
 int numerus_roman_to_value(char *roman, double *value);
@@ -127,4 +127,5 @@ int numerus_export_to_csv(char *filename, long min_value, long max_value,
                           char *quotes);
 char *numerus_pretty_print_long_numerals(char *roman);
 const char *numerus_explain_error(int error_code);
-// FIXME: IF I DONT PUT THIS ; HERE, IT GIVES ME A SYNTAX ERROR
+void numerus_as_struct(double value, struct _num_numeral_value *struct_value);
+char *numerus_pretty_print_float_value(double double_value, int shorten);

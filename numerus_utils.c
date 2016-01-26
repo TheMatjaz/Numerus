@@ -413,6 +413,81 @@ char *numerus_pretty_print_long_numerals(char *roman) {
     }
 }
 
+char *numerus_shorten_fraction(short twelfth) {
+    if (twelfth < 0) {
+        switch (twelfth) {
+            case -11:
+                return "-11/12";
+            case -10:
+                return "-5/6";
+            case -9:
+                return "-3/4";
+            case -8:
+                return "-2/3";
+            case -7:
+                return "-7/12";
+            case -6:
+                return "-1/2";
+            case -5:
+                return "-5/12";
+            case -4:
+                return "-1/3";
+            case -3:
+                return "-1/4";
+            case -2:
+                return "-1/6";
+            case -1:
+                return "-1/12";
+            default:
+                return NULL;
+        }
+    } else {
+        switch (twelfth) {
+            case 0:
+                return "0/12";
+            case 1:
+                return "1/12";
+            case 2:
+                return "1/6";
+            case 3:
+                return "1/4";
+            case 4:
+                return "1/3";
+            case 5:
+                return "5/12";
+            case 6:
+                return "1/2";
+            case 7:
+                return "7/12";
+            case 8:
+                return "2/3";
+            case 9:
+                return "3/4";
+            case 10:
+                return "5/6";
+            case 11:
+                return "11/12";
+            default:
+                return NULL;
+        }
+    }
+}
+
+char *numerus_pretty_print_float_value(double double_value, int shorten) {
+    struct _num_numeral_value struct_value;
+    numerus_as_struct(double_value, &struct_value);
+    char *pretty_value = malloc(17);
+    if (struct_value.twelfths == 0) {
+        snprintf(pretty_value, 17, "%ld", struct_value.integer_part);
+    } else if (shorten) {
+        snprintf(pretty_value, 17, "%ld, %s", struct_value.integer_part,
+                 numerus_shorten_fraction(struct_value.twelfths));
+    } else {
+        snprintf(pretty_value, 17, "%ld, %d/12", struct_value.integer_part, struct_value.twelfths);
+    }
+    return pretty_value;
+}
+
 struct _num_error_codes {
     const int code;
     const char *message;
