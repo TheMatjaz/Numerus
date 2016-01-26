@@ -99,14 +99,18 @@ short numerus_sign(char *roman) {
  * found.
  */
 int numerus_numeral_length(char *roman, short *length) {
+    short *numeral_length = 0;
+    if (length != NULL) {
+        *length = *numeral_length;
+    }
     if (numerus_is_zero(roman)) {
-        *length = (short) strlen(NUMERUS_ZERO);
+        *numeral_length = (short) strlen(NUMERUS_ZERO);
         return NUMERUS_OK;
     }
     short i = 0;
     while (*roman != '\0') {
         if (i > NUMERUS_MAX_LENGTH) {
-            *length = -1;
+            *numeral_length = -1;
             numerus_error_code = NUMERUS_ERROR_TOO_LONG_NUMERAL;
             return NUMERUS_ERROR_TOO_LONG_NUMERAL;
         }
@@ -130,13 +134,13 @@ int numerus_numeral_length(char *roman, short *length) {
                 break;
             }
             default: {
-                *length = -1;
+                *numeral_length = -1;
                 numerus_error_code = NUMERUS_ERROR_ILLEGAL_CHARACTER;
                 return NUMERUS_ERROR_ILLEGAL_CHARACTER;
             }
         }
     }
-    *length = i;
+    *numeral_length = i;
     return NUMERUS_OK;
 }
 
