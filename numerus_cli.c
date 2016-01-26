@@ -230,8 +230,15 @@ int _num_parse_command(char *command) {
             }
         }
         if ((errcode = numerus_roman_to_value(command, &value)) == NUMERUS_OK) { // a roman is typed
-            printf("%15.15f\n", value);
-            return 1;
+            if (pretty_printing == 1) {
+                char *pretty_value;
+                printf("%s\n", pretty_value = numerus_pretty_print_float_value(value, 1));
+                free(pretty_value);
+                return 1;
+            } else {
+                printf("%15.15f\n", value);
+                return 1;
+            }
         } else {
             printf("%s-> %s\n", UNKNOWN_COMMAND_TEXT, numerus_explain_error(errcode));
             return 2;
