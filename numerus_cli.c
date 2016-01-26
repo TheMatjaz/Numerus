@@ -210,7 +210,6 @@ int _num_parse_command(char *command) {
         return 1;
     } else {
         double value;
-        long l;
         char *roman;
         int errcode = 0;
         if (string_is_zero(command)) { // a double of any form with value 0.0 is typed
@@ -231,7 +230,7 @@ int _num_parse_command(char *command) {
             }
         }
         if ((errcode = numerus_roman_to_value(command, &value)) == NUMERUS_OK) { // a roman is typed
-            printf("%f\n", value);
+            printf("%15.15f\n", value);
             return 1;
         } else {
             printf("%s-> %s\n", UNKNOWN_COMMAND_TEXT, numerus_explain_error(errcode));
@@ -272,7 +271,7 @@ void numerus_repl(int argc, char **args) {
 }
 
 int main(int argc, char **args) {
-    numerus_repl(argc, args);
-    //numtest_convert_all_romans();
+    //numerus_repl(argc, args);
+    numtest_convert_all_romans();
     return 0;
 }
