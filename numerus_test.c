@@ -27,7 +27,7 @@
  * @returns the *really* approximate computation time on stdout and returns 0
  * on success or outputs any error on stderr and returns 1.
  */
-int numtest_convert_all_romans() {
+int numtest_convert_all_floats() {
     long i;
     double converted;
     char *roman;
@@ -41,11 +41,11 @@ int numtest_convert_all_romans() {
             roman = numerus_value_to_roman(to_convert, NULL);
             errcode = numerus_roman_to_value(roman, &converted);
             if (errcode != NUMERUS_OK) {
-                fprintf(stderr, "%15.15f: %s: %s\n",
+                fprintf(stderr, "%20.20f: %s: %s\n",
                         to_convert, numerus_explain_error(errcode), roman);
                 return 1;
             }
-            if ((float) to_convert != (float) converted) {
+            if (to_convert != converted) {
                 fprintf(stderr, "Error at converting %20.20f -> %s -> %20.20f",
                         to_convert, roman, converted);
                 return 1;
@@ -55,10 +55,40 @@ int numtest_convert_all_romans() {
     }
     clock_t end_clock = clock();
     double seconds_taken = (end_clock - start_clock) / (double) CLOCKS_PER_SEC;
-    printf("Time to convert all 95999977 roman numerals both ways: %f\n",
+    printf("Time to convert all 96000001 float roman numerals both ways: %f\n",
            seconds_taken);
     printf("It's %f bidirectional conversions per second.\n",
-           95999977.0/seconds_taken);
+           96000001.0/seconds_taken);
+    return 0;
+}
+
+int numtest_convert_all_integers() {
+    long i;
+    double converted;
+    char *roman;
+    int errcode;
+    clock_t start_clock = clock();
+    for (i = NUMERUS_MIN_LONG_VALUE; i <= NUMERUS_MAX_LONG_VALUE; i++) {
+        roman = numerus_value_to_roman(i, NULL);
+        errcode = numerus_roman_to_value(roman, &converted);
+        if (errcode != NUMERUS_OK) {
+            fprintf(stderr, "%ld: %s: %s\n",
+                    i, numerus_explain_error(errcode), roman);
+            return 1;
+        }
+        if (i != (long) converted) {
+            fprintf(stderr, "Error at converting %ld -> %s -> %20.20f",
+                    i, roman, converted);
+            return 1;
+        }
+        free(roman);
+    }
+    clock_t end_clock = clock();
+    double seconds_taken = (end_clock - start_clock) / (double) CLOCKS_PER_SEC;
+    printf("Time to convert all 7999999 integer roman numerals both ways: %f\n",
+           seconds_taken);
+    printf("It's %f bidirectional conversions per second.\n",
+           7999999.0/seconds_taken);
     return 0;
 }
 
