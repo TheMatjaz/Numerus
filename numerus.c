@@ -469,6 +469,7 @@ int numerus_roman_to_value(char *roman, double *value) {
         return response_code;
     }
     *value = parser_data.numeral_sign * parser_data.numeral_value;
+    *value = numerus_round_to_nearest_12th(*value);
     return NUMERUS_OK;
 }
 
@@ -518,8 +519,43 @@ static char *_num_value_part_to_roman(double value, char *roman, int dictionary_
     return roman;
 }
 
+/**
+ *
+ */
+double numerus_round_to_nearest_12th(double value) {
+    /*
+     * 0.000000000000000
+     * 0.083333333333333
+     * 0.166666666666666
+     * 0.250000000000000
+     * 0.333333333333333
+     * 0.416666666666666
+     * 0.500000000000000
+     * 0.583333333333333
+     * 0.666666666666666
+     * 0.750000000000000
+     * 0.833333333333333
+     * 0.916666666666666
+     */
+    value = round(value * 12) / 12; /* Round to nearest twelfth */
+    //value = round(value * 100000) / 100000; /* Round to 6 decimal places */
+    return value;
+}
+
+/*
+// pass it values in [0, 1[ to round to the nearest twelfth. Returns the numerator from 0 to 11
+static short _num_nearest_12th_numerator(double decimal) {
+    decimal = _num_round_to_nearest_12th(decimal);
+    decimal = round(decimal * 12);
+    return (short) decimal;
+}
+*/
+
 
 char *numerus_value_to_roman(double value, int *errcode) {
+    /* To make the result rounded to the nearest 12th istead of floored */
+    value = numerus_round_to_nearest_12th(value);
+
     /* Out of range check */
     if (value < NUMERUS_MIN_VALUE || value > NUMERUS_MAX_VALUE) {
         numerus_error_code = NUMERUS_ERROR_VALUE_OUT_OF_RANGE;
