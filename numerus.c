@@ -439,21 +439,18 @@ int numerus_roman_to_value(char *roman, double *value) {
         *value = 0.0;
         return NUMERUS_OK;
     }
-    short length = 0;
-    int response_code = numerus_numeral_length(roman, &length);
+    struct _num_numeral_parser_data parser_data;
+    _num_init_parser_data(&parser_data, roman);
+    int response_code = numerus_numeral_length(roman, &parser_data.numeral_length);
     if (response_code != NUMERUS_OK) {
         return response_code;
     }
-    struct _num_numeral_parser_data parser_data;
-    _num_init_parser_data(&parser_data, roman);
     if (*parser_data.current_numeral_position == '-') {
         parser_data.numeral_sign = -1;
         parser_data.current_numeral_position++;
-        parser_data.numeral_length++;
     }
     if (*parser_data.current_numeral_position == '_') {
         parser_data.current_numeral_position++;
-        parser_data.numeral_length++;
         parser_data.numeral_is_long = 1;
     }
     if (parser_data.numeral_is_long) {
@@ -472,6 +469,7 @@ int numerus_roman_to_value(char *roman, double *value) {
         return response_code;
     }
     *value = parser_data.numeral_sign * parser_data.numeral_value;
+    *value = numerus_round_to_nearest_12th(*value);
     return NUMERUS_OK;
 }
 
@@ -492,6 +490,7 @@ int numerus_roman_to_value(char *roman, double *value) {
  */
 static char *_num_copy_char_from_dictionary(const char *source,
                                             char *destination) {
+    
     *destination = *(source++);
     if (*source != '\0') {
         *(++destination) = *source;
@@ -507,157 +506,94 @@ static char *_num_copy_char_from_dictionary(const char *source,
  *
  * @returns position after the inserted string.
  */
-static char *_num_short_to_roman(long int arabic, char *roman_string) {
-    const struct _num_dictionary_char *current_roman_char = &_NUM_DICTIONARY[0];
-    while (arabic > 0) {
-        while (arabic >= current_roman_char->value) {
-            roman_string = _num_copy_char_from_dictionary(
-                    current_roman_char->characters, roman_string);
-            arabic -= current_roman_char->value;
+static char *_num_value_part_to_roman(double value, char *roman, int dictionary_start_char) {
+    const struct _num_dictionary_char *current_dictionary_char = &_NUM_DICTIONARY[dictionary_start_char];
+    while (value > 1.0/12.0) {
+        while (value >= current_dictionary_char->value) {
+            roman = _num_copy_char_from_dictionary(
+                    current_dictionary_char->characters, roman);
+            value -= current_dictionary_char->value;
         }
-        current_roman_char++;
+        current_dictionary_char++;
     }
-    return roman_string;
-}
-
-/* Just to be able to call it with more details and parameters
- * returns \0 position in the buffer (the start is easy to find, it's the buffer start itself) */
-static char *_num_long_to_roman(long int arabic, int copy_out_of_buffer) {
-    /* Out of range check */
-    if (arabic < NUMERUS_MIN_LONG_VALUE || arabic > NUMERUS_MAX_LONG_VALUE) {
-        numerus_error_code = NUMERUS_ERROR_OUT_OF_RANGE;
-        fprintf(stderr,
-                "Roman conversion error: short int %li out of range [%li, %li]\n",
-                arabic, NUMERUS_MIN_LONG_VALUE, NUMERUS_MAX_LONG_VALUE);
-        return NULL;
-    }
-
-    /* Create pointer to the building buffer */
-    char *roman_string = &_num_numeral_build_buffer[0];
-
-    /* Save sign or return NUMERUS_ZERO for 0 */
-    if (arabic < 0) {
-        arabic *= -1;
-        *(roman_string++) = '-';
-    } else if (arabic == 0) {
-        /* Return writable copy of NUMERUS_ZERO */
-        char *zero_string = malloc(strlen(NUMERUS_ZERO) + 1);
-        strcpy(zero_string, NUMERUS_ZERO);
-        return zero_string;
-    }
-
-    /* Create part between underscores */
-    if (arabic > NUMERUS_MAX_SHORT_VALUE) {
-        *(roman_string++) = '_';
-        roman_string = _num_short_to_roman(arabic / 1000, roman_string);
-        arabic -= (arabic / 1000) *
-                  1000; /* Keep just the 3 right-most digits because of the integer division */
-        *(roman_string++) = '_';
-    }
-    /* Create part after underscores */
-    roman_string = _num_short_to_roman(arabic, roman_string);
-    *roman_string = '\0';
-
-    /* Copy out of the buffer and return it */
-    if (copy_out_of_buffer) {
-        char *returnable_roman_string =
-                malloc(roman_string - _num_numeral_build_buffer);
-        strcpy(returnable_roman_string, _num_numeral_build_buffer);
-        return returnable_roman_string;
-    } else {
-        return roman_string;
-    }
+    return roman;
 }
 
 /**
- * Converts a short int to a roman numeral.
  *
- * It allocates a string with the roman numerals long just as required and
- * returns a pointer to it.  If the short is outside of [NUMERUS_MIN_LONG_VALUE,
- * NUMERUS_MAX_LONG_VALUE], the conversion is impossible.
- *
- * @returns pointer to a string containing the roman numeral, NULL if the short
- * is out of range.
  */
-char *numerus_long_to_roman(long int arabic) {
-    return _num_long_to_roman(arabic, true);
+double numerus_round_to_nearest_12th(double value) {
+    /*
+     * 0.000000000000000
+     * 0.083333333333333
+     * 0.166666666666666
+     * 0.250000000000000
+     * 0.333333333333333
+     * 0.416666666666666
+     * 0.500000000000000
+     * 0.583333333333333
+     * 0.666666666666666
+     * 0.750000000000000
+     * 0.833333333333333
+     * 0.916666666666666
+     */
+    value = round(value * 12) / 12; /* Round to nearest twelfth */
+    //value = round(value * 100000) / 100000; /* Round to 6 decimal places */
+    return value;
 }
 
-static double _num_round_to_nearest_12th(double decimal) {
-    if (decimal < 0) {
-        decimal *= -1;
-    }
-    decimal = round(decimal * 12) / 12; /* Round to nearest twelfth */
-    return decimal;
-}
-
-/* pass it values in [0, 1[ to round to the nearest twelfth. Returns the numerator from 0 to 11 */
+/*
+// pass it values in [0, 1[ to round to the nearest twelfth. Returns the numerator from 0 to 11
 static short _num_nearest_12th_numerator(double decimal) {
     decimal = _num_round_to_nearest_12th(decimal);
     decimal = round(decimal * 12);
     return (short) decimal;
 }
+*/
 
-static void _num_append_decimal_part_to_numeral(double decimal_part,
-                                                char *roman,
-                                                short insert_minus) {
-    if (decimal_part < 0) {
-        decimal_part *= -1;
-        if (insert_minus != 0) {
-            *(roman++) = '-';
-        }
-    }
-    short twelfth = _num_nearest_12th_numerator(decimal_part);
-    if (twelfth != 0) { /* It's not just a long */
-        if (twelfth > 5) { /* At least one half */
-            *(roman++) = 'S';
-            twelfth -= 6;
-        }
-        while (twelfth > 0) {
-            *(roman++) = '.';
-            twelfth--;
-        }
-    }
-    *roman = '\0';
-}
 
-char *numerus_double_to_roman(double value) {
-    /* Extract integer and decimal part from parameter */
-    double integer_part_double;
-    double decimal_part = modf(value, &integer_part_double);
-    long integer_part = (long) integer_part_double;
-    char *roman;
-    char *returnable_roman_string;
+char *numerus_value_to_roman(double value, int *errcode) {
+    /* To make the result rounded to the nearest 12th istead of floored */
+    value = numerus_round_to_nearest_12th(value);
 
-    if (decimal_part == 0.0) {
-        /* It's just a long */
-        return _num_long_to_roman(integer_part, true);
+    /* Out of range check */
+    if (value < NUMERUS_MIN_VALUE || value > NUMERUS_MAX_VALUE) {
+        numerus_error_code = NUMERUS_ERROR_VALUE_OUT_OF_RANGE;
+        if (errcode != NULL) {
+            *errcode = NUMERUS_ERROR_VALUE_OUT_OF_RANGE;
+        }
+        return NULL;
     }
 
-    if (integer_part != 0) { /* Example 2.7 or -2.7 */
-        roman = _num_long_to_roman(integer_part, 0);
-        if (roman == NULL) {
-            return NULL;
-        }
-        _num_append_decimal_part_to_numeral(decimal_part, roman + strlen(roman),
-                                            0);
-        /* Copy from build buffer */
-        returnable_roman_string = malloc(roman - _num_numeral_build_buffer);
-        strcpy(returnable_roman_string, _num_numeral_build_buffer);
-    } else { /* Example 0.7 or -0.7 */
-        roman = malloc(8); /* '-' + 'S' + 5x '.' + '\0' */
-        _num_append_decimal_part_to_numeral(decimal_part, roman, 1);
-        /* Copy the values in smaller string */
-        returnable_roman_string = malloc(strlen(roman));
-        strcpy(returnable_roman_string, roman);
-        free(roman);
+    /* Create pointer to the building buffer */
+    char *roman_numeral = &_num_numeral_build_buffer[0];
+
+    /* Save sign or return NUMERUS_ZERO for 0 */
+    if (value == 0.0) {
+        /* Return writable copy of NUMERUS_ZERO */
+        char *zero_string = malloc(strlen(NUMERUS_ZERO) + 1);
+        strcpy(zero_string, NUMERUS_ZERO);
+        return zero_string;
+    } else if (value < 0.0) {
+        value *= -1; /* Remove sign from value */
+        *(roman_numeral++) = '-';
     }
+
+    /* Create part between underscores */
+    if (value >= NUMERUS_MAX_SHORT_VALUE+1) { /* Underscores are needed */
+        *(roman_numeral++) = '_';
+        roman_numeral = _num_value_part_to_roman((int) value / 1000, roman_numeral, 0); /* Integer cast to avoid decimals in part between underscores */
+        value -= ((int) value / 1000) * 1000; /* Remove the three left-most digits because of the integer division */
+        *(roman_numeral++) = '_';
+        roman_numeral = _num_value_part_to_roman(value, roman_numeral, 1); /* Part after underscores without "M" char */
+    } else {
+        roman_numeral = _num_value_part_to_roman(value, roman_numeral, 0); /* No underscores, so with "M" char */
+    }
+    *roman_numeral = '\0';
+
+    /* Copy out of the buffer and return it */
+    char *returnable_roman_string =
+            malloc(roman_numeral - _num_numeral_build_buffer);
+    strcpy(returnable_roman_string, _num_numeral_build_buffer);
     return returnable_roman_string;
 }
-
-
-
-
-
-
-
