@@ -101,9 +101,11 @@ short numerus_is_roman(char *roman);
 /* Conversion function from value to roman numeral */
 char *numerus_long_to_roman(long arabic);
 char *numerus_double_to_roman(double value);
+char *numerus_value_to_roman(double value, int *errcode);
 
 /* Conversion function from roman numeral to value */
 int numerus_roman_to_value(char *roman, double *value);
+
 
 /* Utility functions */
 int numerus_compare_value(char *roman_bigger, char *roman_smaller);

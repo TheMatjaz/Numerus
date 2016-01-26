@@ -492,6 +492,7 @@ int numerus_roman_to_value(char *roman, double *value) {
  */
 static char *_num_copy_char_from_dictionary(const char *source,
                                             char *destination) {
+    
     *destination = *(source++);
     if (*source != '\0') {
         *(++destination) = *source;
@@ -601,6 +602,7 @@ static short _num_nearest_12th_numerator(double decimal) {
 static void _num_append_decimal_part_to_numeral(double decimal_part,
                                                 char *roman,
                                                 short insert_minus) {
+    
     if (decimal_part < 0) {
         decimal_part *= -1;
         if (insert_minus != 0) {
@@ -620,6 +622,7 @@ static void _num_append_decimal_part_to_numeral(double decimal_part,
     }
     *roman = '\0';
 }
+
 
 char *numerus_double_to_roman(double value) {
     /* Extract integer and decimal part from parameter */
@@ -657,7 +660,65 @@ char *numerus_double_to_roman(double value) {
 
 
 
+/**
+ * Converts just the internal part of the underscores or the part after them.
+ *
+ * Stores it into `*roman_string`.
+ *
+ * @returns position after the inserted string.
+ */
+static char *_num_value_part_to_roman(double value, char *roman, int dictionary_start_char) {
+    const struct _num_dictionary_char *current_dictionary_char = &_NUM_DICTIONARY[dictionary_start_char];
+    while (value > 1.0/12.0) {
+        while (value >= current_dictionary_char->value) {
+            roman = _num_copy_char_from_dictionary(
+                    current_dictionary_char->characters, roman);
+            value -= current_dictionary_char->value;
+        }
+        current_dictionary_char++;
+    }
+    return roman;
+}
 
+char *numerus_value_to_roman(double value, int *errcode) {
+    /* Out of range check */
+    if (value < NUMERUS_MIN_VALUE || value > NUMERUS_MAX_VALUE) {
+        numerus_error_code = NUMERUS_ERROR_VALUE_OUT_OF_RANGE;
+        if (errcode != NULL) {
+            *errcode = NUMERUS_ERROR_VALUE_OUT_OF_RANGE;
+        }
+        return NULL;
+    }
 
+    /* Create pointer to the building buffer */
+    char *roman_numeral = &_num_numeral_build_buffer[0];
 
+    /* Save sign or return NUMERUS_ZERO for 0 */
+    if (value == 0.0) {
+        /* Return writable copy of NUMERUS_ZERO */
+        char *zero_string = malloc(strlen(NUMERUS_ZERO) + 1);
+        strcpy(zero_string, NUMERUS_ZERO);
+        return zero_string;
+    } else if (value < 0.0) {
+        value *= -1; /* Remove sign from value */
+        *(roman_numeral++) = '-';
+    }
 
+    /* Create part between underscores */
+    if (value > NUMERUS_MAX_SHORT_VALUE) { /* Underscores are needed */
+        *(roman_numeral++) = '_';
+        roman_numeral = _num_value_part_to_roman((int) value / 1000, roman_numeral, 0); /* Integer cast to avoid decimals in part between underscores */
+        value -= ((int) value / 1000) * 1000; /* Remove the three left-most digits because of the integer division */
+        *(roman_numeral++) = '_';
+        roman_numeral = _num_value_part_to_roman(value, roman_numeral, 1); /* Part after underscores without "M" char */
+    } else {
+        roman_numeral = _num_value_part_to_roman(value, roman_numeral, 0); /* No underscores, so with "M" char */
+    }
+    *roman_numeral = '\0';
+
+    /* Copy out of the buffer and return it */
+    char *returnable_roman_string =
+            malloc(roman_numeral - _num_numeral_build_buffer);
+    strcpy(returnable_roman_string, _num_numeral_build_buffer);
+    return returnable_roman_string;
+}
