@@ -235,7 +235,8 @@ static int _num_parse_command(char *command) {
                 return 1;
             }
         }
-        if ((errcode = numerus_roman_to_double(command, &value)) == NUMERUS_OK) { // a roman is typed
+        value = numerus_roman_to_double(command, &errcode);
+        if (errcode == NUMERUS_OK) { // a roman is typed
             if (pretty_printing == 1) {
                 char *pretty_value;
                 printf("%s\n", pretty_value = numerus_pretty_print_float_value(value, 1));

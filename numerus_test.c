@@ -44,7 +44,7 @@ int numtest_convert_all_floats_with_parts() {
                         int_part, frac_part, numerus_explain_error(errcode));
                 return 1;
             }
-            errcode = numerus_roman_to_int_and_frac_part(roman, &int_part_converted, &frac_part_converted);
+            int_part_converted = numerus_roman_to_int_and_frac_part(roman, &frac_part_converted, &errcode);
             if (errcode != NUMERUS_OK) {
                 fprintf(stderr, "Error converting %s to value: %s.\n",
                         roman, numerus_explain_error(errcode));
@@ -88,7 +88,7 @@ int numtest_convert_all_floats_with_doubles() {
                         int_part, frac_part, to_convert, numerus_explain_error(errcode));
                 return 1;
             }
-            errcode = numerus_roman_to_double(roman, &converted);
+            converted = numerus_roman_to_double(roman, &errcode);
             if (errcode != NUMERUS_OK) {
                 fprintf(stderr, "Error converting %s to value: %s.\n",
                         roman, numerus_explain_error(errcode));
@@ -128,7 +128,7 @@ int numtest_convert_all_integers_with_parts() {
                     int_part, numerus_explain_error(errcode));
             return 1;
         }
-        errcode = numerus_roman_to_int(roman, &converted);
+        converted = numerus_roman_to_int(roman, &errcode);
         if (errcode != NUMERUS_OK) {
             fprintf(stderr, "Error converting %s to value: %s\n",
                     roman, numerus_explain_error(errcode));
@@ -169,7 +169,7 @@ int numtest_convert_all_integers_with_doubles() {
                     to_convert, numerus_explain_error(errcode));
             return 1;
         }
-        errcode = numerus_roman_to_double(roman, &converted);
+        converted = numerus_roman_to_double(roman, &errcode);
         if (errcode != NUMERUS_OK) {
             fprintf(stderr, "Error converting %s to value: %s\n",
                     roman, numerus_explain_error(errcode));
@@ -200,15 +200,14 @@ int numtest_convert_all_integers_with_doubles() {
  * conversion when the syntax is correct.
  */
 static void _num_test_for_error(char *roman, int error_code) {
-    double value = 0.0;
-    int code;
-    code = numerus_roman_to_double(roman, &value);
-    if (code == error_code) {
+    int errcode;
+    double value = numerus_roman_to_double(roman, &errcode);
+    if (errcode == error_code) {
         fprintf(stderr, "Test passed: %s raises error \"%s\"\n",
-                roman, numerus_explain_error(code));
+                roman, numerus_explain_error(errcode));
     } else {
         fprintf(stderr, "Test FAILED: %s raises \"%s\" instead of \"%s\"\n",
-                roman, numerus_explain_error(code),
+                roman, numerus_explain_error(errcode),
                 numerus_explain_error(error_code));
     }
 }
