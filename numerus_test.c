@@ -201,7 +201,7 @@ int numtest_convert_all_integers_with_doubles() {
  */
 static void _num_test_for_error(char *roman, int error_code) {
     double value = 0.0;
-    int code = NUMERUS_OK;
+    int code;
     code = numerus_roman_to_double(roman, &value);
     if (code == error_code) {
         fprintf(stderr, "Test passed: %s raises error \"%s\"\n",
@@ -261,4 +261,41 @@ void numtest_roman_syntax_errors() {
     _num_test_for_error("-CCX_II", NUMERUS_ERROR_UNDERSCORE_IN_NON_LONG);
 
     _num_test_for_error("IVI", NUMERUS_ERROR_ILLEGAL_CHAR_SEQUENCE);
+}
+
+void numtest_parts_to_from_double_functions() {
+    double a1 = numerus_parts_to_double(12, 3);
+    double a2 = numerus_parts_to_double(12, -3);
+    if (a1 != a2) {
+        fprintf(stderr, "Error at transforming parts into double.\n");
+    }
+    double b1 = numerus_parts_to_double(-12, 3);
+    double b2 = numerus_parts_to_double(-12, -3);
+    if (b1 != b2) {
+        fprintf(stderr, "Error at transforming parts into double.\n");
+    }
+    double c1 = numerus_parts_to_double(0, 3);
+    double c2 = numerus_parts_to_double(0, -3);
+    double c3 = numerus_parts_to_double(-0, 3);
+    double c4 = numerus_parts_to_double(-0, -3);
+    if (c1 != c2 || c1 != c3 || c1 != c4) {
+        fprintf(stderr, "Error at transforming parts into double.\n");
+    }
+    double d1 = numerus_parts_to_double(0, 0);
+    double d2 = numerus_parts_to_double(0, -0);
+    double d3 = numerus_parts_to_double(-0, 0);
+    double d4 = numerus_parts_to_double(-0, -0);
+    if (d1 != d2 || d1 != d3 || d1 != d4) {
+        fprintf(stderr, "Error at transforming parts into double.\n");
+    }
+    long int_part;
+    short frac_part;
+    numerus_double_to_parts(12.08333, &int_part, &frac_part);
+    if (int_part != 12 || frac_part != 1) {
+        fprintf(stderr, "Error at transforming double into parts.\n");
+    }
+    numerus_double_to_parts(-12.08333, &int_part, &frac_part);
+    if (int_part != -12 || frac_part != 1) {
+        fprintf(stderr, "Error at transforming double into parts.\n");
+    }
 }
