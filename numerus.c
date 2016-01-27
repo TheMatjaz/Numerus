@@ -462,30 +462,29 @@ static int _num_parse_decimal_part(
  * @returns int error code to indicate success (NUMERUS_OK) or failure
  * (NUMERUS_ERROR_*)
  */
-int numerus_roman_to_double(char *roman, double *value) {
+double numerus_roman_to_double(char *roman, int *errcode) {
     long int_part;
     short frac_part;
-    int errcode;
-    numerus_double_to_parts(*value, &int_part, &frac_part);
-    errcode = numerus_roman_to_int_and_frac_part(roman, &int_part, &frac_part);
-    if (errcode != NUMERUS_OK) {
-        numerus_error_code = errcode;
-        return errcode;
-    } else {
-        *value = numerus_parts_to_double(int_part, frac_part);
-        return NUMERUS_OK;
+    int_part = numerus_roman_to_int_and_frac_part(roman, &frac_part, errcode);
+    return numerus_parts_to_double(int_part, frac_part);
+}
+
+long numerus_roman_to_int(char *roman, int *errcode) {
+    return numerus_roman_to_int_and_frac_part(roman, 0, errcode);
+}
+
+long numerus_roman_to_int_and_frac_part(char *roman, short *frac_part, int *errcode) {
+    long int_part;
+    short zero_frac_part = 0;
+    if (frac_part == NULL) {
+        frac_part = &zero_frac_part;
     }
-}
+    if (errcode == NULL) {
+        errcode = &numerus_error_code;
+    }
 
-
-int numerus_roman_to_int(char *roman, long *value) {
-    short unused_frac_part;
-    return numerus_roman_to_int_and_frac_part(roman, value, &unused_frac_part);
-}
-
-int numerus_roman_to_int_and_frac_part(char *roman, long *int_part, short *frac_part) {
     if (numerus_is_zero(roman)) {
-        *int_part = 0;
+        int_part = 0;
         *frac_part = 0;
         return NUMERUS_OK;
     }
@@ -493,7 +492,9 @@ int numerus_roman_to_int_and_frac_part(char *roman, long *int_part, short *frac_
     _num_init_parser_data(&parser_data, roman);
     int response_code = numerus_numeral_length(roman, NULL);
     if (response_code != NUMERUS_OK) {
-        return response_code;
+        numerus_error_code = response_code;
+        *errcode = response_code;
+        return NUMERUS_MAX_LONG_VALUE + 10;
     }
     if (*parser_data.current_numeral_position == '-') {
         parser_data.numeral_sign = -1;
@@ -506,7 +507,9 @@ int numerus_roman_to_int_and_frac_part(char *roman, long *int_part, short *frac_
     if (parser_data.numeral_is_long) {
         response_code = _num_parse_part_in_underscores(&parser_data);
         if (response_code != NUMERUS_OK) {
-            return response_code;
+            numerus_error_code = response_code;
+            *errcode = response_code;
+            return NUMERUS_MAX_LONG_VALUE + 10;
         }
         parser_data.current_numeral_position++; // skip second underscore
         parser_data.int_part *= 1000;
@@ -516,15 +519,21 @@ int numerus_roman_to_int_and_frac_part(char *roman, long *int_part, short *frac_
     }
     response_code = _num_parse_part_after_underscores(&parser_data);
     if (response_code != NUMERUS_OK) {
-        return response_code;
+        numerus_error_code = response_code;
+        *errcode = response_code;
+        return NUMERUS_MAX_LONG_VALUE + 10;
     }
     response_code = _num_parse_decimal_part(&parser_data);
     if (response_code != NUMERUS_OK) {
-        return response_code;
+        numerus_error_code = response_code;
+        *errcode = response_code;
+        return NUMERUS_MAX_LONG_VALUE + 10;
     }
-    *int_part = parser_data.numeral_sign * parser_data.int_part;
+    int_part = parser_data.numeral_sign * parser_data.int_part;
     *frac_part = parser_data.frac_part;
-    return NUMERUS_OK;
+    numerus_error_code = NUMERUS_OK;
+    *errcode = NUMERUS_OK;
+    return int_part;
 }
 
 
