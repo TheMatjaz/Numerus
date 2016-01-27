@@ -12,6 +12,7 @@
  * - http://stackoverflow.com/a/30816418/5292928
  */
 
+#include <math.h>     /* For `round()`  */
 #include <ctype.h>    /* For `upcase()` */
 #include <stdio.h>    /* To  `fprintf()` to `stderr` */
 #include <stdlib.h>   /* For `malloc()` */
@@ -529,4 +530,48 @@ const char *numerus_explain_error(int error_code) {
         }
     }
     return "ERROR CODE NOT FOUND";
+}
+
+
+double numerus_round_to_nearest_12th(double value) {
+    /*
+     * 0.000000000000000
+     * 0.083333333333333
+     * 0.166666666666666
+     * 0.250000000000000
+     * 0.333333333333333
+     * 0.416666666666666
+     * 0.500000000000000
+     * 0.583333333333333
+     * 0.666666666666666
+     * 0.750000000000000
+     * 0.833333333333333
+     * 0.916666666666666
+     */
+    value = round(value * 12) / 12; /* Round to nearest twelfth */
+    //value = round(value * 100000) / 100000; /* Round to 6 decimal places */
+    return value;
+}
+
+/* pass it values in [0, 1[ to round to the nearest twelfth. Returns the numerator from 0 to 11 */
+static short _num_extract_twelfth(double value) {
+    value = numerus_round_to_nearest_12th(value);
+    value = round(value * 12);
+    return (short) value;
+}
+
+static short _num_sign(long signed_value) {
+    return (signed_value > 0) - (signed_value < 0);
+}
+
+double numerus_parts_to_double(long int_part, short frac_part) {
+    frac_part = _num_sign(int_part) * (short) abs(frac_part); // apply sign of the int_part
+    return (double) (int_part) + frac_part/12.0;
+}
+
+void numerus_double_to_parts(double value, long *int_part, short *frac_part) {
+    double double_int_part;
+    double double_frac_part = modf(value, &double_int_part);
+    *int_part = (long) double_int_part;
+    *frac_part = _num_extract_twelfth(double_frac_part);
 }
