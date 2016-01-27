@@ -9,6 +9,19 @@
 
 
 /**
+ * Internal representation of a roman numeral value with its twelfths.
+ *
+ * Contains a long representing the integer part of the value and a short with
+ * the decimal part, incating precisely the number of twelfths the value has.
+ * This is necessary to avoid rounding errors for floating point representations
+ * of the value.
+ */
+//struct _num_numeral_value {
+//    long integer_part;
+//    short twelfths;
+//};
+
+/**
  * Everything went all right.
  *
  * This is the opposite of any NUMERUS_ERROR_*.
@@ -79,8 +92,8 @@ extern const double NUMERUS_MAX_VALUE;
 extern const long NUMERUS_MAX_LONG_VALUE;
 extern const double NUMERUS_MIN_VALUE;
 extern const long NUMERUS_MIN_LONG_VALUE;
-extern const short NUMERUS_MAX_SHORT_VALUE;
-extern const short NUMERUS_MIN_SHORT_VALUE;
+extern const double NUMERUS_MAX_SHORT_VALUE;
+extern const double NUMERUS_MIN_SHORT_VALUE;
 extern const short NUMERUS_MAX_LENGTH;
 extern const char *NUMERUS_ZERO;
 extern const char *NUMERUS_FLOAT_SYNTAX_REGEX_STRING;
@@ -99,19 +112,32 @@ int numerus_numeral_length(char *roman, short *length);
 short numerus_is_roman(char *roman);
 
 /* Conversion function from value to roman numeral */
-char *numerus_value_to_roman(double value, int *errcode);
+char *numerus_int_to_roman(long int_value, int *errcode);
+char *numerus_int_with_twelfth_to_roman(long int_part, short frac_part, int *errcode);
+char *numerus_double_to_roman(double double_value, int *errcode);
+
 
 /* Conversion function from roman numeral to value */
-int numerus_roman_to_value(char *roman, double *value);
+int numerus_roman_to_int(char *roman, long *value);
+int numerus_roman_to_int_and_frac_part(char *roman, long *int_part, short *frac_part);
+int numerus_roman_to_double(char *roman, double *value);
 
 
 /* Utility functions */
 double numerus_round_to_nearest_12th(double value);
+void numerus_double_to_parts(double value, long *int_part, short *frac_part);
+double numerus_parts_to_double(long int_part, short frac_part);
 int numerus_compare_value(char *roman_bigger, char *roman_smaller);
+
+
+/* Export functions */
 int numerus_export_to_sqlite3(char *filename, long min_value, long max_value);
 int numerus_export_to_csv(char *filename, long min_value, long max_value,
                           int numerals_first, char *separator, char *newline,
                           char *quotes);
+
+
+/* Printing functions */
 char *numerus_pretty_print_long_numerals(char *roman);
+char *numerus_pretty_print_float_value(double double_value, int shorten);
 const char *numerus_explain_error(int error_code);
-// FIXME: IF I DONT PUT THIS ; HERE, IT GIVES ME A SYNTAX ERROR

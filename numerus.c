@@ -7,7 +7,7 @@
  * the BSD 3-clause license.
  */
 
-#include <math.h>     /* For `round()`  */
+#include <math.h>     /* For `abs()`    */
 #include <ctype.h>    /* For `upcase()` */
 #include <stdio.h>    /* To  `fprintf()` to `stderr` */
 #include <stdlib.h>   /* For `malloc()` */
@@ -27,7 +27,7 @@
 const long int NUMERUS_MAX_LONG_VALUE = 3999999;
 
 
-const double NUMERUS_MAX_VALUE = NUMERUS_MAX_LONG_VALUE + 11.0 / 12.0;
+const double NUMERUS_MAX_VALUE = NUMERUS_MAX_LONG_VALUE + 11.5 / 12.0; // for the rounding to the nearest twelfth
 
 
 /**
@@ -42,13 +42,13 @@ const double NUMERUS_MIN_VALUE = -NUMERUS_MAX_VALUE;
 /**
  * Maximum value a short roman numeral (without '_') may have.
  */
-const short int NUMERUS_MAX_SHORT_VALUE = 3999;
+const double NUMERUS_MAX_SHORT_VALUE = 3999 + 11.5 / 12.0;
 
 
 /**
  * Minimum value a short roman numeral (without '_') may have.
  */
-const short int NUMERUS_MIN_SHORT_VALUE = -NUMERUS_MAX_SHORT_VALUE;
+const double NUMERUS_MIN_SHORT_VALUE = -NUMERUS_MAX_SHORT_VALUE;
 
 
 /**
@@ -119,7 +119,7 @@ static char _num_numeral_build_buffer[NUMERUS_MAX_LENGTH];
  * chars that have a specific a priori known value.
  */
 struct _num_dictionary_char {
-    const double value;
+    const int value;
     const char *characters;
     const short max_repetitions;
 };
@@ -132,28 +132,27 @@ struct _num_dictionary_char {
  * understand that the array has been parsed.
  */
 static const struct _num_dictionary_char _NUM_DICTIONARY[] = {
-    { 1000.0, "M" ,  3 },
-    {  900.0, "CM",  1 },
-    {  500.0, "D" ,  1 },
-    {  400.0, "CD",  1 },
-    {  100.0, "C" ,  3 },
-    {   90.0, "XC",  1 },
-    {   50.0, "L" ,  1 },
-    {   40.0, "XL",  1 },
-    {   10.0, "X" ,  3 },
-    {    9.0, "IX",  1 },
-    {    5.0, "V" ,  1 },
-    {    4.0, "IV",  1 },
-    {    1.0, "I" ,  3 },
-    {    0.5, "S" ,  1 },
-    { 1/12.0, "." ,  5 },
-    {    0.0, NULL,  0 }
+    { 1000, "M" ,  3 }, // index: 0
+    {  900, "CM",  1 }, // index: 1
+    {  500, "D" ,  1 },
+    {  400, "CD",  1 },
+    {  100, "C" ,  3 },
+    {   90, "XC",  1 },
+    {   50, "L" ,  1 },
+    {   40, "XL",  1 },
+    {   10, "X" ,  3 },
+    {    9, "IX",  1 },
+    {    5, "V" ,  1 },
+    {    4, "IV",  1 },
+    {    1, "I" ,  3 },
+    {    6, "S" ,  1 }, // index: 13
+    {    1, "." ,  5 },
+    {    0, NULL,  0 }
 };
 
 
+/*  -+-+-+-+-+-+-+-+-+-{   CONVERSION ROMAN -> VALUE   }-+-+-+-+-+-+-+-+-+-  */
 
-
-/*  -+-+-+-+-+-+-+-+-+-+-{   CONVERSION FUNCTIONS   }-+-+-+-+-+-+-+-+-+-+-  */
 
 
 /**
@@ -188,19 +187,18 @@ static short _num_string_begins_with(char *to_be_compared,
  *
  * Used by `numerus_roman_to_value()` and other static functions. Contains info
  * about the currently parsed part of the numeral, the dictionary char that the
- * numeral is confronted with, the value, sign, length of the numeral, if it has
- * underscore and counts the number of consecutive repetitions a single roman
- * char has.
+ * numeral is confronted with, the value, sign, if it has underscore and counts
+ * the number of consecutive repetitions a single roman char has.
  *
- * @see numerus_roman_to_value()
+ * @see numerus_roman_to_double()
  */
 struct _num_numeral_parser_data {
     char *current_numeral_position;
     const struct _num_dictionary_char *current_dictionary_char;
     bool numeral_is_long;
-    short numeral_length;
     short numeral_sign;
-    double numeral_value;
+    long int_part;
+    short frac_part;
     short char_repetitions;
 };
 
@@ -210,7 +208,7 @@ struct _num_numeral_parser_data {
  *
  * Sets the fields to be ready to start the conversion from roman to value.
  *
- * @see numerus_roman_to_value()
+ * @see numerus_roman_to_double()
  */
 static void _num_init_parser_data(struct _num_numeral_parser_data *parser_data,
                                   char *roman) {
@@ -218,9 +216,9 @@ static void _num_init_parser_data(struct _num_numeral_parser_data *parser_data,
     parser_data->current_numeral_position = roman;
     parser_data->current_dictionary_char = &_NUM_DICTIONARY[0];
     parser_data->numeral_is_long = false;
-    parser_data->numeral_length = -1;
     parser_data->numeral_sign = 1;
-    parser_data->numeral_value = 0.0;
+    parser_data->int_part = 0;
+    parser_data->frac_part = 0;
     parser_data->char_repetitions = 0;
 }
 
@@ -263,7 +261,7 @@ static bool _num_char_is_in_string(char current, char *terminating_chars) {
  * written as regex: (CM)|(CD)|(D?C{0,3}).
  *
  * Used by: _num_compare_numeral_position_with_dictionary()
- * which is used by numerus_roman_to_value()
+ * which is used by numerus_roman_to_double()
  */
 static void _num_skip_to_next_non_unique_dictionary_char(
         struct _num_numeral_parser_data *parser_data) {
@@ -290,7 +288,7 @@ static void _num_skip_to_next_non_unique_dictionary_char(
  *
  * Used by: _num_parse_part_in_underscores() and
  * _num_parse_part_after_underscores() which are used by
- * numerus_roman_to_value()
+ * numerus_roman_to_double()
  *
  * @returns result code as an error or NUMERUS_OK. The computation result is
  * stored in the passed _num_numeral_parser_data. Possible errors are
@@ -309,7 +307,14 @@ static int _num_compare_numeral_position_with_dictionary(
             return NUMERUS_ERROR_TOO_MANY_REPEATED_CHARS;
         }
         parser_data->current_numeral_position += num_of_matching_chars;
-        parser_data->numeral_value += parser_data->current_dictionary_char->value;
+        if (*(parser_data->current_dictionary_char->characters) == 'S'
+            || *(parser_data->current_dictionary_char->characters) == '.') {
+            // add to decimal part value
+            parser_data->frac_part += parser_data->current_dictionary_char->value;
+        } else {
+            // add to integer part value
+            parser_data->int_part += parser_data->current_dictionary_char->value;
+        }
         _num_skip_to_next_non_unique_dictionary_char(parser_data);
     } else { /* chars don't match */
         parser_data->char_repetitions = 0;
@@ -330,7 +335,7 @@ static int _num_compare_numeral_position_with_dictionary(
  * is found (one of "_Ss.-\0"). If an illegal stopping character is found,
  * a specific error code is returned.
  *
- * Used by: numerus_roman_to_value()
+ * Used by: numerus_roman_to_double()
  *
  * @returns result code as an error or NUMERUS_OK. Possible errors are
  * NUMERUS_ERROR_MISSING_SECOND_UNDERSCORE,
@@ -371,7 +376,7 @@ static int _num_parse_part_in_underscores(
  * a specific error code is returned. "M" is an illegal character in the part
  * after underscores only in long numerals.
  *
- * Used by: numerus_roman_to_value()
+ * Used by: numerus_roman_to_double()
  *
  * @returns result code as an error or NUMERUS_OK. Possible errors are
  * NUMERUS_ERROR_UNDERSCORE_IN_SHORT_PART,
@@ -380,11 +385,12 @@ static int _num_parse_part_in_underscores(
  */
 static int _num_parse_part_after_underscores(
         struct _num_numeral_parser_data *parser_data) {
+
     char *stop_chars;
     if (parser_data->numeral_is_long) {
-        stop_chars = "M_-";
+        stop_chars = "Ss.M_-";
     } else {
-        stop_chars = "_-";
+        stop_chars = "Ss._-";
     }
     while (!_num_char_is_in_string(*(parser_data->current_numeral_position),
                                    stop_chars)) {
@@ -411,6 +417,29 @@ static int _num_parse_part_after_underscores(
 }
 
 
+static int _num_parse_decimal_part(
+        struct _num_numeral_parser_data *parser_data) {
+    while (!_num_char_is_in_string(*(parser_data->current_numeral_position),
+                                   "_-")) {
+        int result_code = _num_compare_numeral_position_with_dictionary(
+                parser_data);
+        if (result_code != NUMERUS_OK) {
+            return result_code;
+        }
+    }
+    if (*(parser_data->current_numeral_position) == '_') {
+        if (parser_data->numeral_is_long) {
+            return NUMERUS_ERROR_UNDERSCORE_IN_SHORT_PART;
+        } else {
+            return NUMERUS_ERROR_UNDERSCORE_IN_NON_LONG;
+        }
+    }
+    if (*(parser_data->current_numeral_position) == '-') {
+        return NUMERUS_ERROR_ILLEGAL_MINUS;
+    }
+    return NUMERUS_OK;
+}
+
 /**
  * Converts a roman numeral to its value as a double.
  *
@@ -434,14 +463,35 @@ static int _num_parse_part_after_underscores(
  * @returns int error code to indicate success (NUMERUS_OK) or failure
  * (NUMERUS_ERROR_*)
  */
-int numerus_roman_to_value(char *roman, double *value) {
+int numerus_roman_to_double(char *roman, double *value) {
+    long int_part;
+    short frac_part;
+    int errcode;
+    numerus_double_to_parts(*value, &int_part, &frac_part);
+    errcode = numerus_roman_to_int_and_frac_part(roman, &int_part, &frac_part);
+    if (errcode != NUMERUS_OK) {
+        return errcode;
+    } else {
+        *value = numerus_parts_to_double(int_part, frac_part);
+        return NUMERUS_OK;
+    }
+}
+
+
+int numerus_roman_to_int(char *roman, long *value) {
+    short unused_frac_part;
+    return numerus_roman_to_int_and_frac_part(roman, value, &unused_frac_part);
+}
+
+int numerus_roman_to_int_and_frac_part(char *roman, long *int_part, short *frac_part) {
     if (numerus_is_zero(roman)) {
-        *value = 0.0;
+        *int_part = 0;
+        *frac_part = 0;
         return NUMERUS_OK;
     }
     struct _num_numeral_parser_data parser_data;
     _num_init_parser_data(&parser_data, roman);
-    int response_code = numerus_numeral_length(roman, &parser_data.numeral_length);
+    int response_code = numerus_numeral_length(roman, NULL);
     if (response_code != NUMERUS_OK) {
         return response_code;
     }
@@ -459,7 +509,7 @@ int numerus_roman_to_value(char *roman, double *value) {
             return response_code;
         }
         parser_data.current_numeral_position++; // skip second underscore
-        parser_data.numeral_value *= 1000;
+        parser_data.int_part *= 1000;
         // reset back to "CM", "M" is excluded for long numerals
         parser_data.current_dictionary_char = &_NUM_DICTIONARY[1];
         parser_data.char_repetitions = 0;
@@ -468,10 +518,18 @@ int numerus_roman_to_value(char *roman, double *value) {
     if (response_code != NUMERUS_OK) {
         return response_code;
     }
-    *value = parser_data.numeral_sign * parser_data.numeral_value;
-    *value = numerus_round_to_nearest_12th(*value);
+    response_code = _num_parse_decimal_part(&parser_data);
+    if (response_code != NUMERUS_OK) {
+        return response_code;
+    }
+    *int_part = parser_data.numeral_sign * parser_data.int_part;
+    *frac_part = parser_data.frac_part;
     return NUMERUS_OK;
 }
+
+
+
+/*  -+-+-+-+-+-+-+-+-+-{   CONVERSION VALUE -> ROMAN   }-+-+-+-+-+-+-+-+-+-  */
 
 
 /**
@@ -506,9 +564,9 @@ static char *_num_copy_char_from_dictionary(const char *source,
  *
  * @returns position after the inserted string.
  */
-static char *_num_value_part_to_roman(double value, char *roman, int dictionary_start_char) {
+static char *_num_value_part_to_roman(long value, char *roman, int dictionary_start_char) {
     const struct _num_dictionary_char *current_dictionary_char = &_NUM_DICTIONARY[dictionary_start_char];
-    while (value > 1.0/12.0) {
+    while (value > 0) {
         while (value >= current_dictionary_char->value) {
             roman = _num_copy_char_from_dictionary(
                     current_dictionary_char->characters, roman);
@@ -519,45 +577,22 @@ static char *_num_value_part_to_roman(double value, char *roman, int dictionary_
     return roman;
 }
 
-/**
- *
- */
-double numerus_round_to_nearest_12th(double value) {
-    /*
-     * 0.000000000000000
-     * 0.083333333333333
-     * 0.166666666666666
-     * 0.250000000000000
-     * 0.333333333333333
-     * 0.416666666666666
-     * 0.500000000000000
-     * 0.583333333333333
-     * 0.666666666666666
-     * 0.750000000000000
-     * 0.833333333333333
-     * 0.916666666666666
-     */
-    value = round(value * 12) / 12; /* Round to nearest twelfth */
-    //value = round(value * 100000) / 100000; /* Round to 6 decimal places */
-    return value;
+char *numerus_int_to_roman(long int_value, int *errcode) {
+    return numerus_int_with_twelfth_to_roman(int_value, 0, errcode);
 }
 
-/*
-// pass it values in [0, 1[ to round to the nearest twelfth. Returns the numerator from 0 to 11
-static short _num_nearest_12th_numerator(double decimal) {
-    decimal = _num_round_to_nearest_12th(decimal);
-    decimal = round(decimal * 12);
-    return (short) decimal;
+char *numerus_double_to_roman(double double_value, int *errcode) {
+    long int_part;
+    short frac_part;
+    numerus_double_to_parts(double_value, &int_part, &frac_part);
+    return numerus_int_with_twelfth_to_roman(int_part, frac_part, errcode);
 }
-*/
 
-
-char *numerus_value_to_roman(double value, int *errcode) {
-    /* To make the result rounded to the nearest 12th istead of floored */
-    value = numerus_round_to_nearest_12th(value);
-
+char *numerus_int_with_twelfth_to_roman(long int_part, short frac_part, int *errcode) {
+    frac_part = (short) abs(frac_part);
+    double double_value = numerus_parts_to_double(int_part, frac_part);
     /* Out of range check */
-    if (value < NUMERUS_MIN_VALUE || value > NUMERUS_MAX_VALUE) {
+    if (double_value < NUMERUS_MIN_VALUE || double_value > NUMERUS_MAX_VALUE) {
         numerus_error_code = NUMERUS_ERROR_VALUE_OUT_OF_RANGE;
         if (errcode != NULL) {
             *errcode = NUMERUS_ERROR_VALUE_OUT_OF_RANGE;
@@ -569,31 +604,38 @@ char *numerus_value_to_roman(double value, int *errcode) {
     char *roman_numeral = &_num_numeral_build_buffer[0];
 
     /* Save sign or return NUMERUS_ZERO for 0 */
-    if (value == 0.0) {
+    if (int_part == 0 && frac_part == 0) {
         /* Return writable copy of NUMERUS_ZERO */
         char *zero_string = malloc(strlen(NUMERUS_ZERO) + 1);
         strcpy(zero_string, NUMERUS_ZERO);
         return zero_string;
-    } else if (value < 0.0) {
-        value *= -1; /* Remove sign from value */
+    } else if (int_part < 0) {
+        int_part = labs(int_part);
+        double_value = fabs(double_value);
         *(roman_numeral++) = '-';
     }
 
     /* Create part between underscores */
-    if (value >= NUMERUS_MAX_SHORT_VALUE+1) { /* Underscores are needed */
+    if (double_value > NUMERUS_MAX_SHORT_VALUE) { /* Underscores are needed */
         *(roman_numeral++) = '_';
-        roman_numeral = _num_value_part_to_roman((int) value / 1000, roman_numeral, 0); /* Integer cast to avoid decimals in part between underscores */
-        value -= ((int) value / 1000) * 1000; /* Remove the three left-most digits because of the integer division */
+        roman_numeral = _num_value_part_to_roman(int_part / 1000, roman_numeral, 0); /* Integer cast to avoid decimals in part between underscores */
+        int_part -= (int_part / 1000) * 1000; /* Remove the three left-most digits because of the integer division */
         *(roman_numeral++) = '_';
-        roman_numeral = _num_value_part_to_roman(value, roman_numeral, 1); /* Part after underscores without "M" char */
+        /* Part after underscores without "M" char, start parsing the dictonary with "CM" */
+        roman_numeral = _num_value_part_to_roman(int_part, roman_numeral, 1);
     } else {
-        roman_numeral = _num_value_part_to_roman(value, roman_numeral, 0); /* No underscores, so with "M" char */
+        /* No underscores, so with "M" char */
+        roman_numeral = _num_value_part_to_roman(int_part, roman_numeral, 0);
     }
+    /* Decimal part, start parsing the dictonary with "S" */
+    roman_numeral = _num_value_part_to_roman(frac_part, roman_numeral, 13);
+
     *roman_numeral = '\0';
 
     /* Copy out of the buffer and return it */
     char *returnable_roman_string =
             malloc(roman_numeral - _num_numeral_build_buffer);
     strcpy(returnable_roman_string, _num_numeral_build_buffer);
+    *errcode = NUMERUS_OK;
     return returnable_roman_string;
 }

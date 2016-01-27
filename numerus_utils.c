@@ -12,6 +12,7 @@
  * - http://stackoverflow.com/a/30816418/5292928
  */
 
+#include <math.h>     /* For `round()`  */
 #include <ctype.h>    /* For `upcase()` */
 #include <stdio.h>    /* To  `fprintf()` to `stderr` */
 #include <stdlib.h>   /* For `malloc()` */
@@ -99,14 +100,19 @@ short numerus_sign(char *roman) {
  * found.
  */
 int numerus_numeral_length(char *roman, short *length) {
+    short temp = -1;
+    short *numeral_length = &temp;
+    if (length != NULL) {
+        *length = *numeral_length;
+    }
     if (numerus_is_zero(roman)) {
-        *length = (short) strlen(NUMERUS_ZERO);
+        *numeral_length = (short) strlen(NUMERUS_ZERO);
         return NUMERUS_OK;
     }
     short i = 0;
     while (*roman != '\0') {
         if (i > NUMERUS_MAX_LENGTH) {
-            *length = -1;
+            *numeral_length = -1;
             numerus_error_code = NUMERUS_ERROR_TOO_LONG_NUMERAL;
             return NUMERUS_ERROR_TOO_LONG_NUMERAL;
         }
@@ -130,13 +136,13 @@ int numerus_numeral_length(char *roman, short *length) {
                 break;
             }
             default: {
-                *length = -1;
+                *numeral_length = -1;
                 numerus_error_code = NUMERUS_ERROR_ILLEGAL_CHARACTER;
                 return NUMERUS_ERROR_ILLEGAL_CHARACTER;
             }
         }
     }
-    *length = i;
+    *numeral_length = i;
     return NUMERUS_OK;
 }
 
@@ -154,9 +160,9 @@ int numerus_numeral_length(char *roman, short *length) {
  */
 int numerus_compare_value(char *roman_bigger, char *roman_smaller) {
     double value_bigger;
-    int errcode_bigger = numerus_roman_to_value(roman_bigger, &value_bigger);
+    int errcode_bigger = numerus_roman_to_double(roman_bigger, &value_bigger);
     double value_smaller;
-    int errcode_smaller = numerus_roman_to_value(roman_smaller, &value_smaller);
+    int errcode_smaller = numerus_roman_to_double(roman_smaller, &value_smaller);
     if (errcode_bigger != NUMERUS_OK || errcode_smaller != NUMERUS_OK) {
         fprintf(stderr, "Roman comparition error: "
                 "cannot compare syntactically wrong numerals\n");
@@ -200,7 +206,7 @@ int numerus_export_to_csv(char *filename, long min_value, long max_value,
                     i,
                     separator,
                     quotes,
-                    numerus_value_to_roman(i, NULL),
+                    numerus_double_to_roman(i, NULL),
                     quotes,
                     newline);
         }
@@ -209,7 +215,7 @@ int numerus_export_to_csv(char *filename, long min_value, long max_value,
             fprintf(csv_file,
                     "%s%s%s%s%li%s",
                     quotes,
-                    numerus_value_to_roman(i, NULL),
+                    numerus_double_to_roman(i, NULL),
                     quotes,
                     separator,
                     i,
@@ -308,7 +314,7 @@ int numerus_export_to_sqlite3(char *filename, long min_value, long max_value) {
     long int i;
     printf("Insering into SQLite...\n");
     for (i = min_value; i <= max_value; i++) {
-        char *roman = numerus_value_to_roman(i, NULL);
+        char *roman = numerus_double_to_roman(i, NULL);
         /* Fill prepared statement */
         sqlite3_bind_int64(stmt, 1, i);
         sqlite3_bind_text(stmt, 2, roman, -1, SQLITE_TRANSIENT);
@@ -413,6 +419,82 @@ char *numerus_pretty_print_long_numerals(char *roman) {
     }
 }
 
+char *numerus_shorten_fraction(short twelfth) {
+    if (twelfth < 0) {
+        switch (twelfth) {
+            case -11:
+                return "-11/12";
+            case -10:
+                return "-5/6";
+            case -9:
+                return "-3/4";
+            case -8:
+                return "-2/3";
+            case -7:
+                return "-7/12";
+            case -6:
+                return "-1/2";
+            case -5:
+                return "-5/12";
+            case -4:
+                return "-1/3";
+            case -3:
+                return "-1/4";
+            case -2:
+                return "-1/6";
+            case -1:
+                return "-1/12";
+            default:
+                return NULL;
+        }
+    } else {
+        switch (twelfth) {
+            case 0:
+                return "0/12";
+            case 1:
+                return "1/12";
+            case 2:
+                return "1/6";
+            case 3:
+                return "1/4";
+            case 4:
+                return "1/3";
+            case 5:
+                return "5/12";
+            case 6:
+                return "1/2";
+            case 7:
+                return "7/12";
+            case 8:
+                return "2/3";
+            case 9:
+                return "3/4";
+            case 10:
+                return "5/6";
+            case 11:
+                return "11/12";
+            default:
+                return NULL;
+        }
+    }
+}
+
+char *numerus_pretty_print_float_value(double double_value, int shorten) {
+    long int_part;
+    short frac_part;
+    numerus_double_to_parts(double_value, &int_part, &frac_part);
+    char *pretty_value = malloc(17);
+    if (frac_part == 0) {
+        snprintf(pretty_value, 17, "%ld", int_part);
+    } else if (shorten) {
+        snprintf(pretty_value, 17, "%ld, %s", int_part,
+                 numerus_shorten_fraction(frac_part));
+    } else {
+        snprintf(pretty_value, 17, "%ld, %d/12", int_part, frac_part);
+    }
+    return pretty_value;
+}
+
 struct _num_error_codes {
     const int code;
     const char *message;
@@ -448,4 +530,48 @@ const char *numerus_explain_error(int error_code) {
         }
     }
     return "ERROR CODE NOT FOUND";
+}
+
+
+double numerus_round_to_nearest_12th(double value) {
+    /*
+     * 0.000000000000000
+     * 0.083333333333333
+     * 0.166666666666666
+     * 0.250000000000000
+     * 0.333333333333333
+     * 0.416666666666666
+     * 0.500000000000000
+     * 0.583333333333333
+     * 0.666666666666666
+     * 0.750000000000000
+     * 0.833333333333333
+     * 0.916666666666666
+     */
+    value = round(value * 12) / 12; /* Round to nearest twelfth */
+    //value = round(value * 100000) / 100000; /* Round to 6 decimal places */
+    return value;
+}
+
+/* pass it values in [0, 1[ to round to the nearest twelfth. Returns the numerator from 0 to 11 */
+static short _num_extract_twelfth(double value) {
+    value = numerus_round_to_nearest_12th(value);
+    value = round(value * 12);
+    return (short) value;
+}
+
+static short _num_sign(long signed_value) {
+    return (signed_value > 0) - (signed_value < 0);
+}
+
+double numerus_parts_to_double(long int_part, short frac_part) {
+    frac_part = _num_sign(int_part) * (short) abs(frac_part); // apply sign of the int_part
+    return (double) (int_part) + frac_part/12.0;
+}
+
+void numerus_double_to_parts(double value, long *int_part, short *frac_part) {
+    double double_int_part;
+    double double_frac_part = modf(value, &double_int_part);
+    *int_part = (long) double_int_part;
+    *frac_part = _num_extract_twelfth(double_frac_part);
 }
