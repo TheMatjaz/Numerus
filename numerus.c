@@ -604,7 +604,7 @@ char *numerus_int_with_twelfth_to_roman(long int_part, short frac_part, int *err
     }
 
     /* Create pointer to the building buffer */
-    char *building_buffer = malloc(NUMERUS_MAX_LENGTH);
+    char *building_buffer = malloc(NUMERUS_MAX_LENGTH + 1);
     if (building_buffer == NULL) {
         numerus_error_code = NUMERUS_ERROR_MALLOC_FAIL;
         *errcode = NUMERUS_ERROR_MALLOC_FAIL;
@@ -639,7 +639,7 @@ char *numerus_int_with_twelfth_to_roman(long int_part, short frac_part, int *err
     /* Decimal part, start parsing the dictonary with "S" */
     roman_numeral = _num_value_part_to_roman(frac_part, roman_numeral, 13);
 
-    *roman_numeral = '\0';
+    *(roman_numeral++) = '\0';
 
     /* Copy out of the buffer and return it */
     char *returnable_roman_string =
@@ -647,6 +647,7 @@ char *numerus_int_with_twelfth_to_roman(long int_part, short frac_part, int *err
     if (returnable_roman_string == NULL) {
         numerus_error_code = NUMERUS_ERROR_MALLOC_FAIL;
         *errcode = NUMERUS_ERROR_MALLOC_FAIL;
+        return NULL;
     }
     strcpy(returnable_roman_string, building_buffer);
     free(building_buffer);
