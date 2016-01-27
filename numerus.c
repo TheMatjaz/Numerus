@@ -486,7 +486,9 @@ long numerus_roman_to_int_and_frac_part(char *roman, short *frac_part, int *errc
     if (numerus_is_zero(roman)) {
         int_part = 0;
         *frac_part = 0;
-        return NUMERUS_OK;
+        numerus_error_code = NUMERUS_OK;
+        *errcode = NUMERUS_OK;
+        return int_part;
     }
     struct _num_numeral_parser_data parser_data;
     _num_init_parser_data(&parser_data, roman);
