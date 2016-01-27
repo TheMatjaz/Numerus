@@ -30,6 +30,9 @@
  * @returns int 1 if the string is (-)NUMERUS_ZERO or 0 if it's not
  */
 short numerus_is_zero(char *roman) {
+    if (roman == NULL) {
+        return false;
+    }
     if (*roman == '-') {
         roman++;
     }
@@ -52,6 +55,9 @@ short numerus_is_zero(char *roman) {
  * @returns int 1 if the string is a long roman numeral or 0 if it's not
  */
 short numerus_is_long_numeral(char *roman) {
+    if (roman == NULL) {
+        return false;
+    }
     if (*roman == '_' || (*roman == '-' && *(roman+1) == '_')) {
         return true;
     } else {
@@ -61,6 +67,9 @@ short numerus_is_long_numeral(char *roman) {
 
 // Checks for an S or . and returns the index of the first found, else -1
 short numerus_is_float_numeral(char *roman) {
+    if (roman == NULL) {
+        return false;
+    }
     short i = 0;
     while (*roman != '\0') {
         if (i > NUMERUS_MAX_LENGTH) {
@@ -77,6 +86,9 @@ short numerus_is_float_numeral(char *roman) {
 }
 
 short numerus_sign(char *roman) {
+    if (roman == NULL || numerus_is_zero(roman)) {
+        return 0;
+    }
     if (*roman == '-') {
         return -1;
     } else {
