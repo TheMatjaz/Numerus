@@ -397,6 +397,10 @@ char *numerus_pretty_print_long_numerals(char *roman) {
     if (numerus_is_long_numeral(roman)) {
         char *roman_start = roman;
         char *pretty_roman = malloc(_num_pretty_print_malloc_size(roman));
+        if (pretty_roman == NULL) {
+            numerus_error_code = NUMERUS_ERROR_MALLOC_FAIL;
+            return NULL;
+        }
         char *pretty_roman_start = pretty_roman;
 
         /* Skip minus sign */
@@ -495,6 +499,10 @@ char *numerus_pretty_print_float_value(double double_value, int shorten) {
     short frac_part;
     long int_part = numerus_double_to_parts(double_value, &frac_part);
     char *pretty_value = malloc(17);
+    if (pretty_value == NULL) {
+        numerus_error_code = NUMERUS_ERROR_MALLOC_FAIL;
+        return NULL;
+    }
     if (frac_part == 0) {
         snprintf(pretty_value, 17, "%ld", int_part);
     } else if (shorten) {
