@@ -7,6 +7,8 @@
  * the BSD 3-clause license.
  */
 
-int numtest_convert_all_floats();
+int numtest_convert_all_floats_with_doubles();
 void numtest_roman_syntax_errors();
-int numtest_convert_all_integers();
+int numtest_convert_all_integers_with_parts();
+int numtest_convert_all_integers_with_doubles();
+int numtest_convert_all_floats_with_parts();
