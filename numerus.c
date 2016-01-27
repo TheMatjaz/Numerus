@@ -181,7 +181,12 @@ static short _num_extract_twelfth(double value) {
     return (short) value;
 }
 
+short _num_sign(long signed_value) {
+    return (signed_value > 0) - (signed_value < 0);
+}
+
 double numerus_parts_to_double(long int_part, short frac_part) {
+    frac_part = _num_sign(int_part) * (short) abs(frac_part); // apply sign of the int_part
     return (double) (int_part) + frac_part/12.0;
 }
 
@@ -603,6 +608,7 @@ char *numerus_double_to_roman(double double_value, int *errcode) {
 }
 
 char *numerus_int_with_twelfth_to_roman(long int_part, short frac_part, int *errcode) {
+    frac_part = (short) abs(frac_part);
     double double_value = numerus_parts_to_double(int_part, frac_part);
     /* Out of range check */
     if (double_value < NUMERUS_MIN_VALUE || double_value > NUMERUS_MAX_VALUE) {
@@ -624,7 +630,6 @@ char *numerus_int_with_twelfth_to_roman(long int_part, short frac_part, int *err
         return zero_string;
     } else if (int_part < 0) {
         int_part = labs(int_part);
-        frac_part = (short) abs(frac_part);
         double_value = fabs(double_value);
         *(roman_numeral++) = '-';
     }
