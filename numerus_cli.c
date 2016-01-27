@@ -220,11 +220,17 @@ static int _num_parse_command(char *command) {
         if ((value = strtod(command, NULL)) != 0) { // a double is typed
             if (pretty_printing == 1) {
                 printf("%s\n", roman = numerus_pretty_print_long_numerals(
-                        numerus_double_to_roman(value, NULL)));
+                        numerus_double_to_roman(value, &errcode)));
+                if (errcode != NUMERUS_OK) {
+                    printf("%s\n", numerus_explain_error(errcode));
+                }
                 free(roman);
                 return 1;
             } else {
-                printf("%s\n", roman = numerus_double_to_roman(value, NULL));
+                printf("%s\n", roman = numerus_double_to_roman(value, &errcode));
+                if (errcode != NUMERUS_OK) {
+                    printf("%s\n", numerus_explain_error(errcode));
+                }
                 free(roman);
                 return 1;
             }
