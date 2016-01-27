@@ -581,10 +581,15 @@ double numerus_parts_to_double(long int_part, short frac_part) {
     return (double) (int_part) + frac_part/12.0;
 }
 
-void numerus_double_to_parts(double value, long *int_part, short *frac_part) {
+long numerus_double_to_parts(double value, short *frac_part) {
+    short zero_frac_part = 0;
+    if (frac_part == NULL) {
+        frac_part = &zero_frac_part;
+    }
     double double_int_part;
     double double_frac_part = modf(value, &double_int_part);
-    *int_part = (long) double_int_part;
+    long int_part = (long) double_int_part;
     *frac_part = _num_extract_twelfth(double_frac_part);
     *frac_part = (short) abs(*frac_part);
+    return int_part;
 }
