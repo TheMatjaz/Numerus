@@ -99,7 +99,7 @@ const short int NUMERUS_MAX_SHORT_LENGTH = 17;
 int numerus_error_code = NUMERUS_OK;
 
 
-/**
+/*
  * Buffer where the strings with roman numerals are build an then copied from.
  *
  * This buffer is as long as the longest roman numeral. The usage of this buffer
@@ -107,7 +107,6 @@ int numerus_error_code = NUMERUS_OK;
  * roman numerals have variable length and can be returned as a string copied
  * from the buffer with just the right amount of space allocated.
  */
-static char _num_numeral_build_buffer[NUMERUS_MAX_LENGTH];
 
 
 /**
@@ -601,7 +600,13 @@ char *numerus_int_with_twelfth_to_roman(long int_part, short frac_part, int *err
     }
 
     /* Create pointer to the building buffer */
-    char *roman_numeral = &_num_numeral_build_buffer[0];
+    char *building_buffer = malloc(NUMERUS_MAX_LENGTH);
+    if (building_buffer == NULL) {
+        numerus_error_code = NUMERUS_ERROR_MALLOC_FAIL;
+        *errcode = NUMERUS_ERROR_MALLOC_FAIL;
+        return NULL;
+    }
+    char *roman_numeral = building_buffer;
 
     /* Save sign or return NUMERUS_ZERO for 0 */
     if (int_part == 0 && frac_part == 0) {
@@ -634,8 +639,14 @@ char *numerus_int_with_twelfth_to_roman(long int_part, short frac_part, int *err
 
     /* Copy out of the buffer and return it */
     char *returnable_roman_string =
-            malloc(roman_numeral - _num_numeral_build_buffer);
-    strcpy(returnable_roman_string, _num_numeral_build_buffer);
+            malloc(roman_numeral - building_buffer);
+    if (returnable_roman_string == NULL) {
+        numerus_error_code = NUMERUS_ERROR_MALLOC_FAIL;
+        *errcode = NUMERUS_ERROR_MALLOC_FAIL;
+    }
+    strcpy(returnable_roman_string, building_buffer);
+    free(building_buffer);
+    numerus_error_code = NUMERUS_OK;
     *errcode = NUMERUS_OK;
     return returnable_roman_string;
 }
