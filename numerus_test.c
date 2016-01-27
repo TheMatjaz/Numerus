@@ -32,25 +32,27 @@ int numtest_convert_all_floats() {
     double converted;
     char *roman;
     int errcode;
-    double decimal = 0;
-    double to_convert;
+    short twelfth = 0;
+    printf("Starting conversion of all roman numerals: \n");
     clock_t start_clock = clock();
     for (i = NUMERUS_MIN_LONG_VALUE; i <= NUMERUS_MAX_LONG_VALUE; i++) {
-        for (decimal = 0.0; decimal < 1.0; decimal += 1.0/12.0) {
-            to_convert = i + decimal;
-            roman = numerus_value_to_roman(to_convert, NULL);
+        for (twelfth = 0; twelfth < 12; twelfth++) {
+            roman = numerus_int_with_twelfth_to_roman(i, twelfth, NULL);
             errcode = numerus_roman_to_value(roman, &converted);
             if (errcode != NUMERUS_OK) {
-                fprintf(stderr, "%20.20f: %s: %s\n",
-                        to_convert, numerus_explain_error(errcode), roman);
+                fprintf(stderr, "%ld, %d: %s: %s\n",
+                        i, twelfth, numerus_explain_error(errcode), roman);
                 return 1;
             }
-            if ((float) to_convert != (float) converted) {
-                fprintf(stderr, "Error at converting %20.20f -> %s -> %20.20f",
-                        to_convert, roman, converted);
+            if ((float) numerus_parts_to_double(i, twelfth) != (float) converted) {
+                fprintf(stderr, "Error at converting %ld, %d/12 (%f) -> %s -> %20.20f",
+                        i, twelfth, numerus_parts_to_double(i, twelfth), roman, converted);
                 return 1;
             }
             free(roman);
+        }
+        if (i % 100000 == 0) {
+            printf("%5.2f%%\n", 100.0 * (i+NUMERUS_MAX_LONG_VALUE)/7999999.0);
         }
     }
     clock_t end_clock = clock();
