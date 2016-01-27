@@ -118,7 +118,9 @@ char *numerus_double_to_roman(double double_value, int *errcode);
 
 
 /* Conversion function from roman numeral to value */
-int numerus_roman_to_value(char *roman, double *value);
+int numerus_roman_to_int(char *roman, long *value);
+int numerus_roman_to_int_and_frac_part(char *roman, long *int_part, short *frac_part);
+int numerus_roman_to_double(char *roman, double *value);
 
 
 /* Utility functions */

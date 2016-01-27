@@ -232,7 +232,7 @@ static short _num_string_begins_with(char *to_be_compared,
  * numeral is confronted with, the value, sign, if it has underscore and counts
  * the number of consecutive repetitions a single roman char has.
  *
- * @see numerus_roman_to_value()
+ * @see numerus_roman_to_double()
  */
 struct _num_numeral_parser_data {
     char *current_numeral_position;
@@ -250,7 +250,7 @@ struct _num_numeral_parser_data {
  *
  * Sets the fields to be ready to start the conversion from roman to value.
  *
- * @see numerus_roman_to_value()
+ * @see numerus_roman_to_double()
  */
 static void _num_init_parser_data(struct _num_numeral_parser_data *parser_data,
                                   char *roman) {
@@ -303,7 +303,7 @@ static bool _num_char_is_in_string(char current, char *terminating_chars) {
  * written as regex: (CM)|(CD)|(D?C{0,3}).
  *
  * Used by: _num_compare_numeral_position_with_dictionary()
- * which is used by numerus_roman_to_value()
+ * which is used by numerus_roman_to_double()
  */
 static void _num_skip_to_next_non_unique_dictionary_char(
         struct _num_numeral_parser_data *parser_data) {
@@ -330,7 +330,7 @@ static void _num_skip_to_next_non_unique_dictionary_char(
  *
  * Used by: _num_parse_part_in_underscores() and
  * _num_parse_part_after_underscores() which are used by
- * numerus_roman_to_value()
+ * numerus_roman_to_double()
  *
  * @returns result code as an error or NUMERUS_OK. The computation result is
  * stored in the passed _num_numeral_parser_data. Possible errors are
@@ -377,7 +377,7 @@ static int _num_compare_numeral_position_with_dictionary(
  * is found (one of "_Ss.-\0"). If an illegal stopping character is found,
  * a specific error code is returned.
  *
- * Used by: numerus_roman_to_value()
+ * Used by: numerus_roman_to_double()
  *
  * @returns result code as an error or NUMERUS_OK. Possible errors are
  * NUMERUS_ERROR_MISSING_SECOND_UNDERSCORE,
@@ -418,7 +418,7 @@ static int _num_parse_part_in_underscores(
  * a specific error code is returned. "M" is an illegal character in the part
  * after underscores only in long numerals.
  *
- * Used by: numerus_roman_to_value()
+ * Used by: numerus_roman_to_double()
  *
  * @returns result code as an error or NUMERUS_OK. Possible errors are
  * NUMERUS_ERROR_UNDERSCORE_IN_SHORT_PART,
@@ -482,7 +482,6 @@ static int _num_parse_decimal_part(
     return NUMERUS_OK;
 }
 
-
 /**
  * Converts a roman numeral to its value as a double.
  *
@@ -506,9 +505,30 @@ static int _num_parse_decimal_part(
  * @returns int error code to indicate success (NUMERUS_OK) or failure
  * (NUMERUS_ERROR_*)
  */
-int numerus_roman_to_value(char *roman, double *value) {
+int numerus_roman_to_double(char *roman, double *value) {
+    long int_part;
+    short frac_part;
+    int errcode;
+    numerus_double_to_parts(*value, &int_part, &frac_part);
+    errcode = numerus_roman_to_int_and_frac_part(roman, &int_part, &frac_part);
+    if (errcode != NUMERUS_OK) {
+        return errcode;
+    } else {
+        *value = numerus_parts_to_double(int_part, frac_part);
+        return NUMERUS_OK;
+    }
+}
+
+
+int numerus_roman_to_int(char *roman, long *value) {
+    short unused_frac_part;
+    return numerus_roman_to_int_and_frac_part(roman, value, &unused_frac_part);
+}
+
+int numerus_roman_to_int_and_frac_part(char *roman, long *int_part, short *frac_part) {
     if (numerus_is_zero(roman)) {
-        *value = 0.0;
+        *int_part = 0;
+        *frac_part = 0;
         return NUMERUS_OK;
     }
     struct _num_numeral_parser_data parser_data;
@@ -544,9 +564,8 @@ int numerus_roman_to_value(char *roman, double *value) {
     if (response_code != NUMERUS_OK) {
         return response_code;
     }
-    *value = numerus_parts_to_double(parser_data.int_part,
-                                     parser_data.frac_part);
-    *value *= parser_data.numeral_sign;
+    *int_part = parser_data.numeral_sign * parser_data.int_part;
+    *frac_part = parser_data.frac_part;
     return NUMERUS_OK;
 }
 
@@ -655,5 +674,6 @@ char *numerus_int_with_twelfth_to_roman(long int_part, short frac_part, int *err
     char *returnable_roman_string =
             malloc(roman_numeral - _num_numeral_build_buffer);
     strcpy(returnable_roman_string, _num_numeral_build_buffer);
+    *errcode = NUMERUS_OK;
     return returnable_roman_string;
 }

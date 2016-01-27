@@ -159,9 +159,9 @@ int numerus_numeral_length(char *roman, short *length) {
  */
 int numerus_compare_value(char *roman_bigger, char *roman_smaller) {
     double value_bigger;
-    int errcode_bigger = numerus_roman_to_value(roman_bigger, &value_bigger);
+    int errcode_bigger = numerus_roman_to_double(roman_bigger, &value_bigger);
     double value_smaller;
-    int errcode_smaller = numerus_roman_to_value(roman_smaller, &value_smaller);
+    int errcode_smaller = numerus_roman_to_double(roman_smaller, &value_smaller);
     if (errcode_bigger != NUMERUS_OK || errcode_smaller != NUMERUS_OK) {
         fprintf(stderr, "Roman comparition error: "
                 "cannot compare syntactically wrong numerals\n");
