@@ -615,17 +615,12 @@ char *numerus_int_with_twelfth_to_roman(long int_part, short frac_part, int *err
     }
 
     /* Create pointer to the building buffer */
-    char *building_buffer = malloc(NUMERUS_MAX_LENGTH + 1);
-    if (building_buffer == NULL) {
-        numerus_error_code = NUMERUS_ERROR_MALLOC_FAIL;
-        *errcode = NUMERUS_ERROR_MALLOC_FAIL;
-        return NULL;
-    }
+    char building_buffer[NUMERUS_MAX_LENGTH];
     char *roman_numeral = building_buffer;
 
     /* Save sign or return NUMERUS_ZERO for 0 */
     if (int_part == 0 && frac_part == 0) {
-        /* Return writable copy of NUMERUS_ZERO */
+        /* Return writable copy of NUMERUS_ZERO on the heap */
         char *zero_string = malloc(strlen(NUMERUS_ZERO) + 1);
         strcpy(zero_string, NUMERUS_ZERO);
         return zero_string;
@@ -652,7 +647,7 @@ char *numerus_int_with_twelfth_to_roman(long int_part, short frac_part, int *err
 
     *(roman_numeral++) = '\0';
 
-    /* Copy out of the buffer and return it */
+    /* Copy out of the buffer and return it on the heap */
     char *returnable_roman_string =
             malloc(roman_numeral - building_buffer);
     if (returnable_roman_string == NULL) {
@@ -661,7 +656,6 @@ char *numerus_int_with_twelfth_to_roman(long int_part, short frac_part, int *err
         return NULL;
     }
     strcpy(returnable_roman_string, building_buffer);
-    free(building_buffer);
     numerus_error_code = NUMERUS_OK;
     *errcode = NUMERUS_OK;
     return returnable_roman_string;
