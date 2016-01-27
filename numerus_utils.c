@@ -205,7 +205,7 @@ int numerus_export_to_csv(char *filename, long min_value, long max_value,
                     i,
                     separator,
                     quotes,
-                    numerus_value_to_roman(i, NULL),
+                    numerus_double_to_roman(i, NULL),
                     quotes,
                     newline);
         }
@@ -214,7 +214,7 @@ int numerus_export_to_csv(char *filename, long min_value, long max_value,
             fprintf(csv_file,
                     "%s%s%s%s%li%s",
                     quotes,
-                    numerus_value_to_roman(i, NULL),
+                    numerus_double_to_roman(i, NULL),
                     quotes,
                     separator,
                     i,
@@ -313,7 +313,7 @@ int numerus_export_to_sqlite3(char *filename, long min_value, long max_value) {
     long int i;
     printf("Insering into SQLite...\n");
     for (i = min_value; i <= max_value; i++) {
-        char *roman = numerus_value_to_roman(i, NULL);
+        char *roman = numerus_double_to_roman(i, NULL);
         /* Fill prepared statement */
         sqlite3_bind_int64(stmt, 1, i);
         sqlite3_bind_text(stmt, 2, roman, -1, SQLITE_TRANSIENT);
@@ -479,16 +479,17 @@ char *numerus_shorten_fraction(short twelfth) {
 }
 
 char *numerus_pretty_print_float_value(double double_value, int shorten) {
-    struct _num_numeral_value struct_value;
-    numerus_as_struct(double_value, &struct_value);
+    long int_part;
+    short frac_part;
+    numerus_double_to_parts(double_value, &int_part, &frac_part);
     char *pretty_value = malloc(17);
-    if (struct_value.twelfths == 0) {
-        snprintf(pretty_value, 17, "%ld", struct_value.integer_part);
+    if (frac_part == 0) {
+        snprintf(pretty_value, 17, "%ld", int_part);
     } else if (shorten) {
-        snprintf(pretty_value, 17, "%ld, %s", struct_value.integer_part,
-                 numerus_shorten_fraction(struct_value.twelfths));
+        snprintf(pretty_value, 17, "%ld, %s", int_part,
+                 numerus_shorten_fraction(frac_part));
     } else {
-        snprintf(pretty_value, 17, "%ld, %d/12", struct_value.integer_part, struct_value.twelfths);
+        snprintf(pretty_value, 17, "%ld, %d/12", int_part, frac_part);
     }
     return pretty_value;
 }

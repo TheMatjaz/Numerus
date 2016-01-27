@@ -213,18 +213,18 @@ static int _num_parse_command(char *command) {
         char *roman;
         int errcode = 0;
         if (_num_string_is_zero(command)) { // a double of any form with value 0.0 is typed
-            printf("%s\n", roman = numerus_value_to_roman(0, NULL));
+            printf("%s\n", roman = numerus_double_to_roman(0, NULL));
             free(roman);
             return 1;
         }
         if ((value = strtod(command, NULL)) != 0) { // a double is typed
             if (pretty_printing == 1) {
                 printf("%s\n", roman = numerus_pretty_print_long_numerals(
-                        numerus_value_to_roman(value, NULL)));
+                        numerus_double_to_roman(value, NULL)));
                 free(roman);
                 return 1;
             } else {
-                printf("%s\n", roman = numerus_value_to_roman(value, NULL));
+                printf("%s\n", roman = numerus_double_to_roman(value, NULL));
                 free(roman);
                 return 1;
             }
