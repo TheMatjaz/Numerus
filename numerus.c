@@ -469,6 +469,7 @@ int numerus_roman_to_double(char *roman, double *value) {
     numerus_double_to_parts(*value, &int_part, &frac_part);
     errcode = numerus_roman_to_int_and_frac_part(roman, &int_part, &frac_part);
     if (errcode != NUMERUS_OK) {
+        numerus_error_code = errcode;
         return errcode;
     } else {
         *value = numerus_parts_to_double(int_part, frac_part);
@@ -588,14 +589,17 @@ char *numerus_double_to_roman(double double_value, int *errcode) {
 }
 
 char *numerus_int_with_twelfth_to_roman(long int_part, short frac_part, int *errcode) {
+    /* Prepare variables */
     frac_part = (short) abs(frac_part);
     double double_value = numerus_parts_to_double(int_part, frac_part);
+    if (errcode == NULL) {
+        errcode = &numerus_error_code;
+    }
+
     /* Out of range check */
     if (double_value < NUMERUS_MIN_VALUE || double_value > NUMERUS_MAX_VALUE) {
         numerus_error_code = NUMERUS_ERROR_VALUE_OUT_OF_RANGE;
-        if (errcode != NULL) {
-            *errcode = NUMERUS_ERROR_VALUE_OUT_OF_RANGE;
-        }
+        *errcode = NUMERUS_ERROR_VALUE_OUT_OF_RANGE;
         return NULL;
     }
 
