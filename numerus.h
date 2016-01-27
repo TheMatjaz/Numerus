@@ -16,10 +16,10 @@
  * This is necessary to avoid rounding errors for floating point representations
  * of the value.
  */
-struct _num_numeral_value {
-    long integer_part;
-    short twelfths;
-};
+//struct _num_numeral_value {
+//    long integer_part;
+//    short twelfths;
+//};
 
 /**
  * Everything went all right.

@@ -154,17 +154,43 @@ static const struct _num_dictionary_char _NUM_DICTIONARY[] = {
 /*  -+-+-+-+-+-+-+-+-+-+-{   CONVERSION FUNCTIONS   }-+-+-+-+-+-+-+-+-+-+-  */
 
 
-/**
- * Converts a numeral's value stored as struct with integer and fractional
- * part to a double.
- *
- * @param *value struct _num_numeral_value to express as double
- * @returns double containing the sum of the integer part and the twelfths from the struct
- */
-double numerus_as_double(struct _num_numeral_value *value) {
-    return (double) (value->integer_part) + value->twelfths/12.0;
+double numerus_round_to_nearest_12th(double value) {
+    /*
+     * 0.000000000000000
+     * 0.083333333333333
+     * 0.166666666666666
+     * 0.250000000000000
+     * 0.333333333333333
+     * 0.416666666666666
+     * 0.500000000000000
+     * 0.583333333333333
+     * 0.666666666666666
+     * 0.750000000000000
+     * 0.833333333333333
+     * 0.916666666666666
+     */
+    value = round(value * 12) / 12; /* Round to nearest twelfth */
+    //value = round(value * 100000) / 100000; /* Round to 6 decimal places */
+    return value;
 }
 
+/* pass it values in [0, 1[ to round to the nearest twelfth. Returns the numerator from 0 to 11 */
+static short _num_extract_twelfth(double value) {
+    value = numerus_round_to_nearest_12th(value);
+    value = round(value * 12);
+    return (short) value;
+}
+
+double numerus_parts_to_double(long int_part, short frac_part) {
+    return (double) (int_part) + frac_part/12.0;
+}
+
+void numerus_double_to_parts(double value, long *int_part, short *frac_part) {
+    double double_int_part;
+    double double_frac_part = modf(value, &double_int_part);
+    *int_part = (long) double_int_part;
+    *frac_part = _num_extract_twelfth(double_frac_part);
+}
 
 /**
  * Checks if two strings match in the the next 1 or 2 characters.
@@ -208,7 +234,8 @@ struct _num_numeral_parser_data {
     const struct _num_dictionary_char *current_dictionary_char;
     bool numeral_is_long;
     short numeral_sign;
-    struct _num_numeral_value numeral_value;
+    long int_part;
+    short frac_part;
     short char_repetitions;
 };
 
@@ -227,8 +254,8 @@ static void _num_init_parser_data(struct _num_numeral_parser_data *parser_data,
     parser_data->current_dictionary_char = &_NUM_DICTIONARY[0];
     parser_data->numeral_is_long = false;
     parser_data->numeral_sign = 1;
-    parser_data->numeral_value.integer_part = 0;
-    parser_data->numeral_value.twelfths = 0;
+    parser_data->int_part = 0;
+    parser_data->frac_part = 0;
     parser_data->char_repetitions = 0;
 }
 
@@ -320,10 +347,10 @@ static int _num_compare_numeral_position_with_dictionary(
         if (*(parser_data->current_dictionary_char->characters) == 'S'
             || *(parser_data->current_dictionary_char->characters) == '.') {
             // add to decimal part value
-            parser_data->numeral_value.twelfths += parser_data->current_dictionary_char->value;
+            parser_data->frac_part += parser_data->current_dictionary_char->value;
         } else {
             // add to integer part value
-            parser_data->numeral_value.integer_part += parser_data->current_dictionary_char->value;
+            parser_data->int_part += parser_data->current_dictionary_char->value;
         }
         _num_skip_to_next_non_unique_dictionary_char(parser_data);
     } else { /* chars don't match */
@@ -499,7 +526,7 @@ int numerus_roman_to_value(char *roman, double *value) {
             return response_code;
         }
         parser_data.current_numeral_position++; // skip second underscore
-        parser_data.numeral_value.integer_part *= 1000;
+        parser_data.int_part *= 1000;
         // reset back to "CM", "M" is excluded for long numerals
         parser_data.current_dictionary_char = &_NUM_DICTIONARY[1];
         parser_data.char_repetitions = 0;
@@ -512,7 +539,8 @@ int numerus_roman_to_value(char *roman, double *value) {
     if (response_code != NUMERUS_OK) {
         return response_code;
     }
-    *value = numerus_as_double(&parser_data.numeral_value);
+    *value = numerus_parts_to_double(parser_data.int_part,
+                                     parser_data.frac_part);
     *value *= parser_data.numeral_sign;
     return NUMERUS_OK;
 }
@@ -563,48 +591,19 @@ static char *_num_value_part_to_roman(long value, char *roman, int dictionary_st
     return roman;
 }
 
-/**
- *
- */
-double numerus_round_to_nearest_12th(double value) {
-    /*
-     * 0.000000000000000
-     * 0.083333333333333
-     * 0.166666666666666
-     * 0.250000000000000
-     * 0.333333333333333
-     * 0.416666666666666
-     * 0.500000000000000
-     * 0.583333333333333
-     * 0.666666666666666
-     * 0.750000000000000
-     * 0.833333333333333
-     * 0.916666666666666
-     */
-    value = round(value * 12) / 12; /* Round to nearest twelfth */
-    //value = round(value * 100000) / 100000; /* Round to 6 decimal places */
-    return value;
+char *numerus_int_to_roman(long int_value, int *errcode) {
+    return numerus_int_with_twelfth_to_roman(int_value, 0, errcode);
 }
 
-/* pass it values in [0, 1[ to round to the nearest twelfth. Returns the numerator from 0 to 11 */
-static short _num_extract_twelfth(double value) {
-    value = numerus_round_to_nearest_12th(value);
-    value = round(value * 12);
-    return (short) value;
+char *numerus_double_to_roman(double double_value, int *errcode) {
+    long int_part;
+    short frac_part;
+    numerus_double_to_parts(double_value, &int_part, &frac_part);
+    return numerus_int_with_twelfth_to_roman(int_part, frac_part, errcode);
 }
 
-
-void numerus_as_struct(double value, struct _num_numeral_value *struct_value) {
-    double integer_part;
-    double fractional_part = modf(value, &integer_part);
-    struct_value->integer_part = (long) integer_part;
-    struct_value->twelfths = _num_extract_twelfth(fractional_part);
-}
-
-
-char *numerus_value_to_roman(double double_value, int *errcode) {
-    double_value = numerus_round_to_nearest_12th(double_value);
-
+char *numerus_int_with_twelfth_to_roman(long int_part, short frac_part, int *errcode) {
+    double double_value = numerus_parts_to_double(int_part, frac_part);
     /* Out of range check */
     if (double_value < NUMERUS_MIN_VALUE || double_value > NUMERUS_MAX_VALUE) {
         numerus_error_code = NUMERUS_ERROR_VALUE_OUT_OF_RANGE;
@@ -618,33 +617,32 @@ char *numerus_value_to_roman(double double_value, int *errcode) {
     char *roman_numeral = &_num_numeral_build_buffer[0];
 
     /* Save sign or return NUMERUS_ZERO for 0 */
-    if (double_value == 0.0) {
+    if (int_part == 0 && frac_part == 0) {
         /* Return writable copy of NUMERUS_ZERO */
         char *zero_string = malloc(strlen(NUMERUS_ZERO) + 1);
         strcpy(zero_string, NUMERUS_ZERO);
         return zero_string;
-    } else if (double_value < 0.0) {
-        double_value *= -1; /* Remove sign from value */
+    } else if (int_part < 0) {
+        int_part = labs(int_part);
+        frac_part = (short) abs(frac_part);
+        double_value = fabs(double_value);
         *(roman_numeral++) = '-';
     }
-
-    struct _num_numeral_value struct_value;
-    numerus_as_struct(double_value, &struct_value);
 
     /* Create part between underscores */
     if (double_value > NUMERUS_MAX_SHORT_VALUE) { /* Underscores are needed */
         *(roman_numeral++) = '_';
-        roman_numeral = _num_value_part_to_roman(struct_value.integer_part / 1000, roman_numeral, 0); /* Integer cast to avoid decimals in part between underscores */
-        struct_value.integer_part -= (struct_value.integer_part / 1000) * 1000; /* Remove the three left-most digits because of the integer division */
+        roman_numeral = _num_value_part_to_roman(int_part / 1000, roman_numeral, 0); /* Integer cast to avoid decimals in part between underscores */
+        int_part -= (int_part / 1000) * 1000; /* Remove the three left-most digits because of the integer division */
         *(roman_numeral++) = '_';
         /* Part after underscores without "M" char, start parsing the dictonary with "CM" */
-        roman_numeral = _num_value_part_to_roman(struct_value.integer_part, roman_numeral, 1);
+        roman_numeral = _num_value_part_to_roman(int_part, roman_numeral, 1);
     } else {
         /* No underscores, so with "M" char */
-        roman_numeral = _num_value_part_to_roman(struct_value.integer_part, roman_numeral, 0);
+        roman_numeral = _num_value_part_to_roman(int_part, roman_numeral, 0);
     }
     /* Decimal part, start parsing the dictonary with "S" */
-    roman_numeral = _num_value_part_to_roman(struct_value.twelfths, roman_numeral, 13);
+    roman_numeral = _num_value_part_to_roman(frac_part, roman_numeral, 13);
 
     *roman_numeral = '\0';
 
