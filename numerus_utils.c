@@ -574,4 +574,5 @@ void numerus_double_to_parts(double value, long *int_part, short *frac_part) {
     double double_frac_part = modf(value, &double_int_part);
     *int_part = (long) double_int_part;
     *frac_part = _num_extract_twelfth(double_frac_part);
+    *frac_part = (short) abs(*frac_part);
 }
