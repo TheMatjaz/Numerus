@@ -287,13 +287,12 @@ void numtest_parts_to_from_double_functions() {
     if (d1 != d2 || d1 != d3 || d1 != d4) {
         fprintf(stderr, "Error at transforming parts into double.\n");
     }
-    long int_part;
     short frac_part;
-    numerus_double_to_parts(12.08333, &int_part, &frac_part);
+    long int_part = numerus_double_to_parts(12.08333, &frac_part);
     if (int_part != 12 || frac_part != 1) {
         fprintf(stderr, "Error at transforming double into parts.\n");
     }
-    numerus_double_to_parts(-12.08333, &int_part, &frac_part);
+    int_part = numerus_double_to_parts(-12.08333, &frac_part);
     if (int_part != -12 || frac_part != 1) {
         fprintf(stderr, "Error at transforming double into parts.\n");
     }

@@ -593,9 +593,8 @@ char *numerus_int_to_roman(long int_value, int *errcode) {
 }
 
 char *numerus_double_to_roman(double double_value, int *errcode) {
-    long int_part;
     short frac_part;
-    numerus_double_to_parts(double_value, &int_part, &frac_part);
+    long int_part = numerus_double_to_parts(double_value, &frac_part);
     return numerus_int_with_twelfth_to_roman(int_part, frac_part, errcode);
 }
 

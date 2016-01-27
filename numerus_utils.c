@@ -492,9 +492,8 @@ char *numerus_shorten_fraction(short twelfth) {
 }
 
 char *numerus_pretty_print_float_value(double double_value, int shorten) {
-    long int_part;
     short frac_part;
-    numerus_double_to_parts(double_value, &int_part, &frac_part);
+    long int_part = numerus_double_to_parts(double_value, &frac_part);
     char *pretty_value = malloc(17);
     if (frac_part == 0) {
         snprintf(pretty_value, 17, "%ld", int_part);
