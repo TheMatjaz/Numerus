@@ -112,7 +112,10 @@ int numerus_numeral_length(char *roman, short *length);
 short numerus_is_roman(char *roman);
 
 /* Conversion function from value to roman numeral */
-char *numerus_value_to_roman(double double_value, int *errcode);
+char *numerus_int_to_roman(long int_value, int *errcode);
+char *numerus_int_with_twelfth_to_roman(long int_part, short frac_part, int *errcode);
+char *numerus_double_to_roman(double double_value, int *errcode);
+
 
 /* Conversion function from roman numeral to value */
 int numerus_roman_to_value(char *roman, double *value);
@@ -120,12 +123,19 @@ int numerus_roman_to_value(char *roman, double *value);
 
 /* Utility functions */
 double numerus_round_to_nearest_12th(double value);
+void numerus_double_to_parts(double value, long *int_part, short *frac_part);
+double numerus_parts_to_double(long int_part, short frac_part);
 int numerus_compare_value(char *roman_bigger, char *roman_smaller);
+
+
+/* Export functions */
 int numerus_export_to_sqlite3(char *filename, long min_value, long max_value);
 int numerus_export_to_csv(char *filename, long min_value, long max_value,
                           int numerals_first, char *separator, char *newline,
                           char *quotes);
+
+
+/* Printing functions */
 char *numerus_pretty_print_long_numerals(char *roman);
-const char *numerus_explain_error(int error_code);
-void numerus_as_struct(double value, struct _num_numeral_value *struct_value);
 char *numerus_pretty_print_float_value(double double_value, int shorten);
+const char *numerus_explain_error(int error_code);
