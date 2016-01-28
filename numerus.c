@@ -631,7 +631,7 @@ char *numerus_int_with_twelfth_to_roman(long int_part, short frac_part, int *err
         double_value = fabs(double_value);
         *(roman_numeral++) = '-';
     }
-    
+
     /* Create part between underscores */
     if (double_value > NUMERUS_MAX_SHORT_VALUE) { /* Underscores are needed */
         *(roman_numeral++) = '_';

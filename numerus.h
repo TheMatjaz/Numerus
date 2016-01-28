@@ -106,10 +106,10 @@ extern const char *NUMERUS_FLOAT_SYNTAX_REGEX_STRING;
 extern int numerus_error_code;
 
 /* Numeral analysis functions */
-short numerus_is_zero(char *roman);
-short numerus_is_long_numeral(char *roman);
+short numerus_is_zero(char *roman, int *errcode);
+short numerus_is_long_numeral(char *roman, int *errcode);
 short numerus_is_float_numeral(char *roman, int *errcode);
-short numerus_sign(char *roman);
+short numerus_sign(char *roman, int *errcode);
 short numerus_numeral_length(char *roman, int *errcode);
 
 /* Conversion function from value to roman numeral */
@@ -139,7 +139,7 @@ int numerus_export_to_csv(char *filename, long min_value, long max_value,
 
 
 /* Printing functions */
-char *numerus_pretty_print_long_numerals(char *roman);
+char *numerus_pretty_print_long_numerals(char *roman, int *errcode);
 char *numerus_pretty_print_float_value(double double_value, int shorten);
 const char *numerus_explain_error(int error_code);
 char *numerus_shorten_fraction(short twelfth);
