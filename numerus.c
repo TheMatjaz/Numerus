@@ -491,7 +491,10 @@ long numerus_roman_to_int_and_frac_part(char *roman, short *frac_part, int *errc
         *errcode = response_code;
         return NUMERUS_MAX_LONG_VALUE + 10;
     }
-    if (numerus_is_zero(roman)) {
+    while (isspace(*roman)) {
+        roman++;
+    }
+    if (_num_is_zero(roman)) {
         int_part = 0;
         *frac_part = 0;
         numerus_error_code = NUMERUS_OK;
@@ -628,7 +631,7 @@ char *numerus_int_with_twelfth_to_roman(long int_part, short frac_part, int *err
         double_value = fabs(double_value);
         *(roman_numeral++) = '-';
     }
-
+    
     /* Create part between underscores */
     if (double_value > NUMERUS_MAX_SHORT_VALUE) { /* Underscores are needed */
         *(roman_numeral++) = '_';
