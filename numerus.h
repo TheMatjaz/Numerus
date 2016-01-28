@@ -143,3 +143,7 @@ char *numerus_pretty_print_long_numerals(char *roman, int *errcode);
 char *numerus_pretty_print_float_value(double double_value, int shorten);
 const char *numerus_explain_error(int error_code);
 char *numerus_shorten_fraction(short twelfth);
+
+
+/* Command line interface */
+void numerus_repl(int argc, char **args);

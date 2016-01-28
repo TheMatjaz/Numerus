@@ -2,8 +2,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
-#include "numerus.h"
-#include "numerus_test.h"
+#include "numerus_internal.h"
 
 const char *PROMPT_TEXT = "numerus> ";
 const char *WELCOME_TEXT = ""
