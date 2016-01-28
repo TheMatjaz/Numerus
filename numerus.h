@@ -88,6 +88,7 @@
 #define NUMERUS_ERROR_GENERIC 119
 #define NUMERUS_ERROR_MALLOC_FAIL 120
 #define NUMERUS_ERROR_NULL_ROMAN 121
+#define NUMERUS_ERROR_EMPTY_ROMAN 122
 
 /* Constants with particular values and extremes */
 extern const double NUMERUS_MAX_VALUE;

@@ -120,6 +120,11 @@ short numerus_numeral_length(char *roman, int *errcode) {
         *errcode = NUMERUS_ERROR_NULL_ROMAN;
         return -1;
     }
+    if (*roman == '\0') {
+        numerus_error_code = NUMERUS_ERROR_EMPTY_ROMAN;
+        *errcode = NUMERUS_ERROR_EMPTY_ROMAN;
+        return -2;
+    }
     if (numerus_is_zero(roman)) {
         numerus_error_code = NUMERUS_OK;
         *errcode = NUMERUS_OK;
@@ -130,7 +135,7 @@ short numerus_numeral_length(char *roman, int *errcode) {
         if (i > NUMERUS_MAX_LENGTH) {
             numerus_error_code = NUMERUS_ERROR_TOO_LONG_NUMERAL;
             *errcode = NUMERUS_ERROR_TOO_LONG_NUMERAL;
-            return -2;
+            return -3;
         }
         switch (toupper(*roman)) {
             case '_': {
@@ -154,7 +159,7 @@ short numerus_numeral_length(char *roman, int *errcode) {
             default: {
                 numerus_error_code = NUMERUS_ERROR_ILLEGAL_CHARACTER;
                 *errcode = NUMERUS_ERROR_ILLEGAL_CHARACTER;
-                return -3;
+                return -4;
             }
         }
     }
