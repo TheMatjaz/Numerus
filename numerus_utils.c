@@ -111,22 +111,26 @@ short numerus_sign(char *roman) {
  * string is too long for a roman numeral, -2 if any non roman character is
  * found.
  */
-int numerus_numeral_length(char *roman, short *length) {
-    short temp = -1;
-    short *numeral_length = &temp;
-    if (length != NULL) {
-        *length = *numeral_length;
+short numerus_numeral_length(char *roman, int *errcode) {
+    if (errcode == NULL) {
+        errcode = &numerus_error_code;
+    }
+    if (roman == NULL) {
+        numerus_error_code = NUMERUS_ERROR_NULL_ROMAN;
+        *errcode = NUMERUS_ERROR_NULL_ROMAN;
+        return -1;
     }
     if (numerus_is_zero(roman)) {
-        *numeral_length = (short) strlen(NUMERUS_ZERO);
-        return NUMERUS_OK;
+        numerus_error_code = NUMERUS_OK;
+        *errcode = NUMERUS_OK;
+        return (short) strlen(NUMERUS_ZERO);
     }
     short i = 0;
     while (*roman != '\0') {
         if (i > NUMERUS_MAX_LENGTH) {
-            *numeral_length = -1;
             numerus_error_code = NUMERUS_ERROR_TOO_LONG_NUMERAL;
-            return NUMERUS_ERROR_TOO_LONG_NUMERAL;
+            *errcode = NUMERUS_ERROR_TOO_LONG_NUMERAL;
+            return -2;
         }
         switch (toupper(*roman)) {
             case '_': {
@@ -148,14 +152,15 @@ int numerus_numeral_length(char *roman, short *length) {
                 break;
             }
             default: {
-                *numeral_length = -1;
                 numerus_error_code = NUMERUS_ERROR_ILLEGAL_CHARACTER;
-                return NUMERUS_ERROR_ILLEGAL_CHARACTER;
+                *errcode = NUMERUS_ERROR_ILLEGAL_CHARACTER;
+                return -3;
             }
         }
     }
-    *numeral_length = i;
-    return NUMERUS_OK;
+    numerus_error_code = NUMERUS_OK;
+    *errcode = NUMERUS_OK;
+    return i;
 }
 
 
