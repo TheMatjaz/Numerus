@@ -22,17 +22,8 @@
 #include "numerus.h"
 
 
-/**
- * Verifies if the passed roman numeral is (-)NUMERUS_ZERO, case insensitive.
- *
- * @param *roman string containing a roman numeral to check if it is
- * NUMERUS_ZERO
- * @returns int 1 if the string is (-)NUMERUS_ZERO or 0 if it's not
- */
-short numerus_is_zero(char *roman) {
-    if (roman == NULL) {
-        return false;
-    }
+
+short _num_is_zero(char *roman) {
     if (*roman == '-') {
         roman++;
     }
@@ -41,6 +32,40 @@ short numerus_is_zero(char *roman) {
     } else {
         return true;
     };
+}
+
+void _num_headtrim_check_numeral(char **roman, int **errcode) {
+    if (*errcode == NULL) {
+        *errcode = &numerus_error_code;
+    }
+    if (*roman == NULL) {
+        numerus_error_code = NUMERUS_ERROR_NULL_ROMAN;
+        **errcode = NUMERUS_ERROR_NULL_ROMAN;
+    }
+    while (isspace(**roman)) {
+        (*roman)++;
+    }
+    if (**roman == '\0') {
+        numerus_error_code = NUMERUS_ERROR_EMPTY_ROMAN;
+        **errcode = NUMERUS_ERROR_EMPTY_ROMAN;
+    }
+    numerus_error_code = NUMERUS_OK;
+    **errcode = NUMERUS_OK;
+}
+
+/**
+ * Verifies if the passed roman numeral is (-)NUMERUS_ZERO, case insensitive.
+ *
+ * @param *roman string containing a roman numeral to check if it is
+ * NUMERUS_ZERO
+ * @returns int 1 if the string is (-)NUMERUS_ZERO or 0 if it's not
+ */
+short numerus_is_zero(char *roman, int *errcode) {
+    _num_headtrim_check_numeral(&roman, &errcode);
+    if (*errcode != NUMERUS_OK) {
+        return false;
+    }
+    return _num_is_zero(roman);
 }
 
 /**
@@ -54,30 +79,48 @@ short numerus_is_zero(char *roman) {
  * roman numeral
  * @returns int 1 if the string is a long roman numeral or 0 if it's not
  */
-short numerus_is_long_numeral(char *roman) {
-    if (roman == NULL) {
+short numerus_is_long_numeral(char *roman, int *errcode) {
+    _num_headtrim_check_numeral(&roman, &errcode);
+    if (*errcode != NUMERUS_OK) {
         return false;
     }
-    if (*roman == '_' || (*roman == '-' && *(roman+1) == '_')) {
+    short i = 0;
+    short underscores_found = 0;
+    while (*roman != '\0') {
+        if (i > NUMERUS_MAX_LENGTH) {
+            numerus_error_code = NUMERUS_ERROR_TOO_LONG_NUMERAL;
+            *errcode = NUMERUS_ERROR_TOO_LONG_NUMERAL;
+            return false;
+        }
+        if (*roman == '_') {
+            underscores_found++;
+        }
+        i++;
+        roman++;
+    }
+    if (underscores_found == 2) {
+        numerus_error_code = NUMERUS_OK;
+        *errcode = NUMERUS_OK;
         return true;
+    } else if (underscores_found == 0){
+        numerus_error_code = NUMERUS_OK;
+        *errcode = NUMERUS_OK;
+        return false;
+    } else if (underscores_found == 1){
+        numerus_error_code = NUMERUS_ERROR_MISSING_SECOND_UNDERSCORE;
+        *errcode = NUMERUS_ERROR_MISSING_SECOND_UNDERSCORE;
+        return false;
     } else {
+        numerus_error_code = NUMERUS_ERROR_UNDERSCORE_IN_SHORT_PART;
+        *errcode = NUMERUS_ERROR_UNDERSCORE_IN_SHORT_PART;
         return false;
     }
 }
 
 // Checks for an S or . and returns the index of the first found, else -1
 short numerus_is_float_numeral(char *roman, int *errcode) {
-    if (errcode == NULL) {
-        errcode = &numerus_error_code;
-    }
-    if (roman == NULL) {
-        numerus_error_code = NUMERUS_ERROR_NULL_ROMAN;
-        *errcode = NUMERUS_ERROR_NULL_ROMAN;
-        return false;
-    }
-    if (*roman == '\0') {
-        numerus_error_code = NUMERUS_ERROR_EMPTY_ROMAN;
-        *errcode = NUMERUS_ERROR_EMPTY_ROMAN;
+    _num_headtrim_check_numeral(&roman, &errcode);
+    if (*errcode != NUMERUS_OK) {
         return false;
     }
     short i = 0;
@@ -101,8 +144,12 @@ short numerus_is_float_numeral(char *roman, int *errcode) {
     return false;
 }
 
-short numerus_sign(char *roman) {
-    if (roman == NULL || numerus_is_zero(roman) || *roman == '\0') {
+short numerus_sign(char *roman, int *errcode) {
+    _num_headtrim_check_numeral(&roman, &errcode);
+    if (*errcode != NUMERUS_OK) {
+        return false;
+    }
+    if (_num_is_zero(roman)) {
         return 0;
     }
     if (*roman == '-') {
@@ -128,20 +175,11 @@ short numerus_sign(char *roman) {
  * found.
  */
 short numerus_numeral_length(char *roman, int *errcode) {
-    if (errcode == NULL) {
-        errcode = &numerus_error_code;
-    }
-    if (roman == NULL) {
-        numerus_error_code = NUMERUS_ERROR_NULL_ROMAN;
-        *errcode = NUMERUS_ERROR_NULL_ROMAN;
+    _num_headtrim_check_numeral(&roman, &errcode);
+    if (*errcode != NUMERUS_OK) {
         return -1;
     }
-    if (*roman == '\0') {
-        numerus_error_code = NUMERUS_ERROR_EMPTY_ROMAN;
-        *errcode = NUMERUS_ERROR_EMPTY_ROMAN;
-        return -2;
-    }
-    if (numerus_is_zero(roman)) {
+    if (_num_is_zero(roman)) {
         numerus_error_code = NUMERUS_OK;
         *errcode = NUMERUS_OK;
         return (short) strlen(NUMERUS_ZERO);
@@ -151,7 +189,7 @@ short numerus_numeral_length(char *roman, int *errcode) {
         if (i > NUMERUS_MAX_LENGTH) {
             numerus_error_code = NUMERUS_ERROR_TOO_LONG_NUMERAL;
             *errcode = NUMERUS_ERROR_TOO_LONG_NUMERAL;
-            return -3;
+            return -2;
         }
         switch (toupper(*roman)) {
             case '_': {
@@ -175,7 +213,7 @@ short numerus_numeral_length(char *roman, int *errcode) {
             default: {
                 numerus_error_code = NUMERUS_ERROR_ILLEGAL_CHARACTER;
                 *errcode = NUMERUS_ERROR_ILLEGAL_CHARACTER;
-                return -4;
+                return -3;
             }
         }
     }
@@ -414,28 +452,29 @@ int numerus_export_to_sqlite3(char *filename, long min_value, long max_value) {
 
 static size_t _num_pretty_print_malloc_size(char *roman) {
     size_t alloc_size = 0;
-    while (*roman != '\0') {
+    while (*roman != '\0' && *roman != ' ' && *roman != '\t' && *roman != '\n' && *roman != '\r') {
         if (*roman != '_') {
             alloc_size++;
         }
         roman++;
     }
-    alloc_size++; /* For '\n' at end of "____" line */
-    // FIXME missing length of part between underscores??
+    alloc_size++; /* For '\n' at end of first line with underscores "____" */
     return alloc_size;
 }
 
 /* TODO: USE THE LENGTH MEASURING FUNCTION TO FIND ANY ILLEGAL CHARACTERS? */
 
-char *numerus_pretty_print_long_numerals(char *roman) {
-    if (roman == NULL) {
-        return NULL;
+char *numerus_pretty_print_long_numerals(char *roman, int *errcode) {
+    _num_headtrim_check_numeral(&roman, &errcode);
+    if (*errcode != NUMERUS_OK) {
+        return false;
     }
-    if (numerus_is_long_numeral(roman)) {
+    if (numerus_is_long_numeral(roman, errcode)) {
         char *roman_start = roman;
         char *pretty_roman = malloc(_num_pretty_print_malloc_size(roman));
         if (pretty_roman == NULL) {
             numerus_error_code = NUMERUS_ERROR_MALLOC_FAIL;
+            *errcode = NUMERUS_ERROR_MALLOC_FAIL;
             return NULL;
         }
         char *pretty_roman_start = pretty_roman;
