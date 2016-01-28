@@ -10,8 +10,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <stdlib.h>
-#include "numerus.h"
-#include "numerus_test.h"
+#include "numerus_internal.h"
 
 /**
  * Converts all 95999977 possible values of roman numerals to their roman form
@@ -296,4 +295,76 @@ void numtest_parts_to_from_double_functions() {
     if (int_part != -12 || frac_part != 1) {
         fprintf(stderr, "Error at transforming double into parts.\n");
     }
+}
+
+void numtest_null_handling_conversions() {
+    char *roman = "M";
+    int errcode;
+    short frac_part;
+    long int_part;
+    double value_double;
+    value_double = numerus_roman_to_double(roman, NULL);
+    value_double = numerus_roman_to_double("", NULL);
+    value_double = numerus_roman_to_double("", &errcode);
+    value_double = numerus_roman_to_double(NULL, NULL);
+    value_double = numerus_roman_to_double(NULL, &errcode);
+    int_part = numerus_roman_to_int(roman, NULL);
+    int_part = numerus_roman_to_int("", NULL);
+    int_part = numerus_roman_to_int(NULL, &errcode);
+    int_part = numerus_roman_to_int(NULL, NULL);
+    int_part = numerus_roman_to_int_and_frac_part("", &frac_part, &errcode);
+    int_part = numerus_roman_to_int_and_frac_part(roman, &frac_part, NULL);
+    int_part = numerus_roman_to_int_and_frac_part(roman, NULL, &errcode);
+    int_part = numerus_roman_to_int_and_frac_part(NULL, &frac_part, &errcode);
+    int_part = numerus_roman_to_int_and_frac_part(roman, NULL, NULL);
+    int_part = numerus_roman_to_int_and_frac_part(NULL, NULL, &errcode);
+    int_part = numerus_roman_to_int_and_frac_part(NULL, &frac_part, NULL);
+    int_part = numerus_roman_to_int_and_frac_part(NULL, NULL, NULL);
+    roman = numerus_double_to_roman(12.3, NULL);
+    roman = numerus_int_to_roman(-3, NULL);
+    roman = numerus_int_with_twelfth_to_roman(4, -2, NULL);
+}
+
+void numtest_null_handling_utils() {
+    int errcode;
+    int result;
+    result = numerus_is_zero(NULL, &errcode);
+    result = numerus_is_zero("", &errcode);
+    result = numerus_is_zero(NULL, NULL);
+    result = numerus_is_zero("", NULL);
+    result = numerus_is_float_numeral(NULL, &errcode);
+    result = numerus_is_float_numeral("", &errcode);
+    result = numerus_is_float_numeral("", NULL);
+    result = numerus_is_long_numeral(NULL, &errcode);
+    result = numerus_is_long_numeral("", &errcode);
+    result = numerus_is_long_numeral("   ", &errcode);
+    result = numerus_is_long_numeral("  _x", &errcode);
+    result = numerus_is_long_numeral("   _x__f", &errcode);
+    result = numerus_is_long_numeral("   _x_f", &errcode);
+    result = numerus_numeral_length(NULL, &errcode);
+    result = numerus_numeral_length("", &errcode);
+    result = numerus_numeral_length(NULL, NULL);
+    result = numerus_numeral_length("", NULL);
+    result = numerus_sign(NULL, &errcode);
+    result = numerus_sign("", &errcode);
+    result = numerus_sign(NULL, NULL);
+    result = numerus_sign("", NULL);
+    result = numerus_compare_value("", "", &errcode);
+    result = numerus_compare_value(NULL, "i", &errcode);
+    result = numerus_compare_value("i", NULL, &errcode);
+    result = numerus_compare_value("i", "i", &errcode);
+    result = numerus_compare_value("i.", "i", &errcode);
+    result = numerus_compare_value("i.", "i", NULL);
+    result = numerus_compare_value(NULL, NULL, NULL);
+    char *pretty = numerus_pretty_print_long_numerals("", &errcode);
+    pretty = numerus_pretty_print_long_numerals(NULL, &errcode);
+    pretty = numerus_pretty_print_long_numerals("_", &errcode);
+    pretty = numerus_pretty_print_long_numerals("i..", &errcode);
+    pretty = numerus_pretty_print_long_numerals("i..", NULL);
+    char *fraction = numerus_shorten_fraction(13);
+    fraction = numerus_shorten_fraction(-13);
+    fraction = numerus_shorten_fraction(-0);
+    fraction = numerus_shorten_fraction(0);
+    pretty = numerus_pretty_print_float_value(20492.51, 1);
+    pretty = numerus_pretty_print_float_value(20492.51, 0);
 }
