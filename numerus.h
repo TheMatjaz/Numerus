@@ -87,6 +87,7 @@
 #define NUMERUS_ERROR_M_IN_SHORT_PART 118
 #define NUMERUS_ERROR_GENERIC 119
 #define NUMERUS_ERROR_MALLOC_FAIL 120
+#define NUMERUS_ERROR_NULL_ROMAN 121
 
 /* Constants with particular values and extremes */
 extern const double NUMERUS_MAX_VALUE;
@@ -109,7 +110,7 @@ short numerus_is_zero(char *roman);
 short numerus_is_long_numeral(char *roman);
 short numerus_is_float_numeral(char *roman);
 short numerus_sign(char *roman);
-int numerus_numeral_length(char *roman, short *length);
+short numerus_numeral_length(char *roman, int *errcode);
 short numerus_is_roman(char *roman);
 
 /* Conversion function from value to roman numeral */

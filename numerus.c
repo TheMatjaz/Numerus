@@ -475,6 +475,7 @@ long numerus_roman_to_int(char *roman, int *errcode) {
 
 long numerus_roman_to_int_and_frac_part(char *roman, short *frac_part, int *errcode) {
     long int_part;
+    int response_code;
     short zero_frac_part = 0;
     if (frac_part == NULL) {
         frac_part = &zero_frac_part;
@@ -492,7 +493,7 @@ long numerus_roman_to_int_and_frac_part(char *roman, short *frac_part, int *errc
     }
     struct _num_numeral_parser_data parser_data;
     _num_init_parser_data(&parser_data, roman);
-    int response_code = numerus_numeral_length(roman, NULL);
+    numerus_numeral_length(roman, &response_code);
     if (response_code != NUMERUS_OK) {
         numerus_error_code = response_code;
         *errcode = response_code;
