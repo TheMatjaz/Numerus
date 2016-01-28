@@ -66,27 +66,43 @@ short numerus_is_long_numeral(char *roman) {
 }
 
 // Checks for an S or . and returns the index of the first found, else -1
-short numerus_is_float_numeral(char *roman) {
+short numerus_is_float_numeral(char *roman, int *errcode) {
+    if (errcode == NULL) {
+        errcode = &numerus_error_code;
+    }
     if (roman == NULL) {
+        numerus_error_code = NUMERUS_ERROR_NULL_ROMAN;
+        *errcode = NUMERUS_ERROR_NULL_ROMAN;
+        return false;
+    }
+    if (*roman == '\0') {
+        numerus_error_code = NUMERUS_ERROR_EMPTY_ROMAN;
+        *errcode = NUMERUS_ERROR_EMPTY_ROMAN;
         return false;
     }
     short i = 0;
     while (*roman != '\0') {
         if (i > NUMERUS_MAX_LENGTH) {
-            return NUMERUS_ERROR_TOO_LONG_NUMERAL;
+            numerus_error_code = NUMERUS_ERROR_TOO_LONG_NUMERAL;
+            *errcode = NUMERUS_ERROR_TOO_LONG_NUMERAL;
+            return false;
         }
         if (*roman == 'S' || *roman == 's' || *roman == '.') {
+            numerus_error_code = NUMERUS_OK;
+            *errcode = NUMERUS_OK;
             return i;
         } else {
             i++;
         }
         roman++;
     }
-    return -1;
+    numerus_error_code = NUMERUS_OK;
+    *errcode = NUMERUS_OK;
+    return false;
 }
 
 short numerus_sign(char *roman) {
-    if (roman == NULL || numerus_is_zero(roman)) {
+    if (roman == NULL || numerus_is_zero(roman) || *roman == '\0') {
         return 0;
     }
     if (*roman == '-') {
