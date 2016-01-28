@@ -17,7 +17,6 @@
 #include <stdio.h>    /* To  `fprintf()` to `stderr` */
 #include <stdlib.h>   /* For `malloc()` */
 #include <string.h>   /* For `strcmp()` */
-#include <sqlite3.h>  /* To export all roman numerals to an SQLite3 file */
 #include <stdbool.h>  /* To use booleans `true` and `false` */
 #include "numerus_internal.h"
 
