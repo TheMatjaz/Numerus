@@ -218,10 +218,14 @@ static int _num_parse_command(char *command) {
         }
         if ((value = strtod(command, NULL)) != 0) { // a double is typed
             if (pretty_printing == 1) {
+                int errcode_pretty;
                 printf("%s\n", roman = numerus_pretty_print_long_numerals(
-                        numerus_double_to_roman(value, &errcode)));
+                        numerus_double_to_roman(value, &errcode), &errcode_pretty));
                 if (errcode != NUMERUS_OK) {
                     printf("%s\n", numerus_explain_error(errcode));
+                }
+                if (errcode_pretty != NUMERUS_OK) {
+                    printf("%s\n", numerus_explain_error(errcode_pretty));
                 }
                 free(roman);
                 return 1;
