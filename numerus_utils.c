@@ -180,23 +180,34 @@ short numerus_numeral_length(char *roman, int *errcode) {
  * second is bigger. Returns NUMERUS_ERROR_CANNOT_COMPARE if at least one of the
  * two numerals has wrong syntax and cannot be compared.
  */
-int numerus_compare_value(char *roman_bigger, char *roman_smaller) {
-    double value_bigger;
-    int errcode_bigger = numerus_roman_to_double(roman_bigger, &value_bigger);
-    double value_smaller;
-    int errcode_smaller = numerus_roman_to_double(roman_smaller, &value_smaller);
-    if (errcode_bigger != NUMERUS_OK || errcode_smaller != NUMERUS_OK) {
-        fprintf(stderr, "Roman comparition error: "
-                "cannot compare syntactically wrong numerals\n");
-        numerus_error_code = NUMERUS_ERROR_CANNOT_COMPARE;
-        return NUMERUS_ERROR_CANNOT_COMPARE;
+int numerus_compare_value(char *roman_bigger, char *roman_smaller, int *errcode) {
+    if (errcode == NULL) {
+        errcode = &numerus_error_code;
     }
-    if (value_bigger > value_smaller) {
-        return 1;
-    } else if (value_bigger == value_smaller) {
+    short frac_part_bigger;
+    long int_part_bigger = numerus_roman_to_int_and_frac_part(roman_bigger, &frac_part_bigger, errcode);
+    if (*errcode != NUMERUS_OK) {
+        numerus_error_code = *errcode;
         return 0;
-    } else {
+    }
+    short frac_part_smaller;
+    long int_part_smaller = numerus_roman_to_int_and_frac_part(roman_smaller, &frac_part_smaller, errcode);
+    if (*errcode != NUMERUS_OK) {
+        numerus_error_code = *errcode;
+        return 0;
+    }
+    if (int_part_bigger > int_part_smaller) {
+        return 1;
+    } else if (int_part_bigger < int_part_smaller) {
         return -1;
+    } else { // equal int parts
+        if (frac_part_bigger > frac_part_smaller) {
+            return 1;
+        } else if (frac_part_bigger < frac_part_smaller) {
+            return -1;
+        } else { // equal frac parts
+            return 0;
+        }
     }
 }
 
@@ -534,7 +545,6 @@ struct _num_error_codes _NUM_ERROR_CODES[] = {
         {NUMERUS_ERROR_VALUE_OUT_OF_RANGE,      "Out of range"},
         {NUMERUS_ERROR_REGEXEC,                 "Regex compilation error"},
         {NUMERUS_ERROR_SQLITE,                  "Generic SQLite3 error"},
-        {NUMERUS_ERROR_CANNOT_COMPARE,          "Cannot compare two romans because they have other errors"},
         {NUMERUS_ERROR_ILLEGAL_CHARACTER,       "Illegal character"},
         {NUMERUS_ERROR_TOO_LONG_NUMERAL,        "Too long numeral"},
         {NUMERUS_ERROR_TOO_MANY_REPEATED_CHARS, "Too many repetitions of a >repeatable< character, like MMMM or IIII"},

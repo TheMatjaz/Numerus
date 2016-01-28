@@ -68,7 +68,6 @@
  * It could not compare the two roman numerals because at least one of them
  * cannot be converted to short so it has no value.
  */
-#define NUMERUS_ERROR_CANNOT_COMPARE 104
 #define NUMERUS_ERROR_ILLEGAL_CHARACTER 105
 #define NUMERUS_ERROR_TOO_LONG_NUMERAL 106
 #define NUMERUS_IS_FLOAT 107
@@ -112,7 +111,6 @@ short numerus_is_long_numeral(char *roman);
 short numerus_is_float_numeral(char *roman);
 short numerus_sign(char *roman);
 short numerus_numeral_length(char *roman, int *errcode);
-short numerus_is_roman(char *roman);
 
 /* Conversion function from value to roman numeral */
 char *numerus_int_to_roman(long int_value, int *errcode);
@@ -130,7 +128,7 @@ double numerus_roman_to_double(char *roman, int *errcode);
 double numerus_round_to_nearest_12th(double value);
 long numerus_double_to_parts(double value, short *frac_part);
 double numerus_parts_to_double(long int_part, short frac_part);
-int numerus_compare_value(char *roman_bigger, char *roman_smaller);
+int numerus_compare_value(char *roman_bigger, char *roman_smaller, int *errcode);
 
 
 /* Export functions */
