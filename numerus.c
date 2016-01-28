@@ -13,7 +13,7 @@
 #include <stdlib.h>   /* For `malloc()` */
 #include <string.h>   /* For `strcmp()` */
 #include <stdbool.h>  /* To use booleans `true` and `false` */
-#include "numerus.h"
+#include "numerus_internal.h"
 
 
 
