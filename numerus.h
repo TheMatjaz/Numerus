@@ -131,13 +131,6 @@ double numerus_parts_to_double(long int_part, short frac_part);
 int numerus_compare_value(char *roman_bigger, char *roman_smaller, int *errcode);
 
 
-/* Export functions */
-int numerus_export_to_sqlite3(char *filename, long min_value, long max_value);
-int numerus_export_to_csv(char *filename, long min_value, long max_value,
-                          int numerals_first, char *separator, char *newline,
-                          char *quotes);
-
-
 /* Printing functions */
 char *numerus_pretty_print_long_numerals(char *roman, int *errcode);
 char *numerus_pretty_print_float_value(double double_value, int shorten);
