@@ -19,7 +19,7 @@
 #include <string.h>   /* For `strcmp()` */
 #include <sqlite3.h>  /* To export all roman numerals to an SQLite3 file */
 #include <stdbool.h>  /* To use booleans `true` and `false` */
-#include "numerus.h"
+#include "numerus_internal.h"
 
 
 
