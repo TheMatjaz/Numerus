@@ -483,14 +483,6 @@ long numerus_roman_to_int_and_frac_part(char *roman, short *frac_part, int *errc
     if (errcode == NULL) {
         errcode = &numerus_error_code;
     }
-
-    if (numerus_is_zero(roman)) {
-        int_part = 0;
-        *frac_part = 0;
-        numerus_error_code = NUMERUS_OK;
-        *errcode = NUMERUS_OK;
-        return int_part;
-    }
     struct _num_numeral_parser_data parser_data;
     _num_init_parser_data(&parser_data, roman);
     numerus_numeral_length(roman, &response_code);
@@ -498,6 +490,13 @@ long numerus_roman_to_int_and_frac_part(char *roman, short *frac_part, int *errc
         numerus_error_code = response_code;
         *errcode = response_code;
         return NUMERUS_MAX_LONG_VALUE + 10;
+    }
+    if (numerus_is_zero(roman)) {
+        int_part = 0;
+        *frac_part = 0;
+        numerus_error_code = NUMERUS_OK;
+        *errcode = NUMERUS_OK;
+        return int_part;
     }
     if (*parser_data.current_numeral_position == '-') {
         parser_data.numeral_sign = -1;
