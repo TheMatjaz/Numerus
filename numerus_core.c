@@ -440,6 +440,9 @@ static int _num_parse_decimal_part(
 }
 
 
+
+
+
 /**
  * Converts a roman numeral to its value expressed as a double.
  *
@@ -598,6 +601,7 @@ long numerus_roman_to_int_and_frac_part(char *roman, short *frac_part, int *errc
     }
     int_part = parser_data.numeral_sign * parser_data.int_part;
     *frac_part = parser_data.frac_part;
+    *frac_part = SIGN(int_part) * ABS(*frac_part);
     numerus_error_code = NUMERUS_OK;
     *errcode = NUMERUS_OK;
     return int_part;
@@ -653,6 +657,22 @@ static char *_num_value_part_to_roman(long value, char *roman, int dictionary_st
     return roman;
 }
 
+/**
+ * Shorten the twelfths by adding the remainder to the int part so that they
+ * have the same sign.
+ */
+void _num_shorten_and_prepare_parts(long *int_part, short *frac_part) {
+    *int_part += *frac_part / 12;
+    *frac_part = *frac_part % (short) 12;
+    if (*int_part > 0 && *frac_part < 0) {
+        *int_part -= 1;
+        *frac_part += 12;
+    } else if (*int_part < 0 && *frac_part > 0) {
+        *int_part += 1;
+        *frac_part -= 12;
+    }
+}
+
 char *numerus_int_to_roman(long int_value, int *errcode) {
     return numerus_int_with_twelfth_to_roman(int_value, 0, errcode);
 }
@@ -665,7 +685,7 @@ char *numerus_double_to_roman(double double_value, int *errcode) {
 
 char *numerus_int_with_twelfth_to_roman(long int_part, short frac_part, int *errcode) {
     /* Prepare variables */
-    frac_part = ABS(frac_part);
+    _num_shorten_and_prepare_parts(&int_part, &frac_part);
     double double_value = numerus_parts_to_double(int_part, frac_part);
     if (errcode == NULL) {
         errcode = &numerus_error_code;
@@ -690,6 +710,7 @@ char *numerus_int_with_twelfth_to_roman(long int_part, short frac_part, int *err
         return zero_string;
     } else if (int_part < 0) {
         int_part = ABS(int_part);
+        frac_part = ABS(frac_part);
         double_value = ABS(double_value);
         *(roman_numeral++) = '-';
     }
