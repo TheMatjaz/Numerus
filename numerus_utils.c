@@ -262,9 +262,12 @@ int numerus_compare_value(char *roman_bigger, char *roman_smaller, int *errcode)
 
 static size_t _num_pretty_print_malloc_size(char *roman) {
     size_t alloc_size = 0;
-    while (*roman != '\0' && *roman != ' ' && *roman != '\t' && *roman != '\n' && *roman != '\r') {
+    while (*roman != '\0' && !isspace(*roman)) {
         if (*roman != '_') {
             alloc_size++;
+        }
+        if (alloc_size > NUMERUS_MAX_LENGTH * 2) {
+            return 0;
         }
         roman++;
     }
