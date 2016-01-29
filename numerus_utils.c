@@ -468,7 +468,6 @@ static short _num_extract_twelfth(double value) {
 
 
 double numerus_parts_to_double(long int_part, short frac_part) {
-    frac_part = SIGN(int_part) * ABS(frac_part); // apply sign of the int_part
     return (double) (int_part) + frac_part/12.0;
 }
 
