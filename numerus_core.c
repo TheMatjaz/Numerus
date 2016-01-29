@@ -603,7 +603,7 @@ char *numerus_double_to_roman(double double_value, int *errcode) {
 
 char *numerus_int_with_twelfth_to_roman(long int_part, short frac_part, int *errcode) {
     /* Prepare variables */
-    frac_part = (short) abs(frac_part);
+    frac_part = ABS(frac_part);
     double double_value = numerus_parts_to_double(int_part, frac_part);
     if (errcode == NULL) {
         errcode = &numerus_error_code;
@@ -627,8 +627,8 @@ char *numerus_int_with_twelfth_to_roman(long int_part, short frac_part, int *err
         strcpy(zero_string, NUMERUS_ZERO);
         return zero_string;
     } else if (int_part < 0) {
-        int_part = labs(int_part);
-        double_value = fabs(double_value);
+        int_part = ABS(int_part);
+        double_value = ABS(double_value);
         *(roman_numeral++) = '-';
     }
 
