@@ -35,6 +35,7 @@ void _num_headtrim_check_numeral(char **roman, int **errcode) {
     if (*roman == NULL) {
         numerus_error_code = NUMERUS_ERROR_NULL_ROMAN;
         **errcode = NUMERUS_ERROR_NULL_ROMAN;
+        return;
     }
     while (isspace(**roman)) {
         (*roman)++;
@@ -42,6 +43,7 @@ void _num_headtrim_check_numeral(char **roman, int **errcode) {
     if (**roman == '\0') {
         numerus_error_code = NUMERUS_ERROR_EMPTY_ROMAN;
         **errcode = NUMERUS_ERROR_EMPTY_ROMAN;
+        return;
     }
     numerus_error_code = NUMERUS_OK;
     **errcode = NUMERUS_OK;
@@ -171,6 +173,7 @@ short numerus_sign(char *roman, int *errcode) {
 short numerus_numeral_length(char *roman, int *errcode) {
     _num_headtrim_check_numeral(&roman, &errcode);
     if (*errcode != NUMERUS_OK) {
+        numerus_error_code = *errcode;
         return -1;
     }
     if (_num_is_zero(roman)) {
