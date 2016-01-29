@@ -406,22 +406,38 @@ struct _num_error_codes {
 };
 
 struct _num_error_codes _NUM_ERROR_CODES[] = {
-        {NUMERUS_ERROR_WRONG_SYNTAX,            "Wrong syntax"},
-        {NUMERUS_ERROR_VALUE_OUT_OF_RANGE,      "Out of range"},
-        {NUMERUS_ERROR_REGEXEC,                 "Regex compilation error"},
-        {NUMERUS_ERROR_SQLITE,                  "Generic SQLite3 error"},
-        {NUMERUS_ERROR_ILLEGAL_CHARACTER,       "Illegal character"},
-        {NUMERUS_ERROR_TOO_LONG_NUMERAL,        "Too long numeral"},
-        {NUMERUS_ERROR_TOO_MANY_REPEATED_CHARS, "Too many repetitions of a >repeatable< character, like MMMM or IIII"},
-        {NUMERUS_ERROR_ILLEGAL_CHAR_SEQUENCE,     "Illegal sequence or order of roman characters"},
-        {NUMERUS_ERROR_MISSING_SECOND_UNDERSCORE, "Missing second underscore"},
-        {NUMERUS_ERROR_UNDERSCORE_IN_SHORT_PART,  "Underscore after second one"},
-        {NUMERUS_ERROR_DECIMALS_IN_LONG_PART,     "Decimals between underscores"},
-        {NUMERUS_ERROR_ILLEGAL_MINUS,             "Minus sign (-) in illegal position"},
-        {NUMERUS_ERROR_M_IN_SHORT_PART,           "`M` symbol after underscores"},
-        {NUMERUS_ERROR_UNDERSCORE_IN_NON_LONG,    "Underscore in non long numeral"},
-        {NUMERUS_OK,                              "OK"},
-        {0,                                       "End reached"}
+    {NUMERUS_ERROR_VALUE_OUT_OF_RANGE,
+            "The value to be converted to roman is out of conversion range."},
+    {NUMERUS_ERROR_ILLEGAL_CHARACTER,
+            "The roman numeral contains a character that is not part of the syntax of roman numerals."},
+    {NUMERUS_ERROR_TOO_LONG_NUMERAL,
+            "The roman numeral is too long to be syntactically correct."},
+    {NUMERUS_ERROR_TOO_MANY_REPEATED_CHARS,
+            "The roman numeral contains too many consecutive repetitions of a repeatable character."},
+    {NUMERUS_ERROR_ILLEGAL_CHAR_SEQUENCE,
+            "The roman numeral contains mispositioned characters."},
+    {NUMERUS_ERROR_MISSING_SECOND_UNDERSCORE,
+            "The roman numeral contains one underscore but not the second one."},
+    {NUMERUS_ERROR_UNDERSCORE_AFTER_LONG_PART,
+            "The long roman numeral contains one underscore after the second one."},
+    {NUMERUS_ERROR_UNDERSCORE_IN_NON_LONG,
+            "The non-long roman numeral contains one underscore."},
+    {NUMERUS_ERROR_DECIMALS_IN_LONG_PART,
+            "The long roman numeral contains decimal characters \"Ss.\" in the long part."},
+    {NUMERUS_ERROR_ILLEGAL_MINUS,
+            "The roman numeral contains a misplaced minus '-' or more than one."},
+    {NUMERUS_ERROR_M_IN_SHORT_PART,
+            "The long roman numeral contains an 'M' character after the long part."},
+    {NUMERUS_ERROR_MALLOC_FAIL,
+            "Heap memory allocation failure."},
+    {NUMERUS_ERROR_NULL_ROMAN,
+            "The pointer to the roman numeral string is NULL."},
+    {NUMERUS_ERROR_EMPTY_ROMAN,
+            "The roman numeral string is empty or filled with whitespace."},
+    {NUMERUS_OK,
+            "Everything went all right."},
+    {NUMERUS_ERROR_GENERIC,
+            "An unknown or unspecified error happened."}
 };
 
 const char *numerus_explain_error(int error_code) {
@@ -433,7 +449,7 @@ const char *numerus_explain_error(int error_code) {
             current_code++;
         }
     }
-    return "ERROR CODE NOT FOUND";
+    return "An unknown or unspecified error happened.";
 }
 
 

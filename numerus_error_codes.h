@@ -23,7 +23,7 @@
 #define NUMERUS_ERROR_GENERIC 100
 
 /**
- * The value to be converted to roman is out of conversion range.
+ * The value to be converted to roman numeral is out of conversion range.
  *
  * The value should be within [NUMERUS_MAX_VALUE, NUMERUS_MIN_VALUE].
  */
