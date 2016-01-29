@@ -47,7 +47,7 @@ double numerus_roman_to_double(char *roman, int *errcode);
 /* Utility functions */
 long numerus_double_to_parts(double value, short *frac_part);
 double numerus_parts_to_double(long int_part, short frac_part);
-int numerus_compare_value(char *roman_bigger, char *roman_smaller, int *errcode);
+short numerus_compare_value(char *roman_bigger, char *roman_smaller, int *errcode);
 
 
 /* Printing functions */

@@ -228,7 +228,7 @@ short numerus_numeral_length(char *roman, int *errcode) {
  * second is bigger. Returns NUMERUS_ERROR_CANNOT_COMPARE if at least one of the
  * two numerals has wrong syntax and cannot be compared.
  */
-int numerus_compare_value(char *roman_bigger, char *roman_smaller, int *errcode) {
+short numerus_compare_value(char *roman_bigger, char *roman_smaller, int *errcode) {
     if (errcode == NULL) {
         errcode = &numerus_error_code;
     }
