@@ -401,7 +401,7 @@ static int _num_parse_part_after_underscores(
     }
     if (*(parser_data->current_numeral_position) == '_') {
         if (parser_data->numeral_is_long) {
-            return NUMERUS_ERROR_UNDERSCORE_IN_SHORT_PART;
+            return NUMERUS_ERROR_UNDERSCORE_AFTER_LONG_PART;
         } else {
             return NUMERUS_ERROR_UNDERSCORE_IN_NON_LONG;
         }
@@ -428,7 +428,7 @@ static int _num_parse_decimal_part(
     }
     if (*(parser_data->current_numeral_position) == '_') {
         if (parser_data->numeral_is_long) {
-            return NUMERUS_ERROR_UNDERSCORE_IN_SHORT_PART;
+            return NUMERUS_ERROR_UNDERSCORE_AFTER_LONG_PART;
         } else {
             return NUMERUS_ERROR_UNDERSCORE_IN_NON_LONG;
         }

@@ -5,11 +5,6 @@
  * <http://matjaz.it>. All rights reserved.
  * @license This file is part of the Numerus project which is released under
  * the BSD 3-clause license.
- *
- * Inspired by:
- *
- * - http://stackoverflow.com/a/26723344/5292928
- * - http://stackoverflow.com/a/30816418/5292928
  */
 
 #include <math.h>     /* For `round()`  */
@@ -110,8 +105,8 @@ short numerus_is_long_numeral(char *roman, int *errcode) {
         *errcode = NUMERUS_ERROR_MISSING_SECOND_UNDERSCORE;
         return false;
     } else {
-        numerus_error_code = NUMERUS_ERROR_UNDERSCORE_IN_SHORT_PART;
-        *errcode = NUMERUS_ERROR_UNDERSCORE_IN_SHORT_PART;
+        numerus_error_code = NUMERUS_ERROR_UNDERSCORE_AFTER_LONG_PART;
+        *errcode = NUMERUS_ERROR_UNDERSCORE_AFTER_LONG_PART;
         return false;
     }
 }

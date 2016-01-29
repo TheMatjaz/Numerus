@@ -221,9 +221,9 @@ static void _num_test_for_error(char *roman, int error_code) {
  * @see _num_test_for_error(char *roman, int error_code)
  */
 void numtest_roman_syntax_errors() {
-    _num_test_for_error("-_MCM_XX_I", NUMERUS_ERROR_UNDERSCORE_IN_SHORT_PART);
-    _num_test_for_error("-_MCM__I", NUMERUS_ERROR_UNDERSCORE_IN_SHORT_PART);
-    _num_test_for_error("-_MCM_LI_", NUMERUS_ERROR_UNDERSCORE_IN_SHORT_PART);
+    _num_test_for_error("-_MCM_XX_I", NUMERUS_ERROR_UNDERSCORE_AFTER_LONG_PART);
+    _num_test_for_error("-_MCM__I", NUMERUS_ERROR_UNDERSCORE_AFTER_LONG_PART);
+    _num_test_for_error("-_MCM_LI_", NUMERUS_ERROR_UNDERSCORE_AFTER_LONG_PART);
 
     _num_test_for_error("-MMCM-LI", NUMERUS_ERROR_ILLEGAL_MINUS);
     _num_test_for_error("--_MCM_LI", NUMERUS_ERROR_ILLEGAL_MINUS);
