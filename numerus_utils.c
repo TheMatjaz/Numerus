@@ -456,26 +456,6 @@ const char *numerus_explain_error(int error_code) {
 }
 
 
-double numerus_round_to_nearest_12th(double value) {
-    /*
-     * 0.000000000000000
-     * 0.083333333333333
-     * 0.166666666666666
-     * 0.250000000000000
-     * 0.333333333333333
-     * 0.416666666666666
-     * 0.500000000000000
-     * 0.583333333333333
-     * 0.666666666666666
-     * 0.750000000000000
-     * 0.833333333333333
-     * 0.916666666666666
-     */
-    value = round(value * 12) / 12; /* Round to nearest twelfth */
-    //value = round(value * 100000) / 100000; /* Round to 6 decimal places */
-    return value;
-}
-
 /* pass it values in [0, 1[ to round to the nearest twelfth. Returns the numerator from 0 to 11 */
 static short _num_extract_twelfth(double value) {
     value = round(value * 12) / 12; /* Round to nearest twelfth */
