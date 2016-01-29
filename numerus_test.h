@@ -12,3 +12,6 @@ void numtest_roman_syntax_errors();
 int numtest_convert_all_integers_with_parts();
 int numtest_convert_all_integers_with_doubles();
 int numtest_convert_all_floats_with_parts();
+void numtest_parts_to_from_double_functions();
+void numtest_null_handling_conversions();
+void numtest_null_handling_utils();

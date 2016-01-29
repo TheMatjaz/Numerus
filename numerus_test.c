@@ -10,8 +10,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <stdlib.h>
-#include "numerus.h"
-#include "numerus_test.h"
+#include "numerus_internal.h"
 
 /**
  * Converts all 95999977 possible values of roman numerals to their roman form
@@ -44,7 +43,7 @@ int numtest_convert_all_floats_with_parts() {
                         int_part, frac_part, numerus_explain_error(errcode));
                 return 1;
             }
-            errcode = numerus_roman_to_int_and_frac_part(roman, &int_part_converted, &frac_part_converted);
+            int_part_converted = numerus_roman_to_int_and_frac_part(roman, &frac_part_converted, &errcode);
             if (errcode != NUMERUS_OK) {
                 fprintf(stderr, "Error converting %s to value: %s.\n",
                         roman, numerus_explain_error(errcode));
@@ -88,7 +87,7 @@ int numtest_convert_all_floats_with_doubles() {
                         int_part, frac_part, to_convert, numerus_explain_error(errcode));
                 return 1;
             }
-            errcode = numerus_roman_to_double(roman, &converted);
+            converted = numerus_roman_to_double(roman, &errcode);
             if (errcode != NUMERUS_OK) {
                 fprintf(stderr, "Error converting %s to value: %s.\n",
                         roman, numerus_explain_error(errcode));
@@ -128,7 +127,7 @@ int numtest_convert_all_integers_with_parts() {
                     int_part, numerus_explain_error(errcode));
             return 1;
         }
-        errcode = numerus_roman_to_int(roman, &converted);
+        converted = numerus_roman_to_int(roman, &errcode);
         if (errcode != NUMERUS_OK) {
             fprintf(stderr, "Error converting %s to value: %s\n",
                     roman, numerus_explain_error(errcode));
@@ -169,7 +168,7 @@ int numtest_convert_all_integers_with_doubles() {
                     to_convert, numerus_explain_error(errcode));
             return 1;
         }
-        errcode = numerus_roman_to_double(roman, &converted);
+        converted = numerus_roman_to_double(roman, &errcode);
         if (errcode != NUMERUS_OK) {
             fprintf(stderr, "Error converting %s to value: %s\n",
                     roman, numerus_explain_error(errcode));
@@ -200,15 +199,14 @@ int numtest_convert_all_integers_with_doubles() {
  * conversion when the syntax is correct.
  */
 static void _num_test_for_error(char *roman, int error_code) {
-    double value = 0.0;
-    int code = NUMERUS_OK;
-    code = numerus_roman_to_double(roman, &value);
-    if (code == error_code) {
+    int errcode;
+    double value = numerus_roman_to_double(roman, &errcode);
+    if (errcode == error_code) {
         fprintf(stderr, "Test passed: %s raises error \"%s\"\n",
-                roman, numerus_explain_error(code));
+                roman, numerus_explain_error(errcode));
     } else {
         fprintf(stderr, "Test FAILED: %s raises \"%s\" instead of \"%s\"\n",
-                roman, numerus_explain_error(code),
+                roman, numerus_explain_error(errcode),
                 numerus_explain_error(error_code));
     }
 }
@@ -223,9 +221,9 @@ static void _num_test_for_error(char *roman, int error_code) {
  * @see _num_test_for_error(char *roman, int error_code)
  */
 void numtest_roman_syntax_errors() {
-    _num_test_for_error("-_MCM_XX_I", NUMERUS_ERROR_UNDERSCORE_IN_SHORT_PART);
-    _num_test_for_error("-_MCM__I", NUMERUS_ERROR_UNDERSCORE_IN_SHORT_PART);
-    _num_test_for_error("-_MCM_LI_", NUMERUS_ERROR_UNDERSCORE_IN_SHORT_PART);
+    _num_test_for_error("-_MCM_XX_I", NUMERUS_ERROR_UNDERSCORE_AFTER_LONG_PART);
+    _num_test_for_error("-_MCM__I", NUMERUS_ERROR_UNDERSCORE_AFTER_LONG_PART);
+    _num_test_for_error("-_MCM_LI_", NUMERUS_ERROR_UNDERSCORE_AFTER_LONG_PART);
 
     _num_test_for_error("-MMCM-LI", NUMERUS_ERROR_ILLEGAL_MINUS);
     _num_test_for_error("--_MCM_LI", NUMERUS_ERROR_ILLEGAL_MINUS);
@@ -261,4 +259,112 @@ void numtest_roman_syntax_errors() {
     _num_test_for_error("-CCX_II", NUMERUS_ERROR_UNDERSCORE_IN_NON_LONG);
 
     _num_test_for_error("IVI", NUMERUS_ERROR_ILLEGAL_CHAR_SEQUENCE);
+}
+
+void numtest_parts_to_from_double_functions() {
+    double a1 = numerus_parts_to_double(12, 3);
+    double a2 = numerus_parts_to_double(12, -3);
+    if (a1 != a2) {
+        fprintf(stderr, "Error at transforming parts into double.\n");
+    }
+    double b1 = numerus_parts_to_double(-12, 3);
+    double b2 = numerus_parts_to_double(-12, -3);
+    if (b1 != b2) {
+        fprintf(stderr, "Error at transforming parts into double.\n");
+    }
+    double c1 = numerus_parts_to_double(0, 3);
+    double c2 = numerus_parts_to_double(0, -3);
+    double c3 = numerus_parts_to_double(-0, 3);
+    double c4 = numerus_parts_to_double(-0, -3);
+    if (c1 != c2 || c1 != c3 || c1 != c4) {
+        fprintf(stderr, "Error at transforming parts into double.\n");
+    }
+    double d1 = numerus_parts_to_double(0, 0);
+    double d2 = numerus_parts_to_double(0, -0);
+    double d3 = numerus_parts_to_double(-0, 0);
+    double d4 = numerus_parts_to_double(-0, -0);
+    if (d1 != d2 || d1 != d3 || d1 != d4) {
+        fprintf(stderr, "Error at transforming parts into double.\n");
+    }
+    short frac_part;
+    long int_part = numerus_double_to_parts(12.08333, &frac_part);
+    if (int_part != 12 || frac_part != 1) {
+        fprintf(stderr, "Error at transforming double into parts.\n");
+    }
+    int_part = numerus_double_to_parts(-12.08333, &frac_part);
+    if (int_part != -12 || frac_part != 1) {
+        fprintf(stderr, "Error at transforming double into parts.\n");
+    }
+}
+
+void numtest_null_handling_conversions() {
+    char *roman = "M";
+    int errcode;
+    short frac_part;
+    long int_part;
+    double value_double;
+    value_double = numerus_roman_to_double(roman, NULL);
+    value_double = numerus_roman_to_double("", NULL);
+    value_double = numerus_roman_to_double("", &errcode);
+    value_double = numerus_roman_to_double(NULL, NULL);
+    value_double = numerus_roman_to_double(NULL, &errcode);
+    int_part = numerus_roman_to_int(roman, NULL);
+    int_part = numerus_roman_to_int("", NULL);
+    int_part = numerus_roman_to_int(NULL, &errcode);
+    int_part = numerus_roman_to_int(NULL, NULL);
+    int_part = numerus_roman_to_int_and_frac_part("", &frac_part, &errcode);
+    int_part = numerus_roman_to_int_and_frac_part(roman, &frac_part, NULL);
+    int_part = numerus_roman_to_int_and_frac_part(roman, NULL, &errcode);
+    int_part = numerus_roman_to_int_and_frac_part(NULL, &frac_part, &errcode);
+    int_part = numerus_roman_to_int_and_frac_part(roman, NULL, NULL);
+    int_part = numerus_roman_to_int_and_frac_part(NULL, NULL, &errcode);
+    int_part = numerus_roman_to_int_and_frac_part(NULL, &frac_part, NULL);
+    int_part = numerus_roman_to_int_and_frac_part(NULL, NULL, NULL);
+    roman = numerus_double_to_roman(12.3, NULL);
+    roman = numerus_int_to_roman(-3, NULL);
+    roman = numerus_int_with_twelfth_to_roman(4, -2, NULL);
+}
+
+void numtest_null_handling_utils() {
+    int errcode;
+    int result;
+    result = numerus_is_zero(NULL, &errcode);
+    result = numerus_is_zero("", &errcode);
+    result = numerus_is_zero(NULL, NULL);
+    result = numerus_is_zero("", NULL);
+    result = numerus_is_float_numeral(NULL, &errcode);
+    result = numerus_is_float_numeral("", &errcode);
+    result = numerus_is_float_numeral("", NULL);
+    result = numerus_is_long_numeral(NULL, &errcode);
+    result = numerus_is_long_numeral("", &errcode);
+    result = numerus_is_long_numeral("   ", &errcode);
+    result = numerus_is_long_numeral("  _x", &errcode);
+    result = numerus_is_long_numeral("   _x__f", &errcode);
+    result = numerus_is_long_numeral("   _x_f", &errcode);
+    result = numerus_numeral_length(NULL, &errcode);
+    result = numerus_numeral_length("", &errcode);
+    result = numerus_numeral_length(NULL, NULL);
+    result = numerus_numeral_length("", NULL);
+    result = numerus_sign(NULL, &errcode);
+    result = numerus_sign("", &errcode);
+    result = numerus_sign(NULL, NULL);
+    result = numerus_sign("", NULL);
+    result = numerus_compare_value("", "", &errcode);
+    result = numerus_compare_value(NULL, "i", &errcode);
+    result = numerus_compare_value("i", NULL, &errcode);
+    result = numerus_compare_value("i", "i", &errcode);
+    result = numerus_compare_value("i.", "i", &errcode);
+    result = numerus_compare_value("i.", "i", NULL);
+    result = numerus_compare_value(NULL, NULL, NULL);
+    char *pretty = numerus_pretty_print_long_numerals("", &errcode);
+    pretty = numerus_pretty_print_long_numerals(NULL, &errcode);
+    pretty = numerus_pretty_print_long_numerals("_", &errcode);
+    pretty = numerus_pretty_print_long_numerals("i..", &errcode);
+    pretty = numerus_pretty_print_long_numerals("i..", NULL);
+    char *fraction = numerus_shorten_fraction(13);
+    fraction = numerus_shorten_fraction(-13);
+    fraction = numerus_shorten_fraction(-0);
+    fraction = numerus_shorten_fraction(0);
+    pretty = numerus_pretty_print_float_value(20492.51, 1);
+    pretty = numerus_pretty_print_float_value(20492.51, 0);
 }
