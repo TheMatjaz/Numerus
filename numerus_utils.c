@@ -66,7 +66,7 @@ short numerus_is_zero(char *roman, int *errcode) {
 
 /**
  * Verifies if the passed roman numeral is a long numeral, outside
- * [NUMERUS_MIN_SHORT_VALUE, NUMERUS_MAX_SHORT_VALUE].
+ * [NUMERUS_MIN_NONLONG_FLOAT_VALUE, NUMERUS_MAX_NONLONG_FLOAT_VALUE].
  *
  * Does **not** perform a syntax check. Any string starting with "-_" or "-"
  * would return a true result.

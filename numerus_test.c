@@ -35,7 +35,8 @@ int numtest_convert_all_floats_with_parts() {
     int errcode;
     printf("Starting conversion of all roman numerals with parts\n");
     clock_t start_clock = clock();
-    for (int_part = NUMERUS_MIN_LONG_VALUE; int_part <= NUMERUS_MAX_LONG_VALUE; int_part++) {
+    for (int_part = NUMERUS_MIN_LONG_NONFLOAT_VALUE; int_part <=
+                                                     NUMERUS_MAX_LONG_NONFLOAT_VALUE; int_part++) {
         for (frac_part = 0; frac_part < 12; frac_part++) {
             roman = numerus_int_with_twelfth_to_roman(int_part, frac_part, &errcode);
             if (errcode != NUMERUS_OK) {
@@ -57,7 +58,8 @@ int numtest_convert_all_floats_with_parts() {
             free(roman);
         }
         if (int_part % 100000 == 0) {
-            printf("%5.2f%%\n", 100.0 * (int_part + NUMERUS_MAX_LONG_VALUE) / 7999999.0);
+            printf("%5.2f%%\n", 100.0 * (int_part +
+                                         NUMERUS_MAX_LONG_NONFLOAT_VALUE) / 7999999.0);
         }
     }
     clock_t end_clock = clock();
@@ -78,7 +80,8 @@ int numtest_convert_all_floats_with_doubles() {
     int errcode;
     printf("Starting conversion of all roman numerals with doubles \n");
     clock_t start_clock = clock();
-    for (int_part = NUMERUS_MIN_LONG_VALUE; int_part <= NUMERUS_MAX_LONG_VALUE; int_part++) {
+    for (int_part = NUMERUS_MIN_LONG_NONFLOAT_VALUE; int_part <=
+                                                     NUMERUS_MAX_LONG_NONFLOAT_VALUE; int_part++) {
         for (frac_part = 0; frac_part < 12; frac_part++) {
             to_convert = numerus_parts_to_double(int_part, frac_part);
             roman = numerus_double_to_roman(to_convert, &errcode);
@@ -101,7 +104,8 @@ int numtest_convert_all_floats_with_doubles() {
             free(roman);
         }
         if (int_part % 100000 == 0) {
-            printf("%5.2f%%\n", 100.0 * (int_part + NUMERUS_MAX_LONG_VALUE) / 7999999.0);
+            printf("%5.2f%%\n", 100.0 * (int_part +
+                                         NUMERUS_MAX_LONG_NONFLOAT_VALUE) / 7999999.0);
         }
     }
     clock_t end_clock = clock();
@@ -120,7 +124,8 @@ int numtest_convert_all_integers_with_parts() {
     int errcode;
     printf("Starting conversion of all integer roman numerals with parts \n");
     clock_t start_clock = clock();
-    for (int_part = NUMERUS_MIN_LONG_VALUE; int_part <= NUMERUS_MAX_LONG_VALUE; int_part++) {
+    for (int_part = NUMERUS_MIN_LONG_NONFLOAT_VALUE; int_part <=
+                                                     NUMERUS_MAX_LONG_NONFLOAT_VALUE; int_part++) {
         roman = numerus_int_to_roman(int_part, &errcode);
         if (errcode != NUMERUS_OK) {
             fprintf(stderr, "Error converting %ld to roman: %s\n",
@@ -140,7 +145,8 @@ int numtest_convert_all_integers_with_parts() {
         }
         free(roman);
         if (int_part % 100000 == 0) {
-            printf("%5.2f%%\n", 100.0 * (int_part + NUMERUS_MAX_LONG_VALUE) / 7999999.0);
+            printf("%5.2f%%\n", 100.0 * (int_part +
+                                         NUMERUS_MAX_LONG_NONFLOAT_VALUE) / 7999999.0);
         }
     }
     clock_t end_clock = clock();
@@ -160,7 +166,8 @@ int numtest_convert_all_integers_with_doubles() {
     int errcode;
     printf("Starting conversion of all integer roman numerals with doubles \n");
     clock_t start_clock = clock();
-    for (int_part = NUMERUS_MIN_LONG_VALUE; int_part <= NUMERUS_MAX_LONG_VALUE; int_part++) {
+    for (int_part = NUMERUS_MIN_LONG_NONFLOAT_VALUE; int_part <=
+                                                     NUMERUS_MAX_LONG_NONFLOAT_VALUE; int_part++) {
         to_convert = numerus_parts_to_double(int_part, 0);
         roman = numerus_double_to_roman(to_convert, &errcode);
         if (errcode != NUMERUS_OK) {
@@ -181,7 +188,8 @@ int numtest_convert_all_integers_with_doubles() {
         }
         free(roman);
         if (int_part % 100000 == 0) {
-            printf("%5.2f%%\n", 100.0 * (int_part + NUMERUS_MAX_LONG_VALUE) / 7999999.0);
+            printf("%5.2f%%\n", 100.0 * (int_part +
+                                         NUMERUS_MAX_LONG_NONFLOAT_VALUE) / 7999999.0);
         }
     }
     clock_t end_clock = clock();

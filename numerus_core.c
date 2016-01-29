@@ -1,5 +1,5 @@
 /**
- * @file numerus.c
+ * @file numerus_core.c
  * @brief Numerus constants and functions for roman numerals conversion.
  * @copyright Copyright © 2015-2016, Matjaž Guštin <dev@matjaz.it>
  * <http://matjaz.it>. All rights reserved.
@@ -7,11 +7,9 @@
  * the BSD 3-clause license.
  */
 
-#include <math.h>     /* For `abs()`    */
-#include <ctype.h>    /* For `upcase()` */
-#include <stdio.h>    /* To  `fprintf()` to `stderr` */
+#include <ctype.h>    /* For `isspace()` */
 #include <stdlib.h>   /* For `malloc()` */
-#include <string.h>   /* For `strcmp()` */
+#include <string.h>   /* For `strlen()`, `strncasecmp()`, `strcpy()` */
 #include <stdbool.h>  /* To use booleans `true` and `false` */
 #include "numerus_internal.h"
 
@@ -22,69 +20,72 @@
 
 
 /**
- * Maximum value a long roman numeral (with '_') may have.
+ * The maximum value a roman numeral with underscores without decimals may have.
  */
-const long int NUMERUS_MAX_LONG_VALUE = 3999999;
-
-
-const double NUMERUS_MAX_VALUE = NUMERUS_MAX_LONG_VALUE + 11.5 / 12.0; // for the rounding to the nearest twelfth
+const long NUMERUS_MAX_LONG_NONFLOAT_VALUE = 3999999;
 
 
 /**
- * Minimum value a long a roman numeral (with '_') may have.
+ * The maximum value a roman numeral may have.
+ *
+ * This is for a positive long and float roman numeral. It exceeds the actual
+ * maximum value by 1/24 because conversion functions round the value to the
+ * nearest 12th.
  */
-const long int NUMERUS_MIN_LONG_VALUE = -NUMERUS_MAX_LONG_VALUE;
+const double NUMERUS_MAX_VALUE = NUMERUS_MAX_LONG_NONFLOAT_VALUE + 11.5 / 12.0;
 
 
+/**
+ * The minimum value a roman numeral with underscores without decimals may have.
+ *
+ * It's the opposite of NUMERUS_MAX_LONG_NONFLOAT_VALUE.s
+ */
+const long int NUMERUS_MIN_LONG_NONFLOAT_VALUE = -NUMERUS_MAX_LONG_NONFLOAT_VALUE;
+
+
+/**
+ * The minimum value a roman numeral may have.
+ *
+ * It's the opposite of NUMERUS_MAX_VALUE. This is for a negative long and float
+ * roman numeral. It is below the actual maximum value by 1/24 because
+ * conversion functions round the value to the nearest 12th.
+ */
 const double NUMERUS_MIN_VALUE = -NUMERUS_MAX_VALUE;
 
 
 /**
- * Maximum value a short roman numeral (without '_') may have.
+ * The maximum value a roman numeral without underscores with decimals may have.
+ *
+ * If you floor() this value, you get the maximum value the standard roman
+ * syntax allows.
  */
-const double NUMERUS_MAX_SHORT_VALUE = 3999 + 11.5 / 12.0;
+const double NUMERUS_MAX_NONLONG_FLOAT_VALUE = 3999 + 11.5 / 12.0;
 
 
 /**
- * Minimum value a short roman numeral (without '_') may have.
+ * The minimum value a roman numeral without underscores with decimals may have.
+ *
+ * If you ceil() this value, you get the minimum value the standard roman
+ * syntax allows.
  */
-const double NUMERUS_MIN_SHORT_VALUE = -NUMERUS_MAX_SHORT_VALUE;
+const double NUMERUS_MIN_NONLONG_FLOAT_VALUE = -NUMERUS_MAX_NONLONG_FLOAT_VALUE;
 
 
 /**
- * Roman numeral of value 0 (zero).
+ * The roman numeral of value 0 (zero).
+ *
+ * Both for positive and negative zero.
  */
 const char *NUMERUS_ZERO = "NULLA";
 
 
 /**
- * Maximum length of a float roman numeral string including the null terminator.
+ * The maximum length a roman numeral string may have, including '\0'.
  *
  * The roman numeral `"-_MMMDCCCLXXXVIII_DCCCLXXXVIIIS....."`
- * (value: -3888888 - 11+12) + `\0` is a string long 36+1 = 37 chars.
+ * (value: -3888888, -11/12) + `\0` is a string long 36+1 = 37 chars.
  */
 const short int NUMERUS_MAX_LENGTH = 37;
-
-
-/**
- * Maximum length of a long non-float roman numeral string including the null
- * terminator.
- *
- * The roman numeral `"-_MMMDCCCLXXXVIII_DCCCLXXXVIII"`
- * (value: -3888888) + `\0` is a string long 30+1 = 31 chars.
- */
-const short int NUMERUS_MAX_LONG_LENGTH = 31;
-
-
-/**
- * Maximum length of a short non-long non-float roman numeral string including
- * the null terminator.
- *
- * The roman numeral `"-MMMDCCCLXXXVIII"`
- * (value: -3888) + `\0` is a string long 16+1 = 17 chars.
- */
-const short int NUMERUS_MAX_SHORT_LENGTH = 17;
-
 
 
 
@@ -92,7 +93,7 @@ const short int NUMERUS_MAX_SHORT_LENGTH = 17;
 
 
 /**
- * Global error code variable to store any errors during conversions.
+ * The elobal error code variable to store any errors during conversions.
  *
  * It may contain any of the NUMERUS_ERROR_* error codes or NUMERUS_OK.
  */
@@ -133,20 +134,20 @@ struct _num_dictionary_char {
 static const struct _num_dictionary_char _NUM_DICTIONARY[] = {
     { 1000, "M" ,  3 }, // index: 0
     {  900, "CM",  1 }, // index: 1
-    {  500, "D" ,  1 },
-    {  400, "CD",  1 },
-    {  100, "C" ,  3 },
-    {   90, "XC",  1 },
-    {   50, "L" ,  1 },
-    {   40, "XL",  1 },
-    {   10, "X" ,  3 },
-    {    9, "IX",  1 },
-    {    5, "V" ,  1 },
-    {    4, "IV",  1 },
-    {    1, "I" ,  3 },
+    {  500, "D" ,  1 }, // index: 2
+    {  400, "CD",  1 }, // index: 3
+    {  100, "C" ,  3 }, // index: 4
+    {   90, "XC",  1 }, // index: 5
+    {   50, "L" ,  1 }, // index: 6
+    {   40, "XL",  1 }, // index: 7
+    {   10, "X" ,  3 }, // index: 8
+    {    9, "IX",  1 }, // index: 9
+    {    5, "V" ,  1 }, // index: 10
+    {    4, "IV",  1 }, // index: 11
+    {    1, "I" ,  3 }, // index: 12
     {    6, "S" ,  1 }, // index: 13
-    {    1, "." ,  5 },
-    {    0, NULL,  0 }
+    {    1, "." ,  5 }, // index: 14
+    {    0, NULL,  0 }  // index: 15
 };
 
 
@@ -489,7 +490,7 @@ long numerus_roman_to_int_and_frac_part(char *roman, short *frac_part, int *errc
     if (response_code != NUMERUS_OK) {
         numerus_error_code = response_code;
         *errcode = response_code;
-        return NUMERUS_MAX_LONG_VALUE + 10;
+        return NUMERUS_MAX_LONG_NONFLOAT_VALUE + 10;
     }
     while (isspace(*roman)) {
         roman++;
@@ -514,7 +515,7 @@ long numerus_roman_to_int_and_frac_part(char *roman, short *frac_part, int *errc
         if (response_code != NUMERUS_OK) {
             numerus_error_code = response_code;
             *errcode = response_code;
-            return NUMERUS_MAX_LONG_VALUE + 10;
+            return NUMERUS_MAX_LONG_NONFLOAT_VALUE + 10;
         }
         parser_data.current_numeral_position++; // skip second underscore
         parser_data.int_part *= 1000;
@@ -526,13 +527,13 @@ long numerus_roman_to_int_and_frac_part(char *roman, short *frac_part, int *errc
     if (response_code != NUMERUS_OK) {
         numerus_error_code = response_code;
         *errcode = response_code;
-        return NUMERUS_MAX_LONG_VALUE + 10;
+        return NUMERUS_MAX_LONG_NONFLOAT_VALUE + 10;
     }
     response_code = _num_parse_decimal_part(&parser_data);
     if (response_code != NUMERUS_OK) {
         numerus_error_code = response_code;
         *errcode = response_code;
-        return NUMERUS_MAX_LONG_VALUE + 10;
+        return NUMERUS_MAX_LONG_NONFLOAT_VALUE + 10;
     }
     int_part = parser_data.numeral_sign * parser_data.int_part;
     *frac_part = parser_data.frac_part;
@@ -633,7 +634,7 @@ char *numerus_int_with_twelfth_to_roman(long int_part, short frac_part, int *err
     }
 
     /* Create part between underscores */
-    if (double_value > NUMERUS_MAX_SHORT_VALUE) { /* Underscores are needed */
+    if (double_value > NUMERUS_MAX_NONLONG_FLOAT_VALUE) { /* Underscores are needed */
         *(roman_numeral++) = '_';
         roman_numeral = _num_value_part_to_roman(int_part / 1000, roman_numeral, 0); /* Integer cast to avoid decimals in part between underscores */
         int_part -= (int_part / 1000) * 1000; /* Remove the three left-most digits because of the integer division */

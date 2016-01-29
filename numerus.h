@@ -9,28 +9,24 @@
 
 #include "numerus_error_codes.h"
 
-/* Constants with particular values and extremes */
-extern const double NUMERUS_MAX_VALUE;
-extern const long NUMERUS_MAX_LONG_VALUE;
-extern const double NUMERUS_MIN_VALUE;
-extern const long NUMERUS_MIN_LONG_VALUE;
-extern const double NUMERUS_MAX_SHORT_VALUE;
-extern const double NUMERUS_MIN_SHORT_VALUE;
-extern const short NUMERUS_MAX_LENGTH;
-extern const char *NUMERUS_ZERO;
-extern const char *NUMERUS_FLOAT_SYNTAX_REGEX_STRING;
 
-/**
- * Error code global variable
- */
+/* Extremes of the value range */
+extern const double NUMERUS_MAX_VALUE;
+extern const double NUMERUS_MIN_VALUE;
+extern const long   NUMERUS_MAX_LONG_NONFLOAT_VALUE;
+extern const long   NUMERUS_MIN_LONG_NONFLOAT_VALUE;
+extern const double NUMERUS_MAX_NONLONG_FLOAT_VALUE;
+extern const double NUMERUS_MIN_NONLONG_FLOAT_VALUE;
+
+
+/* Special values */
+extern const short  NUMERUS_MAX_LENGTH;
+extern const char  *NUMERUS_ZERO;
+
+
+/* Error code global variable */
 extern int numerus_error_code;
 
-/* Numeral analysis functions */
-short numerus_is_zero(char *roman, int *errcode);
-short numerus_is_long_numeral(char *roman, int *errcode);
-short numerus_is_float_numeral(char *roman, int *errcode);
-short numerus_sign(char *roman, int *errcode);
-short numerus_numeral_length(char *roman, int *errcode);
 
 /* Conversion function from value to roman numeral */
 char *numerus_int_to_roman(long int_value, int *errcode);
@@ -44,17 +40,25 @@ long numerus_roman_to_int(char *roman, int *errcode);
 double numerus_roman_to_double(char *roman, int *errcode);
 
 
-/* Utility functions */
+/* Functions to manage twelfths */
 long numerus_double_to_parts(double value, short *frac_part);
 double numerus_parts_to_double(long int_part, short frac_part);
+
+
+/* Numeral analysis functions */
+short numerus_is_zero(char *roman, int *errcode);
+short numerus_is_long_numeral(char *roman, int *errcode);
+short numerus_is_float_numeral(char *roman, int *errcode);
+short numerus_sign(char *roman, int *errcode);
+short numerus_numeral_length(char *roman, int *errcode);
 short numerus_compare_value(char *roman_bigger, char *roman_smaller, int *errcode);
 
 
-/* Printing functions */
+/* Output formatting functions */
 char *numerus_pretty_print_long_numerals(char *roman, int *errcode);
 char *numerus_pretty_print_float_value(double double_value, int shorten);
-const char *numerus_explain_error(int error_code);
 char *numerus_shorten_fraction(short twelfth);
+const char *numerus_explain_error(int error_code);
 
 
 /* Command line interface */
