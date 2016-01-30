@@ -531,9 +531,10 @@ long numerus_roman_to_int(char *roman, int *errcode) {
  * @param *roman string with a roman numeral
  * @param *errcode int where to store the conversion status: NUMERUS_OK or any
  * other error. Can be NULL to ignore the error (NOT recommended).
- * @param *twelfths number of twelfths from 0 to 11. NULL is interpreted as 0 twelfths.
- * @returns double value of the roman numeral or a value outside the the
- * possible range of values when an error occurs.
+ * @param *twelfths number of twelfths from 0 to 11. NULL is interpreted as 0
+ * twelfths.
+ * @returns long as the integer part of the value of the roman numeral or a
+ * value outside the the possible range of values when an error occurs.
  */
 long numerus_roman_to_int_part_and_twelfths(char *roman, short *twelfths,
                                             int *errcode) {

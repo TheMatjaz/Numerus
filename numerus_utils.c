@@ -433,7 +433,8 @@ static size_t _num_overlining_alloc_size(char *roman) {
  * @param *roman string containing the roman numeral.
  * @param *errcode int where to store the analysis status: NUMERUS_OK or any
  * other error. Can be NULL to ignore the error (NOT recommended).
- * @returns short with the number of roman characters excluding underscores.
+ * @returns char* allocated string with the prettier version of the roman
+ * numeral.
  */
 char *numerus_pretty_print_long_numerals(char *roman, int *errcode) {
     _num_headtrim_check_numeral_and_errcode(&roman, &errcode);
@@ -500,7 +501,17 @@ char *numerus_pretty_print_long_numerals(char *roman, int *errcode) {
     }
 }
 
-/* Euclidean algorithm for computing the greatest common divisor */
+
+/**
+ * Computes the greatest common divisor of two values using the Euclidean
+ * algorithm.
+ *
+ * Ignores any sign of the passed values.
+ *
+ * @param numerator first of two values to compute the GCD of.
+ * @param denominator second of two values to compute the GCD of.
+ * @returns short greatest common divisor of the the passed values.
+ */
 static short _num_greatest_common_divisor(short numerator, short denominator) {
     numerator = ABS(numerator);
     denominator = ABS(denominator);
@@ -519,15 +530,19 @@ static short _num_greatest_common_divisor(short numerator, short denominator) {
  * Shortens the twelfths by adding the remainder to the int part so that they
  * have the same sign.
  *
- * It's useful when the twelfths are more than 11 (or -11 if negative).
+ * It's useful when the twelfths are more than 11 (or -11 if negative). The
+ * transformation is performed so that the parts will carry the same sign for
+ * better readability.
+ *
+ * Example: `-3, 2` (= -3 + 2/12) becomes `-2, -10` (= -2 -10/12).
  *
  * Modifies the passed parameters themselves. The sign of the twelfth will be
- * the same of the int part (the int part leads) for a correct conversion to
- * roman numeral.
+ * the same of the int part (the int part leads) which is necessary also for a
+ * correct conversion to of the parts to roman numeral.
  *
- * @param *int_part long integer part of a value
- * @param *twelfths twelfth of the value
- * @returns void since modifies the passed values
+ * @param *int_part long integer part of a value.
+ * @param *twelfths twelfth of the value.
+ * @returns void since modifies the passed values.
  */
 void numerus_shorten_and_same_sign_to_parts(long *int_part, short *twelfths) {
     *int_part += *twelfths / 12;
@@ -542,6 +557,17 @@ void numerus_shorten_and_same_sign_to_parts(long *int_part, short *twelfths) {
 }
 
 
+/**
+ * Allocates a string with a prettier representation of a double value of a
+ * roman numeral as integer part and shortened twelfth.
+ *
+ * Remember to free() the pretty-printed value when it's not useful anymore.
+ *
+ * Example: -12.5 becomes "-12, -1/2".
+ *
+ * @param double_value double value to be converted in a pretty string.
+ * @returns char* allocated string with the prettier version of the value.
+ */
 char *numerus_pretty_print_value_as_double(double double_value) {
     short twelfths;
     long int_part = numerus_double_to_parts(double_value, &twelfths);
@@ -549,6 +575,20 @@ char *numerus_pretty_print_value_as_double(double double_value) {
 }
 
 
+/**
+ * Allocates a string with a prettier representation of a value as an integer
+ * and a number of twelfths, with the twelfths shortened.
+ *
+ * Remember to free() the pretty-printed value when it's not useful anymore.
+ *
+ * Example: `-3, 2` (= -3 + 2/12) becomes "-2, -5/6" (= -2 -10/12).
+ *
+ * @param int_part long integer part of a value to be added to the twelfths
+ * and converted to a pretty string.
+ * @param twelfths short integer as number of twelfths (1/12) to be added to the
+ * integer part and converted to a pretty string.
+ * @returns char* allocated string with the prettier version of the value
+ */
 char *numerus_pretty_print_value_as_parts(long int_part, short twelfths) {
     char *pretty_value;
     if (twelfths == 0) {
@@ -574,11 +614,23 @@ char *numerus_pretty_print_value_as_parts(long int_part, short twelfths) {
     return pretty_value;
 }
 
+
+/**
+ * Struct containing an error code and it's human-frendly text description,
+ * useful to be printed on stderr, stdout or a log file.
+ *
+ * It's used to create the _NUM_ERROR_CODES list of error codes explanation.
+ */
 struct _num_error_codes {
     const int code;
     const char *message;
 };
 
+
+/**
+ * List of error codes and their human-frendly text description, useful to
+ * be printed on stderr, stdout or a log file.
+ */
 struct _num_error_codes _NUM_ERROR_CODES[] = {
     {NUMERUS_ERROR_VALUE_OUT_OF_RANGE,
             "The value to be converted to roman is out of conversion range."},
@@ -616,6 +668,18 @@ struct _num_error_codes _NUM_ERROR_CODES[] = {
             "An unknown or unspecified error happened."}
 };
 
+
+/**
+ * Returns a pointer to the human-frendly text description of any
+ * NUMERUS_ERROR_* error code.
+ *
+ * Useful to be printed on stderr, stdout or a log file. The error code is
+ * hard-coded so no need to free() it afterwards.
+ *
+ * @param error_code one of the NUMERUS_ERROR_* error codes or NUMERUS_OK.
+ * @returns char* pointer to a constant string with the human-frendly text
+ * description of the error code.
+ */
 const char *numerus_explain_error(int error_code) {
     const struct _num_error_codes *current_code = &_NUM_ERROR_CODES[0];
     while (current_code->code != 0) {
@@ -625,14 +689,36 @@ const char *numerus_explain_error(int error_code) {
             current_code++;
         }
     }
-    return "An unknown or unspecified error happened.";
+    return numerus_explain_error(NUMERUS_ERROR_GENERIC);
 }
 
 
+/**
+ * Converts a value expressed as sum of an integer part and a number of twelfths
+ * to a double.
+ *
+ * @param int_part long integer part of a value to be added to the twelfths
+ * and converted to double.
+ * @param twelfths short integer as number of twelfths (1/12) to be added to the
+ * integer part and converted to double.
+ * @returns double value as the sum of the integer part and the twelfths.
+ */
 double numerus_parts_to_double(long int_part, short twelfths) {
     return (double) (int_part) + twelfths / 12.0;
 }
 
+
+/**
+ * Splits a double value to a pair of its integer part and a number of twelfths.
+ *
+ * The twelfths are obtained by rounding the double value to the nearest
+ * twelfts. The number of twelfths is stored in the passed parameter, while the
+ * integer part is returned directly.
+ *
+ * @param double value to be split into integer part and number of twelfths.
+ * @param *twelfths number of twelfths. NULL is interpreted as 0 twelfths.
+ * @returns long as the integer part of the value of the roman numeral.
+ */
 long numerus_double_to_parts(double value, short *twelfths) {
     short zero_twelfths = 0;
     if (twelfths == NULL) {
