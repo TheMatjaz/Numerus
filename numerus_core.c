@@ -786,7 +786,7 @@ char *numerus_int_with_twelfth_to_roman(long int_part, short twelfths,
         }
         strcpy(zero_string, NUMERUS_ZERO);
         return zero_string;
-    } else if (int_part < 0) {
+    } else if (int_part < 0 || (int_part == 0 && twelfths < 0)) {
         int_part = ABS(int_part);
         twelfths = ABS(twelfths);
         double_value = ABS(double_value);

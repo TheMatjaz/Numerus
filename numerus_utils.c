@@ -725,7 +725,7 @@ long numerus_double_to_parts(double value, short *twelfths) {
     if (twelfths == NULL) {
         twelfths = &zero_twelfths;
     }
-    long int_part = (long) floor(value);
+    long int_part = (long) value;
     value -= int_part; /* Get only decimal part */
     value = round(value * 12) / 12; /* Round to nearest twelfth */
     value = round(value * 12); /* Get numerator of that twelfth */
