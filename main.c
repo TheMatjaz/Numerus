@@ -15,6 +15,6 @@
 
 
 int main(int argc, char **args) {
-    numerus_repl(argc, args);
+    numerus_cli(argc, args);
     return 0;
 }

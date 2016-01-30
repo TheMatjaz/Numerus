@@ -9,7 +9,7 @@
  * This file contains a command line interface that converts any typed value
  * to a roman numeral or vice-versa. To use it, just call
  *
- * `numerus_repl(argc, args);`
+ * `numerus_cli(argc, args);`
  *
  * with `argc` and `args` the arguments of the main. This allows any command
  * line parameters passed to the numerus executable to be interpreted as if
@@ -210,8 +210,8 @@ static int _num_parse_command(char *command) {
     }
 }
 
-void numerus_repl(int argc, char **args) {
     int cycle_repl = 1;
+int numerus_cli(int argc, char **args) {
     char *command;
     size_t line_buffer_size = 50; /* Suffices for every command, gets
                                    * reallocated by getline() if not enough */

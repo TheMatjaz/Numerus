@@ -68,4 +68,4 @@ const char *numerus_explain_error(int error_code);
 
 
 /* Command line interface */
-void numerus_repl(int argc, char **args);
+int numerus_cli(int argc, char **args);
