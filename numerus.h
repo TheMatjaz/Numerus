@@ -61,7 +61,7 @@ short numerus_compare_value(char *roman_bigger, char *roman_smaller,
 
 
 /* Output formatting functions */
-char *numerus_pretty_print_long_numerals(char *roman, int *errcode);
+char *numerus_pretty_print_long_numerals(char *roman);
 char *numerus_pretty_print_value_as_double(double double_value);
 char *numerus_pretty_print_value_as_parts(long int_part, short twelfths);
 const char *numerus_explain_error(int error_code);

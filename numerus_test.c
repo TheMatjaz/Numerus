@@ -377,11 +377,11 @@ void numtest_null_handling_utils() {
     result = numerus_compare_value("i.", "i", &errcode);
     result = numerus_compare_value("i.", "i", NULL);
     result = numerus_compare_value(NULL, NULL, NULL);
-    char *pretty = numerus_pretty_print_long_numerals("", &errcode);
-    pretty = numerus_pretty_print_long_numerals(NULL, &errcode);
-    pretty = numerus_pretty_print_long_numerals("_", &errcode);
-    pretty = numerus_pretty_print_long_numerals("i..", &errcode);
-    pretty = numerus_pretty_print_long_numerals("i..", NULL);
+    char *pretty = numerus_pretty_print_long_numerals("");
+    pretty = numerus_pretty_print_long_numerals(NULL);
+    pretty = numerus_pretty_print_long_numerals("_");
+    pretty = numerus_pretty_print_long_numerals("i..");
+    pretty = numerus_pretty_print_long_numerals("i..");
     pretty = numerus_pretty_print_value_as_parts(20492, 3);
     pretty = numerus_pretty_print_value_as_parts(20492, 0);
 }
@@ -407,7 +407,7 @@ int numtest_pretty_print_all_numerals() {
                         int_part, frac_part, roman, numerus_explain_error(errcode));
                 return 1;
             }
-            pretty_roman = numerus_pretty_print_long_numerals(roman, &errcode);
+            pretty_roman = numerus_pretty_print_long_numerals(roman);
             if (errcode != NUMERUS_OK) {
                 fprintf(stderr, "Error pretty printing %s (%ld, %d) to value: %s.\n",
                         roman, int_part, frac_part, numerus_explain_error(errcode));

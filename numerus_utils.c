@@ -439,21 +439,21 @@ static size_t _num_overlining_alloc_size(char *roman) {
  * @returns char* allocated string with the prettier version of the roman
  * numeral.
  */
-char *numerus_pretty_print_long_numerals(char *roman, int *errcode) {
+char *numerus_pretty_print_long_numerals(char *roman) {
+    int errcode;
     _num_headtrim_check_numeral_and_errcode(&roman, &errcode);
-    if (*errcode != NUMERUS_OK) {
+    if (errcode != NUMERUS_OK) {
         return NULL;
     }
-    int length = numerus_count_roman_chars(roman, errcode);
-    if (*errcode != NUMERUS_OK) {
-        numerus_error_code = *errcode;
+    int length = numerus_count_roman_chars(roman, &errcode);
+    if (errcode != NUMERUS_OK) {
+        numerus_error_code = errcode;
         return NULL;
     }
-    if (numerus_is_long_numeral(roman, errcode)) {
+    if (numerus_is_long_numeral(roman, &errcode)) {
         char *pretty_roman_start = malloc(length + _num_overlining_alloc_size(roman));
         if (pretty_roman_start == NULL) {
             numerus_error_code = NUMERUS_ERROR_MALLOC_FAIL;
-            *errcode = NUMERUS_ERROR_MALLOC_FAIL;
             return NULL;
         }
         char *roman_start = roman;
@@ -488,14 +488,13 @@ char *numerus_pretty_print_long_numerals(char *roman, int *errcode) {
         return pretty_roman_start;
     } else {
         /* Not a long roman numeral or error */
-        if (*errcode != NUMERUS_OK) {
-            numerus_error_code = *errcode;
+        if (errcode != NUMERUS_OK) {
+            numerus_error_code = errcode;
             return NULL;
         } else {
             char *roman_copy = malloc(strlen(roman) + 1);
             if (roman_copy == NULL) {
                 numerus_error_code = NUMERUS_ERROR_MALLOC_FAIL;
-                *errcode = NUMERUS_ERROR_MALLOC_FAIL;
                 return NULL;
             }
             strcpy(roman_copy, roman);
