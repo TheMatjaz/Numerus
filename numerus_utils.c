@@ -195,7 +195,7 @@ short numerus_is_float_numeral(char *roman, int *errcode) {
         if (*roman == 'S' || *roman == 's' || *roman == '.') {
             numerus_error_code = NUMERUS_OK;
             *errcode = NUMERUS_OK;
-            return i;
+            return true;
         } else {
             i++;
         }
@@ -263,7 +263,6 @@ short numerus_sign(char *roman, int *errcode) {
 short numerus_count_roman_chars(char *roman, int *errcode) {
     _num_headtrim_check_numeral_and_errcode(&roman, &errcode);
     if (*errcode != NUMERUS_OK) {
-        numerus_error_code = *errcode;
         return -1;
     }
     if (_num_is_zero(roman)) {
