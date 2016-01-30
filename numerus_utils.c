@@ -235,14 +235,17 @@ short numerus_compare_value(char *roman_bigger, char *roman_smaller, int *errcod
     if (errcode == NULL) {
         errcode = &numerus_error_code;
     }
-    short frac_part_bigger;
-    long int_part_bigger = numerus_roman_to_int_and_frac_part(roman_bigger, &frac_part_bigger, errcode);
+    short twelfths_bigger;
+    long int_part_bigger = numerus_roman_to_int_part_and_twelfths(roman_bigger,
+                                                                  &twelfths_bigger,
+                                                                  errcode);
     if (*errcode != NUMERUS_OK) {
         numerus_error_code = *errcode;
         return 0;
     }
-    short frac_part_smaller;
-    long int_part_smaller = numerus_roman_to_int_and_frac_part(roman_smaller, &frac_part_smaller, errcode);
+    short twelfths_smaller;
+    long int_part_smaller = numerus_roman_to_int_part_and_twelfths(
+            roman_smaller, &twelfths_smaller, errcode);
     if (*errcode != NUMERUS_OK) {
         numerus_error_code = *errcode;
         return 0;
@@ -252,9 +255,9 @@ short numerus_compare_value(char *roman_bigger, char *roman_smaller, int *errcod
     } else if (int_part_bigger < int_part_smaller) {
         return -1;
     } else { // equal int parts
-        if (frac_part_bigger > frac_part_smaller) {
+        if (twelfths_bigger > twelfths_smaller) {
             return 1;
-        } else if (frac_part_bigger < frac_part_smaller) {
+        } else if (twelfths_bigger < twelfths_smaller) {
             return -1;
         } else { // equal frac parts
             return 0;
@@ -388,20 +391,20 @@ char *numerus_shorten_fraction(short twelfth) {
 }
 
 char *numerus_pretty_print_float_value(double double_value, int shorten) {
-    short frac_part;
-    long int_part = numerus_double_to_parts(double_value, &frac_part);
+    short twelfths;
+    long int_part = numerus_double_to_parts(double_value, &twelfths);
     char *pretty_value = malloc(17);
     if (pretty_value == NULL) {
         numerus_error_code = NUMERUS_ERROR_MALLOC_FAIL;
         return NULL;
     }
-    if (frac_part == 0) {
+    if (twelfths == 0) {
         snprintf(pretty_value, 17, "%ld", int_part);
     } else if (shorten) {
         snprintf(pretty_value, 17, "%ld, %s", int_part,
-                 numerus_shorten_fraction(frac_part));
+                 numerus_shorten_fraction(twelfths));
     } else {
-        snprintf(pretty_value, 17, "%ld, %d/12", int_part, frac_part);
+        snprintf(pretty_value, 17, "%ld, %d/12", int_part, twelfths);
     }
     return pretty_value;
 }
@@ -459,19 +462,19 @@ const char *numerus_explain_error(int error_code) {
 }
 
 
-double numerus_parts_to_double(long int_part, short frac_part) {
-    return (double) (int_part) + frac_part/12.0;
+double numerus_parts_to_double(long int_part, short twelfths) {
+    return (double) (int_part) + twelfths / 12.0;
 }
 
-long numerus_double_to_parts(double value, short *frac_part) {
-    short zero_frac_part = 0;
-    if (frac_part == NULL) {
-        frac_part = &zero_frac_part;
+long numerus_double_to_parts(double value, short *twelfths) {
+    short zero_twelfths = 0;
+    if (twelfths == NULL) {
+        twelfths = &zero_twelfths;
     }
     long int_part = (long) floor(value);
     value -= int_part; /* Get only decimal part */
     value = round(value * 12) / 12; /* Round to nearest twelfth */
     value = round(value * 12); /* Get numerator of that twelfth */
-    *frac_part = (short) value;
+    *twelfths = (short) value;
     return int_part;
 }

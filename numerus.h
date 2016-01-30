@@ -30,19 +30,20 @@ extern int numerus_error_code;
 
 /* Conversion function from value to roman numeral */
 char *numerus_int_to_roman(long int_value, int *errcode);
-char *numerus_int_with_twelfth_to_roman(long int_part, short frac_part, int *errcode);
+char *numerus_int_with_twelfth_to_roman(long int_part, short twelfths, int *errcode);
 char *numerus_double_to_roman(double double_value, int *errcode);
 
 
 /* Conversion function from roman numeral to value */
-long numerus_roman_to_int_and_frac_part(char *roman, short *frac_part, int *errcode);
+long numerus_roman_to_int_part_and_twelfths(char *roman, short *twelfths,
+                                            int *errcode);
 long numerus_roman_to_int(char *roman, int *errcode);
 double numerus_roman_to_double(char *roman, int *errcode);
 
 
 /* Functions to manage twelfths */
-long numerus_double_to_parts(double value, short *frac_part);
-double numerus_parts_to_double(long int_part, short frac_part);
+long numerus_double_to_parts(double value, short *twelfths);
+double numerus_parts_to_double(long int_part, short twelfths);
 
 
 /* Numeral analysis functions */

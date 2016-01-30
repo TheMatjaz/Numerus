@@ -149,8 +149,6 @@ static const struct _num_dictionary_char _NUM_DICTIONARY[] = {
  * numeral, the dictionary char that the numeral is confronted with, the value,
  * the sign, if it has underscore and counts the number of consecutive
  * repetitions a single roman char has.
- *
- * @see numerus_roman_to_int_and_frac_part
  */
 struct _num_numeral_parser_data {
     char *current_numeral_position;
@@ -158,7 +156,7 @@ struct _num_numeral_parser_data {
     bool  numeral_is_long;
     short numeral_sign;
     long  int_part;
-    short frac_part;
+    short twelfths;
     short char_repetitions;
 };
 
@@ -197,8 +195,6 @@ static short _num_string_begins_with(char *to_be_compared,
  * Initializer of the _num_numeral_parser_data data structure.
  *
  * Sets the fields to be ready to start the conversion from roman to value.
- *
- * @see numerus_roman_to_int_and_frac_part
  */
 static void _num_init_parser_data(struct _num_numeral_parser_data *parser_data,
                                   char *roman) {
@@ -208,7 +204,7 @@ static void _num_init_parser_data(struct _num_numeral_parser_data *parser_data,
     parser_data->numeral_is_long = false;
     parser_data->numeral_sign = 1;
     parser_data->int_part = 0;
-    parser_data->frac_part = 0;
+    parser_data->twelfths = 0;
     parser_data->char_repetitions = 0;
 }
 
@@ -300,7 +296,7 @@ static int _num_compare_numeral_position_with_dictionary(
         if (*(parser_data->current_dictionary_char->characters) == 'S'
             || *(parser_data->current_dictionary_char->characters) == '.') {
             /* Add to decimal part value */
-            parser_data->frac_part += parser_data->current_dictionary_char->value;
+            parser_data->twelfths += parser_data->current_dictionary_char->value;
         } else {
             /* Add to integer part value */
             parser_data->int_part += parser_data->current_dictionary_char->value;
@@ -471,9 +467,9 @@ static int _num_parse_decimal_part(
  */
 double numerus_roman_to_double(char *roman, int *errcode) {
     long int_part;
-    short frac_part;
-    int_part = numerus_roman_to_int_and_frac_part(roman, &frac_part, errcode);
-    return numerus_parts_to_double(int_part, frac_part);
+    short twelfths;
+    int_part = numerus_roman_to_int_part_and_twelfths(roman, &twelfths, errcode);
+    return numerus_parts_to_double(int_part, twelfths);
 }
 
 
@@ -504,7 +500,7 @@ double numerus_roman_to_double(char *roman, int *errcode) {
  * possible range of values when an error occurs.
  */
 long numerus_roman_to_int(char *roman, int *errcode) {
-    return numerus_roman_to_int_and_frac_part(roman, 0, errcode);
+    return numerus_roman_to_int_part_and_twelfths(roman, 0, errcode);
 }
 
 
@@ -535,17 +531,18 @@ long numerus_roman_to_int(char *roman, int *errcode) {
  * @param *roman string with a roman numeral
  * @param *errcode int where to store the conversion status, NUMERUS_OK or any
  * other error. Can be NULL to ignore the error (NOT recommended).
- * @param *frac_part number of twelfths from 0 to 11. NULL is interpreted as 0 twelfths.
+ * @param *twelfths number of twelfths from 0 to 11. NULL is interpreted as 0 twelfths.
  * @returns double value of the roman numeral or a value outside the the
  * possible range of values when an error occurs.
  */
-long numerus_roman_to_int_and_frac_part(char *roman, short *frac_part, int *errcode) {
+long numerus_roman_to_int_part_and_twelfths(char *roman, short *twelfths,
+                                            int *errcode) {
     /* Prepare variables */
     long int_part;
     int response_code;
-    short zero_frac_part = 0;
-    if (frac_part == NULL) {
-        frac_part = &zero_frac_part;
+    short zero_twelfths = 0;
+    if (twelfths == NULL) {
+        twelfths = &zero_twelfths;
     }
     if (errcode == NULL) {
         errcode = &numerus_error_code;
@@ -569,7 +566,7 @@ long numerus_roman_to_int_and_frac_part(char *roman, short *frac_part, int *errc
     /* Conversion if NUMERUS_NULLA */
     if (_num_is_zero(roman)) {
         int_part = 0;
-        *frac_part = 0;
+        *twelfths = 0;
         numerus_error_code = NUMERUS_OK;
         *errcode = NUMERUS_OK;
         return int_part;
@@ -609,8 +606,8 @@ long numerus_roman_to_int_and_frac_part(char *roman, short *frac_part, int *errc
         return NUMERUS_MAX_LONG_NONFLOAT_VALUE + 10;
     }
     int_part = parser_data.numeral_sign * parser_data.int_part;
-    *frac_part = parser_data.frac_part;
-    *frac_part = SIGN(int_part) * ABS(*frac_part);
+    *twelfths = parser_data.twelfths;
+    *twelfths = SIGN(int_part) * ABS(*twelfths);
     numerus_error_code = NUMERUS_OK;
     *errcode = NUMERUS_OK;
     return int_part;
@@ -685,18 +682,18 @@ static char *_num_value_part_to_roman(long value, char *roman,
  * roman numeral.
  *
  * @param *int_part long integer part of a value
- * @param *frac_part twelfth of the value
+ * @param *twelfths twelfth of the value
  * @returns void since modifies the passed values
  */
-void _num_shorten_and_prepare_parts(long *int_part, short *frac_part) {
-    *int_part += *frac_part / 12;
-    *frac_part = *frac_part % (short) 12;
-    if (*int_part > 0 && *frac_part < 0) {
+void _num_shorten_and_prepare_parts(long *int_part, short *twelfths) {
+    *int_part += *twelfths / 12;
+    *twelfths = *twelfths % (short) 12;
+    if (*int_part > 0 && *twelfths < 0) {
         *int_part -= 1;
-        *frac_part += 12;
-    } else if (*int_part < 0 && *frac_part > 0) {
+        *twelfths += 12;
+    } else if (*int_part < 0 && *twelfths > 0) {
         *int_part += 1;
-        *frac_part -= 12;
+        *twelfths -= 12;
     }
 }
 
@@ -744,9 +741,9 @@ char *numerus_int_to_roman(long int_value, int *errcode) {
  * occurs.
  */
 char *numerus_double_to_roman(double double_value, int *errcode) {
-    short frac_part;
-    long int_part = numerus_double_to_parts(double_value, &frac_part);
-    return numerus_int_with_twelfth_to_roman(int_part, frac_part, errcode);
+    short twelfths;
+    long int_part = numerus_double_to_parts(double_value, &twelfths);
+    return numerus_int_with_twelfth_to_roman(int_part, twelfths, errcode);
 }
 
 
@@ -772,12 +769,12 @@ char *numerus_double_to_roman(double double_value, int *errcode) {
  * @returns char* a string containing the roman numeral or NULL when an error
  * occurs.
  */
-char *numerus_int_with_twelfth_to_roman(long int_part, short frac_part,
+char *numerus_int_with_twelfth_to_roman(long int_part, short twelfths,
                                         int *errcode) {
 
     /* Prepare variables */
-    _num_shorten_and_prepare_parts(&int_part, &frac_part);
-    double double_value = numerus_parts_to_double(int_part, frac_part);
+    _num_shorten_and_prepare_parts(&int_part, &twelfths);
+    double double_value = numerus_parts_to_double(int_part, twelfths);
     if (errcode == NULL) {
         errcode = &numerus_error_code;
     }
@@ -794,14 +791,14 @@ char *numerus_int_with_twelfth_to_roman(long int_part, short frac_part,
     char *roman_numeral = building_buffer;
 
     /* Save sign or return NUMERUS_ZERO for 0 */
-    if (int_part == 0 && frac_part == 0) {
+    if (int_part == 0 && twelfths == 0) {
         /* Return writable copy of NUMERUS_ZERO on the heap */
         char *zero_string = malloc(strlen(NUMERUS_ZERO) + 1);
         strcpy(zero_string, NUMERUS_ZERO);
         return zero_string;
     } else if (int_part < 0) {
         int_part = ABS(int_part);
-        frac_part = ABS(frac_part);
+        twelfths = ABS(twelfths);
         double_value = ABS(double_value);
         *(roman_numeral++) = '-';
     }
@@ -821,7 +818,7 @@ char *numerus_int_with_twelfth_to_roman(long int_part, short frac_part,
         roman_numeral = _num_value_part_to_roman(int_part, roman_numeral, 0);
     }
     /* Decimal part, starting with "S" char */
-    roman_numeral = _num_value_part_to_roman(frac_part, roman_numeral, 13);
+    roman_numeral = _num_value_part_to_roman(twelfths, roman_numeral, 13);
     *(roman_numeral++) = '\0';
 
     /* Copy out of the buffer and return it on the heap */

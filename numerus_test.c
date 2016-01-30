@@ -45,7 +45,9 @@ int numtest_convert_all_floats_with_parts() {
                         int_part, frac_part, numerus_explain_error(errcode));
                 return 1;
             }
-            int_part_converted = numerus_roman_to_int_and_frac_part(roman, &frac_part_converted, &errcode);
+            int_part_converted = numerus_roman_to_int_part_and_twelfths(roman,
+                                                                        &frac_part_converted,
+                                                                        &errcode);
             if (errcode != NUMERUS_OK) {
                 fprintf(stderr, "Error converting %s to value: %s.\n",
                         roman, numerus_explain_error(errcode));
@@ -324,14 +326,15 @@ void numtest_null_handling_conversions() {
     int_part = numerus_roman_to_int("", NULL);
     int_part = numerus_roman_to_int(NULL, &errcode);
     int_part = numerus_roman_to_int(NULL, NULL);
-    int_part = numerus_roman_to_int_and_frac_part("", &frac_part, &errcode);
-    int_part = numerus_roman_to_int_and_frac_part(roman, &frac_part, NULL);
-    int_part = numerus_roman_to_int_and_frac_part(roman, NULL, &errcode);
-    int_part = numerus_roman_to_int_and_frac_part(NULL, &frac_part, &errcode);
-    int_part = numerus_roman_to_int_and_frac_part(roman, NULL, NULL);
-    int_part = numerus_roman_to_int_and_frac_part(NULL, NULL, &errcode);
-    int_part = numerus_roman_to_int_and_frac_part(NULL, &frac_part, NULL);
-    int_part = numerus_roman_to_int_and_frac_part(NULL, NULL, NULL);
+    int_part = numerus_roman_to_int_part_and_twelfths("", &frac_part, &errcode);
+    int_part = numerus_roman_to_int_part_and_twelfths(roman, &frac_part, NULL);
+    int_part = numerus_roman_to_int_part_and_twelfths(roman, NULL, &errcode);
+    int_part = numerus_roman_to_int_part_and_twelfths(NULL, &frac_part,
+                                                      &errcode);
+    int_part = numerus_roman_to_int_part_and_twelfths(roman, NULL, NULL);
+    int_part = numerus_roman_to_int_part_and_twelfths(NULL, NULL, &errcode);
+    int_part = numerus_roman_to_int_part_and_twelfths(NULL, &frac_part, NULL);
+    int_part = numerus_roman_to_int_part_and_twelfths(NULL, NULL, NULL);
     roman = numerus_double_to_roman(12.3, NULL);
     roman = numerus_int_to_roman(-3, NULL);
     roman = numerus_int_with_twelfth_to_roman(4, -2, NULL);
