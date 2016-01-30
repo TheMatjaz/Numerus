@@ -316,15 +316,27 @@ short numerus_count_roman_chars(char *roman, int *errcode) {
 
 
 /**
- * Compares the value of two roman numerals, emulating the operator '>'.
+ * Compares the values of two roman numerals, emulating the operator '>'.
  *
- * @param *roman_bigger string with a roman numeral to compare with the second
- * parameter
+ * Returns a positive value is the value of the first parameter is bigger than
+ * the second, a negative one if the opposite or zero if they have the same
+ * value, making it also a check for numeral equality, since two roman
+ * numerals have the same value only if they are the same numeral.
+ *
+ * The comparition status is stored in the errcode passed as parameter, which
+ * can be NULL to ignore the error, although it's not recommended. If the the
+ * error code is different than NUMERUS_OK, an error occured during the
+ * comparition and the returned value is zero. The error code may help find the
+ * specific error.
+ *
+ * @param *roman_bigger string containing the roman numeral to compare with
+ * roman_smaller
  * @param *roman_smaller string with a roman numeral to compare with the first
  * parameter
- * @returns 1 if the first parameter is bigger, 0 if they are equal, -1 if the
- * second is bigger. Returns NUMERUS_ERROR_CANNOT_COMPARE if at least one of the
- * two numerals has wrong syntax and cannot be compared.
+ * @param *errcode int where to store the comparition status: NUMERUS_OK or any
+ * other error. Can be NULL to ignore the error (NOT recommended).
+ * @returns 1 if the first parameter has a bigger value, 0 if they have the
+ * same, -1 if the second is bigger.
  */
 short numerus_compare_value(char *roman_bigger, char *roman_smaller, int *errcode) {
     if (errcode == NULL) {
@@ -349,12 +361,14 @@ short numerus_compare_value(char *roman_bigger, char *roman_smaller, int *errcod
         return 1;
     } else if (int_part_bigger < int_part_smaller) {
         return -1;
-    } else { // equal int parts
+    } else {
+        /* Equal int parts */
         if (twelfths_bigger > twelfths_smaller) {
             return 1;
         } else if (twelfths_bigger < twelfths_smaller) {
             return -1;
-        } else { // equal frac parts
+        } else {
+            /* Equal twelfths */
             return 0;
         }
     }
