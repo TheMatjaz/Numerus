@@ -260,8 +260,8 @@ short numerus_sign(char *roman, int *errcode) {
  * other error. Can be NULL to ignore the error (NOT recommended).
  * @returns short with the number of roman characters excluding underscores.
  */
-short numerus_numeral_length(char *roman, int *errcode) {
     _num_headtrim_check_numeral(&roman, &errcode);
+short numerus_count_roman_chars(char *roman, int *errcode) {
     if (*errcode != NUMERUS_OK) {
         numerus_error_code = *errcode;
         return -1;

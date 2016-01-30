@@ -340,6 +340,7 @@ void numtest_null_handling_conversions() {
     roman = numerus_int_with_twelfth_to_roman(4, -2, NULL);
 }
 
+
 void numtest_null_handling_utils() {
     int errcode;
     int result;
@@ -356,10 +357,10 @@ void numtest_null_handling_utils() {
     result = numerus_is_long_numeral("  _x", &errcode);
     result = numerus_is_long_numeral("   _x__f", &errcode);
     result = numerus_is_long_numeral("   _x_f", &errcode);
-    result = numerus_numeral_length(NULL, &errcode);
-    result = numerus_numeral_length("", &errcode);
-    result = numerus_numeral_length(NULL, NULL);
-    result = numerus_numeral_length("", NULL);
+    result = numerus_count_roman_chars(NULL, &errcode);
+    result = numerus_count_roman_chars("", &errcode);
+    result = numerus_count_roman_chars(NULL, NULL);
+    result = numerus_count_roman_chars("", NULL);
     result = numerus_sign(NULL, &errcode);
     result = numerus_sign("", &errcode);
     result = numerus_sign(NULL, NULL);

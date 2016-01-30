@@ -551,7 +551,7 @@ long numerus_roman_to_int_part_and_twelfths(char *roman, short *twelfths,
     _num_init_parser_data(&parser_data, roman);
 
     /* Check for illegal symbols or length */
-    numerus_numeral_length(roman, &response_code);
+    numerus_count_roman_chars(roman, &response_code);
     if (response_code != NUMERUS_OK) {
         numerus_error_code = response_code;
         *errcode = response_code;

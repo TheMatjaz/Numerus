@@ -51,7 +51,7 @@ short numerus_is_zero(char *roman, int *errcode);
 short numerus_is_long_numeral(char *roman, int *errcode);
 short numerus_is_float_numeral(char *roman, int *errcode);
 short numerus_sign(char *roman, int *errcode);
-short numerus_numeral_length(char *roman, int *errcode);
+short numerus_count_roman_chars(char *roman, int *errcode);
 short numerus_compare_value(char *roman_bigger, char *roman_smaller, int *errcode);
 
 
