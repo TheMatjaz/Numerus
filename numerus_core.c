@@ -5,6 +5,11 @@
  * <http://matjaz.it>. All rights reserved.
  * @license This file is part of the Numerus project which is released under
  * the BSD 3-clause license.
+ *
+ * This file contains all constants with special values or extremes as well as
+ * the conversion functions from value to roman numeral and vice versa. Some
+ * functions from the numerus_utils.c file are also used to perform some checks
+ * on the numerals or to convert some values in other formats.
  */
 
 #include <ctype.h>    /* For `isspace()` */

@@ -1,24 +1,43 @@
+/**
+ * @file numerus_cli.c
+ * @brief Numerus command line interface for user-friendly conversions.
+ * @copyright Copyright © 2015-2016, Matjaž Guštin <dev@matjaz.it>
+ * <http://matjaz.it>. All rights reserved.
+ * @license This file is part of the Numerus project which is released under
+ * the BSD 3-clause license.
+ *
+ * This file contains a command line interface that converts any typed value
+ * to a roman numeral or vice-versa. To use it, just call
+ *
+ * `numerus_repl(argc, args);`
+ *
+ * with `argc` and `args` the arguments of the main. This allows any command
+ * line parameters passed to the numerus executable to be interpreted as if
+ * they were written withing the command line interface.
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
-#include "numerus_internal.h"
+#include "numerus.h"
 
-const char *PROMPT_TEXT = "numerus> ";
-const char *WELCOME_TEXT = ""
+
+static const char *PROMPT_TEXT = "numerus> ";
+static const char *WELCOME_TEXT = ""
 "+-----------------+\n"
 "|  N V M E R V S  |\n"
 "+-----------------+\n";
-const char *INFO_TEXT = ""
+static const char *INFO_TEXT = ""
 "Numerus, C library for conversion and manipulation of roman numerals.\n"
 "Version 2.0.0, Command Line Interface\n"
 "Copyright (c) 2015-2016 Matjaž Guštin <dev@matjaz.it> http://matjaz.it\n"
 "This software is subject to the terms of the BSD 3-Clause license.\n"
 "Project page and source code: https://github.com/TheMatjaz/Numerus\n";
-const char *MOO_TEXT = "This is not an easter egg. Try `ascii`.\n";
-const char *PING_TEXT = "Pong.\n";
-const char *AVE_TEXT = "Ave tibi!\n";
-const char *HELP_TEXT = ""
+static const char *MOO_TEXT = "This is not an easter egg. Try `ascii`.\n";
+static const char *PING_TEXT = "Pong.\n";
+static const char *AVE_TEXT = "Ave tibi!\n";
+static const char *HELP_TEXT = ""
 "For ANY information about the library or the syntax of roman numeral, "
 "check the documentation available on https://thematjaz.github.io/Numerus/\n\n"
 ""
@@ -34,18 +53,19 @@ const char *HELP_TEXT = ""
 "exit, quit    ends this shell\n\n"
 ""
 "We also have: moo, ping, ave.\n";
-const char *QUIT_TEXT = "Vale!\n";
-const char *ASCII_TEXT = ""
+static const char *QUIT_TEXT = "Vale!\n";
+static const char *ASCII_TEXT = ""
 " ____  _____   ____   ____   ____    ____   _________   _______    ____   ____    _______ \n"
 "|_   \\|_   _| |_  _| |_  _| |_   \\  /   _| |_   ___  | |_   __ \\  |_  _| |_  _|  /  ___  |\n"
 "  |   \\ | |     \\ \\   / /     |   \\/   |     | |_  \\_|   | |__) |   \\ \\   / /   |  (__ \\_|\n"
 "  | |\\ \\| |      \\ \\ / /      | |\\  /| |     |  _|  _    |  __ /     \\ \\ / /     '.___`-. \n"
 " _| |_\\   |_      \\ ' /      _| |_\\/_| |_   _| |___/ |  _| |  \\ \\_    \\ ' /     |`\\____) |\n"
 "|_____|\\____|      \\_/      |_____||_____| |_________| |____| |___|    \\_/      |_______.'\n";
-const char *UNKNOWN_COMMAND_TEXT = "Unknown command or wrong roman numeral syntax.\n";
-const char *PRETTY_ON_TEXT = "Pretty printing is enabled.\n";
-const char *PRETTY_OFF_TEXT = "Pretty printing is disabled.\n";
+static const char *UNKNOWN_COMMAND_TEXT = "Unknown command or wrong roman numeral syntax.\n";
+static const char *PRETTY_ON_TEXT = "Pretty printing is enabled.\n";
+static const char *PRETTY_OFF_TEXT = "Pretty printing is disabled.\n";
 static int pretty_printing = 0;
+
 
 /**
  * Do not free a string after it has been trimmed, free the original pointer to it.
@@ -201,7 +221,7 @@ void numerus_repl(int argc, char **args) {
         pretty_printing = 0;
         while (argc > 1) {
             command = _num_trim_lowercase_get_first_word(*args);
-             _num_parse_command(command);
+            _num_parse_command(command);
             args++;
             argc--;
         }

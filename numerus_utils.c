@@ -1,10 +1,14 @@
 /**
  * @file numerus_utils.c
- * @brief Numerus constants and utility functions for roman numerals manipulation.
+ * @brief Numerus utility functions for roman numerals and values manipulation.
  * @copyright Copyright © 2015-2016, Matjaž Guštin <dev@matjaz.it>
  * <http://matjaz.it>. All rights reserved.
  * @license This file is part of the Numerus project which is released under
  * the BSD 3-clause license.
+ *
+ * This file contains functions that analyze roman numerals, perform some checks
+ * on them or convert some values in other formats. Functions that create a
+ * more human-readable output are also placed in this file.
  */
 
 #include <math.h>     /* For `round()`, `floor()`  */
@@ -160,7 +164,6 @@ short numerus_is_long_numeral(char *roman, int *errcode) {
 }
 
 
-// Checks for an S or . and returns the index of the first found, else -1
 /**
  * Verifies if the passed roman numeral is a float roman numeral (if contains
  * decimal characters 'S' and dot '.').

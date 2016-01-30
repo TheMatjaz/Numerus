@@ -5,12 +5,17 @@
  * <http://matjaz.it>. All rights reserved.
  * @license This file is part of the Numerus project which is released under
  * the BSD 3-clause license.
+ *
+ * This file contains test functions to verify the correctness of the library.
+ * Test are not nicely done and documented since are mostly used for internal
+ * testing of the library, not for public usage.
  */
 
 #include <stdio.h>
 #include <time.h>
 #include <stdlib.h>
 #include "numerus_internal.h"
+
 
 /**
  * Converts all 95999977 possible values of roman numerals to their roman form
