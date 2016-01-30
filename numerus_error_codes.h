@@ -139,3 +139,10 @@
  * Insert some non-whitespace characters in the string.
  */
 #define NUMERUS_ERROR_EMPTY_ROMAN 114
+
+/**
+ * The roman numeral string contains whitespace characters, even at the end.
+ *
+ * Remove the whitespace characters from inside the string and trim it.
+ */
+#define NUMERUS_ERROR_WHITESPACE_CHARACTER 115

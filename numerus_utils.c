@@ -298,9 +298,15 @@ short numerus_count_roman_chars(char *roman, int *errcode) {
                 break;
             }
             default: {
-                numerus_error_code = NUMERUS_ERROR_ILLEGAL_CHARACTER;
-                *errcode = NUMERUS_ERROR_ILLEGAL_CHARACTER;
-                return -3;
+                if (isspace(*roman)) {
+                    numerus_error_code = NUMERUS_ERROR_WHITESPACE_CHARACTER;
+                    *errcode = NUMERUS_ERROR_WHITESPACE_CHARACTER;
+                    return -3;
+                } else {
+                    numerus_error_code = NUMERUS_ERROR_ILLEGAL_CHARACTER;
+                    *errcode = NUMERUS_ERROR_ILLEGAL_CHARACTER;
+                    return -4;
+                }
             }
         }
     }
@@ -533,6 +539,8 @@ struct _num_error_codes _NUM_ERROR_CODES[] = {
             "The pointer to the roman numeral string is NULL."},
     {NUMERUS_ERROR_EMPTY_ROMAN,
             "The roman numeral string is empty or filled with whitespace."},
+    {NUMERUS_ERROR_WHITESPACE_CHARACTER,
+            "The roman numeral string contains whitespace characters, even at the end."},
     {NUMERUS_OK,
             "Everything went all right."},
     {NUMERUS_ERROR_GENERIC,
