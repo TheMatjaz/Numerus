@@ -7,16 +7,24 @@
  * the BSD 3-clause license.
  */
 
-#include <math.h>     /* For `round()`  */
-#include <ctype.h>    /* For `upcase()` */
-#include <stdio.h>    /* To  `fprintf()` to `stderr` */
-#include <stdlib.h>   /* For `malloc()` */
-#include <string.h>   /* For `strcmp()` */
+#include <math.h>     /* For `round()`, `floor()`  */
+#include <ctype.h>    /* For `isspace()`    */
+#include <stdio.h>    /* For `snprintf()`   */
+#include <stdlib.h>   /* For `malloc()`     */
+#include <string.h>   /* For `strcasecmp()` */
 #include <stdbool.h>  /* To use booleans `true` and `false` */
 #include "numerus_internal.h"
 
 
-
+/**
+ * Verifies if the roman numeral is of value 0 (zero) without security checks.
+ *
+ * Ignores any leading minus. It's case INsensitive.
+ *
+ * @param *roman string containing the roman numeral.
+ * @returns short as boolean: true if the numeral is NUMERUS_ZERO, false
+ * otherwise.
+ */
 short _num_is_zero(char *roman) {
     if (*roman == '-') {
         roman++;
@@ -28,6 +36,22 @@ short _num_is_zero(char *roman) {
     };
 }
 
+
+/**
+ * Performs a security check and headtrimming of the roman numeral.
+ *
+ * Modifies the passed values themselves. Verifies if the *roman numeral is
+ * NULL, if the *errcode is NULL, skips any heading whitespace of the roman
+ * numeral, verifies if the roman numeral is empty. Otherwise stores NUMERUS_OK
+ * in the *errcode.
+ *
+ * It is used as a preliminary securit check by other functions
+ *
+ * @param **roman string containing the roman numeral.
+ * @param **errcode int where to store the analysis status: NUMERUS_OK or any
+ * other error.
+ * @returns void as the result is stored in **errcode.
+ */
 void _num_headtrim_check_numeral(char **roman, int **errcode) {
     if (*errcode == NULL) {
         *errcode = &numerus_error_code;
@@ -49,12 +73,23 @@ void _num_headtrim_check_numeral(char **roman, int **errcode) {
     **errcode = NUMERUS_OK;
 }
 
+
 /**
- * Verifies if the passed roman numeral is (-)NUMERUS_ZERO, case insensitive.
+ * Verifies if the roman numeral is of value 0 (zero).
  *
- * @param *roman string containing a roman numeral to check if it is
- * NUMERUS_ZERO
- * @returns int 1 if the string is (-)NUMERUS_ZERO or 0 if it's not
+ * Ignores any leading minus. It's case INsensitive.
+ *
+ * The analysis status is stored in the errcode passed as parameter, which
+ * can be NULL to ignore the error, although it's not recommended. If the the
+ * error code is different than NUMERUS_OK, an error occured during the
+ * analysis and the returned value is false. The error code may help find the
+ * specific error.
+ *
+ * @param *roman string containing the roman numeral.
+ * @param *errcode int where to store the analysis status: NUMERUS_OK or any
+ * other error. Can be NULL to ignore the error (NOT recommended).
+ * @returns short as boolean: true if the numeral is NUMERUS_ZERO, false
+ * otherwise.
  */
 short numerus_is_zero(char *roman, int *errcode) {
     _num_headtrim_check_numeral(&roman, &errcode);
@@ -64,16 +99,27 @@ short numerus_is_zero(char *roman, int *errcode) {
     return _num_is_zero(roman);
 }
 
+
 /**
- * Verifies if the passed roman numeral is a long numeral, outside
- * [NUMERUS_MIN_NONLONG_FLOAT_VALUE, NUMERUS_MAX_NONLONG_FLOAT_VALUE].
+ * Verifies if the passed roman numeral is a long roman numeral (if contains a
+ * correct number of underscores).
  *
- * Does **not** perform a syntax check. Any string starting with "-_" or "-"
- * would return a true result.
+ * Does **not** perform a syntax check or a value check, just searches for
+ * underscores. Zero underscores means it's not a long roman numeral, two means
+ * it is. Other numbers of underscores result in an error different than
+ * NUMERUS_OK.
  *
- * @param *roman string containing a roman numeral to check if it is a long
- * roman numeral
- * @returns int 1 if the string is a long roman numeral or 0 if it's not
+ * The analysis status is stored in the errcode passed as parameter, which
+ * can be NULL to ignore the error, although it's not recommended. If the the
+ * error code is different than NUMERUS_OK, an error occured during the
+ * analysis and the returned value is false. The error code may help find the
+ * specific error.
+ *
+ * @param *roman string containing the roman numeral.
+ * @param *errcode int where to store the analysis status: NUMERUS_OK or any
+ * other error. Can be NULL to ignore the error (NOT recommended).
+ * @returns short as boolean: true if the numeral is long, false
+ * otherwise.
  */
 short numerus_is_long_numeral(char *roman, int *errcode) {
     _num_headtrim_check_numeral(&roman, &errcode);
@@ -113,7 +159,27 @@ short numerus_is_long_numeral(char *roman, int *errcode) {
     }
 }
 
+
 // Checks for an S or . and returns the index of the first found, else -1
+/**
+ * Verifies if the passed roman numeral is a float roman numeral (if contains
+ * decimal characters 'S' and dot '.').
+ *
+ * Does **not** perform a syntax check or a value check, just searches for 'S'
+ * and dot '.'. It's case INsensitive.
+ *
+ * The analysis status is stored in the errcode passed as parameter, which
+ * can be NULL to ignore the error, although it's not recommended. If the the
+ * error code is different than NUMERUS_OK, an error occured during the
+ * analysis and the returned value is false. The error code may help find the
+ * specific error.
+ *
+ * @param *roman string containing the roman numeral.
+ * @param *errcode int where to store the analysis status: NUMERUS_OK or any
+ * other error. Can be NULL to ignore the error (NOT recommended).
+ * @returns short as boolean: true if the numeral contains 'S' or dot '.', false
+ * otherwise.
+ */
 short numerus_is_float_numeral(char *roman, int *errcode) {
     _num_headtrim_check_numeral(&roman, &errcode);
     if (*errcode != NUMERUS_OK) {
@@ -140,10 +206,30 @@ short numerus_is_float_numeral(char *roman, int *errcode) {
     return false;
 }
 
+
+/**
+ * Returns the sign of the roman numeral.
+ *
+ * Does **not** perform a syntax check or a value check, just searches for
+ * the sign. If the numeral has value zero, returns 0; if the numeral has
+ * a leading minus '-', returns -1; otherwise +1.
+ *
+ * The analysis status is stored in the errcode passed as parameter, which
+ * can be NULL to ignore the error, although it's not recommended. If the the
+ * error code is different than NUMERUS_OK, an error occured during the
+ * analysis and the returned value is 0 (zero). The error code may help find the
+ * specific error.
+ *
+ * @param *roman string containing the roman numeral.
+ * @param *errcode int where to store the analysis status: NUMERUS_OK or any
+ * other error. Can be NULL to ignore the error (NOT recommended).
+ * @returns short with the sign of the roman numeral: 0 if has value zero, -1
+ * if negative, +1 if positive.
+ */
 short numerus_sign(char *roman, int *errcode) {
     _num_headtrim_check_numeral(&roman, &errcode);
     if (*errcode != NUMERUS_OK) {
-        return false;
+        return 0;
     }
     if (_num_is_zero(roman)) {
         return 0;
@@ -157,18 +243,22 @@ short numerus_sign(char *roman, int *errcode) {
 
 
 /**
- * Calculates the number of roman characters in the roman numeral.
+ * Returns the number of roman characters in the roman numeral.
  *
- * It's case insensitive. Includes the minus `-` and any of the following
- * characters `MDCLXVI`. Exludes underscroes `_` and the null terminator. It
- * does not perform a syntax check, but it stops at NUMERAL_MAX_LONG_LENGTH
- * characters. If the string is longer, returns -1. If any non-roman character
- * is found in the string, returns -2.
+ * Does **not** perform a syntax check or a value check, but **does** check for
+ * illegal characters. The length value does not count the underscores or
+ * whitespace.
  *
- * @param *roman string containing a roman numeral to count the roman chars of
- * @returns short number of roman characters in a roman numeral, -1 if the
- * string is too long for a roman numeral, -2 if any non roman character is
- * found.
+ * The analysis status is stored in the errcode passed as parameter, which
+ * can be NULL to ignore the error, although it's not recommended. If the the
+ * error code is different than NUMERUS_OK, an error occured during the
+ * analysis and the returned value is negative. The error code may help find the
+ * specific error.
+ *
+ * @param *roman string containing the roman numeral.
+ * @param *errcode int where to store the analysis status: NUMERUS_OK or any
+ * other error. Can be NULL to ignore the error (NOT recommended).
+ * @returns short with the number of roman characters excluding underscores.
  */
 short numerus_numeral_length(char *roman, int *errcode) {
     _num_headtrim_check_numeral(&roman, &errcode);

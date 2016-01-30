@@ -460,7 +460,7 @@ static int _num_parse_decimal_part(
  * The error code may help find the specific error.
  *
  * @param *roman string with a roman numeral
- * @param *errcode int where to store the conversion status, NUMERUS_OK or any
+ * @param *errcode int where to store the conversion status: NUMERUS_OK or any
  * other error. Can be NULL to ignore the error (NOT recommended).
  * @returns double value of the roman numeral or a value outside the the
  * possible range of values when an error occurs.
@@ -494,7 +494,7 @@ double numerus_roman_to_double(char *roman, int *errcode) {
  * The error code may help find the specific error.
  *
  * @param *roman string with a roman numeral
- * @param *errcode int where to store the conversion status, NUMERUS_OK or any
+ * @param *errcode int where to store the conversion status: NUMERUS_OK or any
  * other error. Can be NULL to ignore the error (NOT recommended).
  * @returns long value of the roman numeral or a value outside the the
  * possible range of values when an error occurs.
@@ -529,7 +529,7 @@ long numerus_roman_to_int(char *roman, int *errcode) {
  * part is returned directly.
  *
  * @param *roman string with a roman numeral
- * @param *errcode int where to store the conversion status, NUMERUS_OK or any
+ * @param *errcode int where to store the conversion status: NUMERUS_OK or any
  * other error. Can be NULL to ignore the error (NOT recommended).
  * @param *twelfths number of twelfths from 0 to 11. NULL is interpreted as 0 twelfths.
  * @returns double value of the roman numeral or a value outside the the
@@ -711,7 +711,7 @@ void _num_shorten_and_prepare_parts(long *int_part, short *twelfths) {
  * specific error.
  *
  * @param int_value long integer to be converted to roman numeral.
- * @param *errcode int where to store the conversion status, NUMERUS_OK or any
+ * @param *errcode int where to store the conversion status: NUMERUS_OK or any
  * other error. Can be NULL to ignore the error (NOT recommended).
  * @returns char* a string containing the roman numeral or NULL when an error
  * occurs.
@@ -735,7 +735,7 @@ char *numerus_int_to_roman(long int_value, int *errcode) {
  *
  * @param double_value double precision floating point value to be converted to
  * roman numeral.
- * @param *errcode int where to store the conversion status, NUMERUS_OK or any
+ * @param *errcode int where to store the conversion status: NUMERUS_OK or any
  * other error. Can be NULL to ignore the error (NOT recommended).
  * @returns char* a string containing the roman numeral or NULL when an error
  * occurs.
@@ -764,7 +764,7 @@ char *numerus_double_to_roman(double double_value, int *errcode) {
  * and converted to roman numeral.
  * @param twelfths short integer as number of twelfths (1/12) to be added to the
  * integer part and converted to roman numeral.
- * @param *errcode int where to store the conversion status, NUMERUS_OK or any
+ * @param *errcode int where to store the conversion status: NUMERUS_OK or any
  * other error. Can be NULL to ignore the error (NOT recommended).
  * @returns char* a string containing the roman numeral or NULL when an error
  * occurs.
