@@ -377,12 +377,8 @@ void numtest_null_handling_utils() {
     pretty = numerus_pretty_print_long_numerals("_", &errcode);
     pretty = numerus_pretty_print_long_numerals("i..", &errcode);
     pretty = numerus_pretty_print_long_numerals("i..", NULL);
-    char *fraction = numerus_shorten_fraction(13);
-    fraction = numerus_shorten_fraction(-13);
-    fraction = numerus_shorten_fraction(-0);
-    fraction = numerus_shorten_fraction(0);
-    pretty = numerus_pretty_print_float_value(20492.51, 1);
-    pretty = numerus_pretty_print_float_value(20492.51, 0);
+    pretty = numerus_pretty_print_value_as_parts(20492, 3);
+    pretty = numerus_pretty_print_value_as_parts(20492, 0);
 }
 
 
@@ -426,6 +422,43 @@ int numtest_pretty_print_all_numerals() {
     printf("Time to pretty print all 96000001 float roman numerals both ways as parts: %f\n",
            seconds_taken);
     printf("It's %f string generations (with conversions) per second.\n",
+           96000001.0/seconds_taken);
+    return 0;
+}
+
+
+
+int numtest_pretty_print_all_values() {
+    long int_part;
+    short frac_part;
+    char *roman;
+    char *pretty_roman;
+    int errcode;
+    printf("Starting pretty printing of all values with parts\n");
+    clock_t start_clock = clock();
+    for (int_part = NUMERUS_MIN_LONG_NONFLOAT_VALUE;
+         int_part <= NUMERUS_MAX_LONG_NONFLOAT_VALUE; int_part++) {
+        for (frac_part = 0; frac_part < 12; frac_part++) {
+            frac_part = SIGN(int_part) * ABS(frac_part);
+            pretty_roman = numerus_pretty_print_value_as_parts(int_part, frac_part);
+            if (pretty_roman == NULL) {
+                fprintf(stderr, "Error pretty printing %ld, %d to value.\n",
+                        int_part, frac_part);
+                return 1;
+            }
+            frac_part = ABS(frac_part);
+            free(pretty_roman);
+        }
+        if (int_part % 100000 == 0) {
+            printf("%5.2f%%\n", 100.0 * (int_part +
+                                         NUMERUS_MAX_LONG_NONFLOAT_VALUE) / 7999999.0);
+        }
+    }
+    clock_t end_clock = clock();
+    double seconds_taken = (end_clock - start_clock) / (double) CLOCKS_PER_SEC;
+    printf("Time to pretty print all 96000001 float values as parts: %f\n",
+           seconds_taken);
+    printf("It's %f string generations per second.\n",
            96000001.0/seconds_taken);
     return 0;
 }
