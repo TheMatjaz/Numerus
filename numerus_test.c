@@ -38,6 +38,7 @@ int numtest_convert_all_floats_with_parts() {
     for (int_part = NUMERUS_MIN_LONG_NONFLOAT_VALUE; int_part <=
                                                      NUMERUS_MAX_LONG_NONFLOAT_VALUE; int_part++) {
         for (frac_part = 0; frac_part < 12; frac_part++) {
+            frac_part = SIGN(int_part) * ABS(frac_part);
             roman = numerus_int_with_twelfth_to_roman(int_part, frac_part, &errcode);
             if (errcode != NUMERUS_OK) {
                 fprintf(stderr, "Error converting %ld, %d to roman: %s\n",
@@ -55,6 +56,7 @@ int numtest_convert_all_floats_with_parts() {
                         int_part, frac_part, numerus_parts_to_double(int_part, frac_part), roman, int_part_converted, frac_part_converted, numerus_parts_to_double(int_part_converted, frac_part_converted));
                 return 1;
             }
+            frac_part = ABS(frac_part);
             free(roman);
         }
         if (int_part % 100000 == 0) {
@@ -83,6 +85,7 @@ int numtest_convert_all_floats_with_doubles() {
     for (int_part = NUMERUS_MIN_LONG_NONFLOAT_VALUE; int_part <=
                                                      NUMERUS_MAX_LONG_NONFLOAT_VALUE; int_part++) {
         for (frac_part = 0; frac_part < 12; frac_part++) {
+            frac_part = SIGN(int_part) * ABS(frac_part);
             to_convert = numerus_parts_to_double(int_part, frac_part);
             roman = numerus_double_to_roman(to_convert, &errcode);
             if (errcode != NUMERUS_OK) {
@@ -101,6 +104,7 @@ int numtest_convert_all_floats_with_doubles() {
                         to_convert, int_part, frac_part, roman, converted);
                 return 1;
             }
+            frac_part = ABS(frac_part);
             free(roman);
         }
         if (int_part % 100000 == 0) {
