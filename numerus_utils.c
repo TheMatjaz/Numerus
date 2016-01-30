@@ -52,7 +52,7 @@ short _num_is_zero(char *roman) {
  * other error.
  * @returns void as the result is stored in **errcode.
  */
-void _num_headtrim_check_numeral(char **roman, int **errcode) {
+void _num_headtrim_check_numeral_and_errcode(char **roman, int **errcode) {
     if (*errcode == NULL) {
         *errcode = &numerus_error_code;
     }
@@ -92,7 +92,7 @@ void _num_headtrim_check_numeral(char **roman, int **errcode) {
  * otherwise.
  */
 short numerus_is_zero(char *roman, int *errcode) {
-    _num_headtrim_check_numeral(&roman, &errcode);
+    _num_headtrim_check_numeral_and_errcode(&roman, &errcode);
     if (*errcode != NUMERUS_OK) {
         return false;
     }
@@ -122,7 +122,7 @@ short numerus_is_zero(char *roman, int *errcode) {
  * otherwise.
  */
 short numerus_is_long_numeral(char *roman, int *errcode) {
-    _num_headtrim_check_numeral(&roman, &errcode);
+    _num_headtrim_check_numeral_and_errcode(&roman, &errcode);
     if (*errcode != NUMERUS_OK) {
         return false;
     }
@@ -181,7 +181,7 @@ short numerus_is_long_numeral(char *roman, int *errcode) {
  * otherwise.
  */
 short numerus_is_float_numeral(char *roman, int *errcode) {
-    _num_headtrim_check_numeral(&roman, &errcode);
+    _num_headtrim_check_numeral_and_errcode(&roman, &errcode);
     if (*errcode != NUMERUS_OK) {
         return false;
     }
@@ -227,7 +227,7 @@ short numerus_is_float_numeral(char *roman, int *errcode) {
  * if negative, +1 if positive.
  */
 short numerus_sign(char *roman, int *errcode) {
-    _num_headtrim_check_numeral(&roman, &errcode);
+    _num_headtrim_check_numeral_and_errcode(&roman, &errcode);
     if (*errcode != NUMERUS_OK) {
         return 0;
     }
@@ -260,8 +260,8 @@ short numerus_sign(char *roman, int *errcode) {
  * other error. Can be NULL to ignore the error (NOT recommended).
  * @returns short with the number of roman characters excluding underscores.
  */
-    _num_headtrim_check_numeral(&roman, &errcode);
 short numerus_count_roman_chars(char *roman, int *errcode) {
+    _num_headtrim_check_numeral_and_errcode(&roman, &errcode);
     if (*errcode != NUMERUS_OK) {
         numerus_error_code = *errcode;
         return -1;
