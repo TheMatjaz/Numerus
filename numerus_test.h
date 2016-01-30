@@ -15,3 +15,4 @@ int numtest_convert_all_floats_with_parts();
 void numtest_parts_to_from_double_functions();
 void numtest_null_handling_conversions();
 void numtest_null_handling_utils();
+int numtest_pretty_print_all_numerals();

@@ -384,3 +384,48 @@ void numtest_null_handling_utils() {
     pretty = numerus_pretty_print_float_value(20492.51, 1);
     pretty = numerus_pretty_print_float_value(20492.51, 0);
 }
+
+
+int numtest_pretty_print_all_numerals() {
+    long int_part;
+    short frac_part;
+    long int_part_converted;
+    short frac_part_converted;
+    char *roman;
+    char *pretty_roman;
+    int errcode;
+    printf("Starting pretty printing of all roman numerals with parts\n");
+    clock_t start_clock = clock();
+    for (int_part = NUMERUS_MIN_LONG_NONFLOAT_VALUE;
+         int_part <= NUMERUS_MAX_LONG_NONFLOAT_VALUE; int_part++) {
+        for (frac_part = 0; frac_part < 12; frac_part++) {
+            frac_part = SIGN(int_part) * ABS(frac_part);
+            roman = numerus_int_with_twelfth_to_roman(int_part, frac_part, &errcode);
+            if (errcode != NUMERUS_OK) {
+                fprintf(stderr, "Error converting %ld, %d to roman (%s): %s\n",
+                        int_part, frac_part, roman, numerus_explain_error(errcode));
+                return 1;
+            }
+            pretty_roman = numerus_pretty_print_long_numerals(roman, &errcode);
+            if (errcode != NUMERUS_OK) {
+                fprintf(stderr, "Error pretty printing %s (%ld, %d) to value: %s.\n",
+                        roman, int_part, frac_part, numerus_explain_error(errcode));
+                return 1;
+            }
+            frac_part = ABS(frac_part);
+            free(roman);
+            free(pretty_roman);
+        }
+        if (int_part % 100000 == 0) {
+            printf("%5.2f%%\n", 100.0 * (int_part +
+                                         NUMERUS_MAX_LONG_NONFLOAT_VALUE) / 7999999.0);
+        }
+    }
+    clock_t end_clock = clock();
+    double seconds_taken = (end_clock - start_clock) / (double) CLOCKS_PER_SEC;
+    printf("Time to pretty print all 96000001 float roman numerals both ways as parts: %f\n",
+           seconds_taken);
+    printf("It's %f string generations (with conversions) per second.\n",
+           96000001.0/seconds_taken);
+    return 0;
+}
