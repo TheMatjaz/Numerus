@@ -375,37 +375,85 @@ short numerus_compare_value(char *roman_bigger, char *roman_smaller, int *errcod
 }
 
 
-static size_t _num_pretty_print_malloc_size(char *roman) {
-    size_t alloc_size = 0;
-    while (*roman != '\0' && !isspace(*roman)) {
-        if (*roman != '_') {
-            alloc_size++;
-        }
-        if (alloc_size > NUMERUS_MAX_LENGTH * 2) {
-            return 0;
+/**
+ * Analyzes how many chars are necessary to allocate the first line of the
+ * pretty-printing version of a long roman numeral without security checks.
+ *
+ * It has to be used after the roman numeral has been already checked with
+ * numerus_count_roman_chars() to prevent any errors.
+ */
+static size_t _num_overlining_alloc_size(char *roman) {
+    size_t alloc_size_to_add = 0;
+    char *first_underscore = NULL;
+    char *second_underscore = NULL;
+    while (second_underscore == NULL && *roman != '\0') {
+        if (*roman == '_') {
+            if (first_underscore == NULL) {
+                first_underscore = roman;
+            } else {
+                second_underscore = roman;
+            }
+        } else {
+            alloc_size_to_add++;
         }
         roman++;
     }
-    alloc_size++; /* For '\n' at end of first line with underscores "____" */
-    return alloc_size;
+    /* Includes space for a '\n' */
+    alloc_size_to_add += second_underscore - first_underscore;
+    return alloc_size_to_add;
 }
 
-/* TODO: USE THE LENGTH MEASURING FUNCTION TO FIND ANY ILLEGAL CHARACTERS? */
 
+/**
+ * Allocates a string with a prettier representation of a long roman numeral
+ * with actual overlining.
+ *
+ * Generates a two lined string (newline character is '\n') by overlining the
+ * part between underscores. The string is just copied if the roman numeral is
+ * not long.
+ *
+ * Remember to free() the pretty-printed roman numeral when it's not useful
+ * anymore and (depending on your necessity) also the roman numeral itself.
+ *
+ * Example:
+ *
+ * <pre>
+ *                  ___
+ * -_CXX_VIII  =>  -CXXVIII
+ *
+ * VIII        =>   VIII
+ * </pre>
+ *
+ * The operation status is stored in the errcode passed as parameter, which
+ * can be NULL to ignore the error, although it's not recommended. If the the
+ * error code is different than NUMERUS_OK, an error occured during the
+ * operation and the returned value is NULL. The error code may help find the
+ * specific error.
+ *
+ * @param *roman string containing the roman numeral.
+ * @param *errcode int where to store the analysis status: NUMERUS_OK or any
+ * other error. Can be NULL to ignore the error (NOT recommended).
+ * @returns short with the number of roman characters excluding underscores.
+ */
 char *numerus_pretty_print_long_numerals(char *roman, int *errcode) {
-    _num_headtrim_check_numeral(&roman, &errcode);
+    _num_headtrim_check_numeral_and_errcode(&roman, &errcode);
     if (*errcode != NUMERUS_OK) {
-        return false;
+        return NULL;
+    }
+    int length = numerus_count_roman_chars(roman, errcode);
+    if (*errcode != NUMERUS_OK) {
+        numerus_error_code = *errcode;
+        return NULL;
     }
     if (numerus_is_long_numeral(roman, errcode)) {
-        char *roman_start = roman;
-        char *pretty_roman = malloc(_num_pretty_print_malloc_size(roman));
-        if (pretty_roman == NULL) {
+        char *pretty_roman_start = malloc(length + _num_overlining_alloc_size(roman));
+        if (pretty_roman_start == NULL) {
             numerus_error_code = NUMERUS_ERROR_MALLOC_FAIL;
             *errcode = NUMERUS_ERROR_MALLOC_FAIL;
             return NULL;
         }
-        char *pretty_roman_start = pretty_roman;
+        char *roman_start = roman;
+        char *pretty_roman = pretty_roman_start;
 
         /* Skip minus sign */
         if (*roman == '-') {
@@ -425,7 +473,7 @@ char *numerus_pretty_print_long_numerals(char *roman, int *errcode) {
         /* Copy the numeral in the second line */
         roman = roman_start;
         while (*roman != '\0') {
-            if (*roman == '_') { // TODO remove this if, should still work
+            if (*roman == '_') {
                 roman++;
             } else {
                 *(pretty_roman++) = *roman;
@@ -435,7 +483,20 @@ char *numerus_pretty_print_long_numerals(char *roman, int *errcode) {
         *pretty_roman = '\0';
         return pretty_roman_start;
     } else {
-        return roman;
+        /* Not a long roman numeral or error */
+        if (*errcode != NUMERUS_OK) {
+            numerus_error_code = *errcode;
+            return NULL;
+        } else {
+            char *roman_copy = malloc(strlen(roman) + 1);
+            if (roman_copy == NULL) {
+                numerus_error_code = NUMERUS_ERROR_MALLOC_FAIL;
+                *errcode = NUMERUS_ERROR_MALLOC_FAIL;
+                return NULL;
+            }
+            strcpy(roman_copy, roman);
+            return roman_copy;
+        }
     }
 }
 
