@@ -819,4 +819,3 @@ char *numerus_int_with_twelfth_to_roman(long int_part, short twelfths,
     *errcode = NUMERUS_OK;
     return returnable_roman_string;
 }
-
