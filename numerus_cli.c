@@ -173,8 +173,11 @@ static int _num_parse_command(char *command) {
         if (errcode == NUMERUS_OK) { // a roman is typed
             if (pretty_printing == 1) {
                 char *pretty_value;
-                printf("%s\n", pretty_value = numerus_pretty_print_float_value(value, 1));
-                free(pretty_value);
+                printf("%s\n", pretty_value = numerus_pretty_print_value_as_double(
+                        value));
+                if (pretty_value != NULL) {
+                    free(pretty_value);
+                }
                 return 1;
             } else {
                 printf("%15.15f\n", value);

@@ -500,81 +500,76 @@ char *numerus_pretty_print_long_numerals(char *roman, int *errcode) {
     }
 }
 
-char *numerus_shorten_fraction(short twelfth) {
-    if (twelfth < 0) {
-        switch (twelfth) {
-            case -11:
-                return "-11/12";
-            case -10:
-                return "-5/6";
-            case -9:
-                return "-3/4";
-            case -8:
-                return "-2/3";
-            case -7:
-                return "-7/12";
-            case -6:
-                return "-1/2";
-            case -5:
-                return "-5/12";
-            case -4:
-                return "-1/3";
-            case -3:
-                return "-1/4";
-            case -2:
-                return "-1/6";
-            case -1:
-                return "-1/12";
-            default:
-                return NULL;
+/* Euclidean algorithm for computing the greatest common divisor */
+static short _num_greatest_common_divisor(short numerator, short denominator) {
+    numerator = ABS(numerator);
+    denominator = ABS(denominator);
+    while (numerator != denominator) {
+        if (numerator > denominator) {
+            numerator -= denominator;
+        } else {
+            denominator -= numerator;
         }
-    } else {
-        switch (twelfth) {
-            case 0:
-                return "0/12";
-            case 1:
-                return "1/12";
-            case 2:
-                return "1/6";
-            case 3:
-                return "1/4";
-            case 4:
-                return "1/3";
-            case 5:
-                return "5/12";
-            case 6:
-                return "1/2";
-            case 7:
-                return "7/12";
-            case 8:
-                return "2/3";
-            case 9:
-                return "3/4";
-            case 10:
-                return "5/6";
-            case 11:
-                return "11/12";
-            default:
-                return NULL;
-        }
+    }
+    return numerator;
+}
+
+
+/**
+ * Shortens the twelfths by adding the remainder to the int part so that they
+ * have the same sign.
+ *
+ * It's useful when the twelfths are more than 11 (or -11 if negative).
+ *
+ * Modifies the passed parameters themselves. The sign of the twelfth will be
+ * the same of the int part (the int part leads) for a correct conversion to
+ * roman numeral.
+ *
+ * @param *int_part long integer part of a value
+ * @param *twelfths twelfth of the value
+ * @returns void since modifies the passed values
+ */
+void numerus_shorten_and_same_sign_to_parts(long *int_part, short *twelfths) {
+    *int_part += *twelfths / 12;
+    *twelfths = *twelfths % (short) 12;
+    if (*int_part > 0 && *twelfths < 0) {
+        *int_part -= 1;
+        *twelfths += 12;
+    } else if (*int_part < 0 && *twelfths > 0) {
+        *int_part += 1;
+        *twelfths -= 12;
     }
 }
 
-char *numerus_pretty_print_float_value(double double_value, int shorten) {
+
+char *numerus_pretty_print_value_as_double(double double_value) {
     short twelfths;
     long int_part = numerus_double_to_parts(double_value, &twelfths);
-    char *pretty_value = malloc(17);
-    if (pretty_value == NULL) {
-        numerus_error_code = NUMERUS_ERROR_MALLOC_FAIL;
-        return NULL;
-    }
+    return numerus_pretty_print_value_as_parts(int_part, twelfths);
+}
+
+
+char *numerus_pretty_print_value_as_parts(long int_part, short twelfths) {
+    char *pretty_value;
     if (twelfths == 0) {
-        snprintf(pretty_value, 17, "%ld", int_part);
-    } else if (shorten) {
-        snprintf(pretty_value, 17, "%ld, %s", int_part,
-                 numerus_shorten_fraction(twelfths));
+        size_t needed_space = snprintf(NULL, 0, "%ld", int_part);
+        pretty_value = malloc(needed_space + 1); /* +1 for '\0' */
+        if (pretty_value == NULL) {
+            numerus_error_code = NUMERUS_ERROR_MALLOC_FAIL;
+            return NULL;
+        }
+        sprintf(pretty_value, "%ld", int_part);
     } else {
-        snprintf(pretty_value, 17, "%ld, %d/12", int_part, twelfths);
+        numerus_shorten_and_same_sign_to_parts(&int_part, &twelfths);
+        /* Shorten twelfth fraction */
+        short gcd = _num_greatest_common_divisor(twelfths, 12);
+        size_t needed_space = snprintf(NULL, 0, "%ld, %d/%d", int_part, twelfths/gcd, 12/gcd);
+        pretty_value = malloc(needed_space + 1); /* +1 for '\0' */
+        if (pretty_value == NULL) {
+            numerus_error_code = NUMERUS_ERROR_MALLOC_FAIL;
+            return NULL;
+        }
+        sprintf(pretty_value, "%ld, %d/%d", int_part, twelfths/gcd, 12/gcd);
     }
     return pretty_value;
 }

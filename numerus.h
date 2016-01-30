@@ -44,6 +44,7 @@ double numerus_roman_to_double(char *roman, int *errcode);
 /* Functions to manage twelfths */
 long numerus_double_to_parts(double value, short *twelfths);
 double numerus_parts_to_double(long int_part, short twelfths);
+void numerus_shorten_and_same_sign_to_parts(long *int_part, short *twelfths);
 
 
 /* Numeral analysis functions */
@@ -57,8 +58,8 @@ short numerus_compare_value(char *roman_bigger, char *roman_smaller, int *errcod
 
 /* Output formatting functions */
 char *numerus_pretty_print_long_numerals(char *roman, int *errcode);
-char *numerus_pretty_print_float_value(double double_value, int shorten);
-char *numerus_shorten_fraction(short twelfth);
+char *numerus_pretty_print_value_as_double(double double_value);
+char *numerus_pretty_print_value_as_parts(long int_part, short twelfths);
 const char *numerus_explain_error(int error_code);
 
 

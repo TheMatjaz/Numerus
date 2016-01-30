@@ -672,33 +672,6 @@ static char *_num_value_part_to_roman(long value, char *roman,
 
 
 /**
- * Shortens the twelfths by adding the remainder to the int part so that they
- * have the same sign.
- *
- * It's useful when the twelfths are more than 11 (or -11 if negative).
- *
- * Modifies the passed parameters themselves. The sign of the twelfth will be
- * the same of the int part (the int part leads) for a correct conversion to
- * roman numeral.
- *
- * @param *int_part long integer part of a value
- * @param *twelfths twelfth of the value
- * @returns void since modifies the passed values
- */
-void _num_shorten_and_prepare_parts(long *int_part, short *twelfths) {
-    *int_part += *twelfths / 12;
-    *twelfths = *twelfths % (short) 12;
-    if (*int_part > 0 && *twelfths < 0) {
-        *int_part -= 1;
-        *twelfths += 12;
-    } else if (*int_part < 0 && *twelfths > 0) {
-        *int_part += 1;
-        *twelfths -= 12;
-    }
-}
-
-
-/**
  * Converts a long integer value to a roman numeral with its value.
  *
  * Accepts any long within
@@ -779,7 +752,7 @@ char *numerus_int_with_twelfth_to_roman(long int_part, short twelfths,
                                         int *errcode) {
 
     /* Prepare variables */
-    _num_shorten_and_prepare_parts(&int_part, &twelfths);
+    numerus_shorten_and_same_sign_to_parts(&int_part, &twelfths);
     double double_value = numerus_parts_to_double(int_part, twelfths);
     if (errcode == NULL) {
         errcode = &numerus_error_code;
