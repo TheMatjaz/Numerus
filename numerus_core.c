@@ -540,6 +540,7 @@ long numerus_roman_to_int(char *roman, int *errcode) {
  * possible range of values when an error occurs.
  */
 long numerus_roman_to_int_and_frac_part(char *roman, short *frac_part, int *errcode) {
+    /* Prepare variables */
     long int_part;
     int response_code;
     short zero_frac_part = 0;
@@ -551,15 +552,21 @@ long numerus_roman_to_int_and_frac_part(char *roman, short *frac_part, int *errc
     }
     struct _num_numeral_parser_data parser_data;
     _num_init_parser_data(&parser_data, roman);
+
+    /* Check for illegal symbols or length */
     numerus_numeral_length(roman, &response_code);
     if (response_code != NUMERUS_OK) {
         numerus_error_code = response_code;
         *errcode = response_code;
         return NUMERUS_MAX_LONG_NONFLOAT_VALUE + 10;
     }
+
+    /* Skip initial whitespace */
     while (isspace(*roman)) {
         roman++;
     }
+
+    /* Conversion if NUMERUS_NULLA */
     if (_num_is_zero(roman)) {
         int_part = 0;
         *frac_part = 0;
@@ -567,6 +574,8 @@ long numerus_roman_to_int_and_frac_part(char *roman, short *frac_part, int *errc
         *errcode = NUMERUS_OK;
         return int_part;
     }
+
+    /* Conversion of other cases */
     if (*parser_data.current_numeral_position == '-') {
         parser_data.numeral_sign = -1;
         parser_data.current_numeral_position++;
@@ -615,11 +624,8 @@ long numerus_roman_to_int_and_frac_part(char *roman, short *frac_part, int *errc
 /**
  * Copies a string of 1 or 2 characters.
  *
- * Copies the character from the source to the destination. If there is another
- * character after that, that is not the null terminator, copies that as well.
- * Everything is performed without security checks for faster performance. This
- * function is used by numerus_short_to_roman() and it's meant to be used just
- * on the _num_char_struct in the dictionary _NUM_DICTIONARY.
+ * Copies a character from the source to the destination. If there is another
+ * character after that in the source, copies that as well.
  *
  * @param *source the string of 1-2 characters to copy
  * @param *destination the string, already allocated, to copy the *source into
@@ -638,14 +644,24 @@ static char *_num_copy_char_from_dictionary(const char *source,
 
 
 /**
- * Converts just the internal part of the underscores or the part after them.
+ * Converts a value to a part of a roman numeral for the part between
+ * underscores or the part after them.
  *
- * Stores it into `*roman_string`.
+ * Appends the generated numeral to the passed position in the roman string,
+ * already allocated. Starts comparing the values with the specified dictionary
+ * char.
  *
- * @returns position after the inserted string.
+ * @param value long to be converted to a roman numeral
+ * @param *roman string where to add the generated roman numral
+ * @param dictionary_start_char int index of the dictionary to specify the
+ * starting dictionary entry to compare the characters with
+ * @returns position after the inserted string
  */
-static char *_num_value_part_to_roman(long value, char *roman, int dictionary_start_char) {
-    const struct _num_dictionary_char *current_dictionary_char = &_NUM_DICTIONARY[dictionary_start_char];
+static char *_num_value_part_to_roman(long value, char *roman,
+                                      int dictionary_start_char) {
+
+    const struct _num_dictionary_char *current_dictionary_char
+            = &_NUM_DICTIONARY[dictionary_start_char];
     while (value > 0) {
         while (value >= current_dictionary_char->value) {
             roman = _num_copy_char_from_dictionary(
@@ -657,9 +673,20 @@ static char *_num_value_part_to_roman(long value, char *roman, int dictionary_st
     return roman;
 }
 
+
 /**
- * Shorten the twelfths by adding the remainder to the int part so that they
+ * Shortens the twelfths by adding the remainder to the int part so that they
  * have the same sign.
+ *
+ * It's useful when the twelfths are more than 11 (or -11 if negative).
+ *
+ * Modifies the passed parameters themselves. The sign of the twelfth will be
+ * the same of the int part (the int part leads) for a correct conversion to
+ * roman numeral.
+ *
+ * @param *int_part long integer part of a value
+ * @param *frac_part twelfth of the value
+ * @returns void since modifies the passed values
  */
 void _num_shorten_and_prepare_parts(long *int_part, short *frac_part) {
     *int_part += *frac_part / 12;
@@ -673,17 +700,81 @@ void _num_shorten_and_prepare_parts(long *int_part, short *frac_part) {
     }
 }
 
+
+/**
+ * Converts a long integer value to a roman numeral with its value.
+ *
+ * Accepts any long within
+ * [NUMERUS_MAX_LONG_NONFLOAT_VALUE, NUMERUS_MIN_LONG_NONFLOAT_VALUE].
+ *
+ * The conversion status is stored in the errcode passed as parameter, which
+ * can be NULL to ignore the error, although it's not recommended. If the the
+ * error code is different than NUMERUS_OK, an error occured during the
+ * conversion and the returned string is NULL. The error code may help find the
+ * specific error.
+ *
+ * @param int_value long integer to be converted to roman numeral.
+ * @param *errcode int where to store the conversion status, NUMERUS_OK or any
+ * other error. Can be NULL to ignore the error (NOT recommended).
+ * @returns char* a string containing the roman numeral or NULL when an error
+ * occurs.
+ */
 char *numerus_int_to_roman(long int_value, int *errcode) {
     return numerus_int_with_twelfth_to_roman(int_value, 0, errcode);
 }
 
+
+/**
+ * Converts a double value to a roman numeral with its value.
+ *
+ * Accepts any long within [NUMERUS_MAX_VALUE, NUMERUS_MIN_VALUE]. The decimal
+ * part of the value is also converted.
+ *
+ * The conversion status is stored in the errcode passed as parameter, which
+ * can be NULL to ignore the error, although it's not recommended. If the the
+ * error code is different than NUMERUS_OK, an error occured during the
+ * conversion and the returned string is NULL. The error code may help find the
+ * specific error.
+ *
+ * @param double_value double precision floating point value to be converted to
+ * roman numeral.
+ * @param *errcode int where to store the conversion status, NUMERUS_OK or any
+ * other error. Can be NULL to ignore the error (NOT recommended).
+ * @returns char* a string containing the roman numeral or NULL when an error
+ * occurs.
+ */
 char *numerus_double_to_roman(double double_value, int *errcode) {
     short frac_part;
     long int_part = numerus_double_to_parts(double_value, &frac_part);
     return numerus_int_with_twelfth_to_roman(int_part, frac_part, errcode);
 }
 
-char *numerus_int_with_twelfth_to_roman(long int_part, short frac_part, int *errcode) {
+
+/**
+ * Converts an integer value and a number of twelfths to a roman numeral with
+ * their sum as value.
+ *
+ * Accepts any pair of integer value and twelfths so that their sum is within
+ * [NUMERUS_MAX_VALUE, NUMERUS_MIN_VALUE].
+ *
+ * The conversion status is stored in the errcode passed as parameter, which
+ * can be NULL to ignore the error, although it's not recommended. If the the
+ * error code is different than NUMERUS_OK, an error occured during the
+ * conversion and the returned string is NULL. The error code may help find the
+ * specific error.
+ *
+ * @param int_part long integer part of a value to be added to the twelfths
+ * and converted to roman numeral.
+ * @param twelfths short integer as number of twelfths (1/12) to be added to the
+ * integer part and converted to roman numeral.
+ * @param *errcode int where to store the conversion status, NUMERUS_OK or any
+ * other error. Can be NULL to ignore the error (NOT recommended).
+ * @returns char* a string containing the roman numeral or NULL when an error
+ * occurs.
+ */
+char *numerus_int_with_twelfth_to_roman(long int_part, short frac_part,
+                                        int *errcode) {
+
     /* Prepare variables */
     _num_shorten_and_prepare_parts(&int_part, &frac_part);
     double double_value = numerus_parts_to_double(int_part, frac_part);
@@ -716,20 +807,21 @@ char *numerus_int_with_twelfth_to_roman(long int_part, short frac_part, int *err
     }
 
     /* Create part between underscores */
-    if (double_value > NUMERUS_MAX_NONLONG_FLOAT_VALUE) { /* Underscores are needed */
+    if (double_value > NUMERUS_MAX_NONLONG_FLOAT_VALUE) {
+        /* Underscores are needed */
         *(roman_numeral++) = '_';
-        roman_numeral = _num_value_part_to_roman(int_part / 1000, roman_numeral, 0); /* Integer cast to avoid decimals in part between underscores */
-        int_part -= (int_part / 1000) * 1000; /* Remove the three left-most digits because of the integer division */
+        roman_numeral = _num_value_part_to_roman(int_part / 1000,
+                                                 roman_numeral, 0);
+        int_part -= (int_part / 1000) * 1000; /* Remove 3 left-most digits */
         *(roman_numeral++) = '_';
-        /* Part after underscores without "M" char, start parsing the dictonary with "CM" */
+        /* Part after underscores without "M" char, start with "CM" */
         roman_numeral = _num_value_part_to_roman(int_part, roman_numeral, 1);
     } else {
-        /* No underscores, so with "M" char */
+        /* No underscores needed, so starting with "M" char */
         roman_numeral = _num_value_part_to_roman(int_part, roman_numeral, 0);
     }
-    /* Decimal part, start parsing the dictonary with "S" */
+    /* Decimal part, starting with "S" char */
     roman_numeral = _num_value_part_to_roman(frac_part, roman_numeral, 13);
-
     *(roman_numeral++) = '\0';
 
     /* Copy out of the buffer and return it on the heap */
