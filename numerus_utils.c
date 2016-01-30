@@ -427,17 +427,13 @@ static size_t _num_overlining_alloc_size(char *roman) {
  * VIII        =>   VIII
  * </pre>
  *
- * The operation status is stored in the errcode passed as parameter, which
- * can be NULL to ignore the error, although it's not recommended. If the the
- * error code is different than NUMERUS_OK, an error occured during the
- * operation and the returned value is NULL. The error code may help find the
- * specific error.
+ * If a malloc() error occurs during the operation, the returned value is NULL.
  *
  * @param *roman string containing the roman numeral.
  * @param *errcode int where to store the analysis status: NUMERUS_OK or any
  * other error. Can be NULL to ignore the error (NOT recommended).
  * @returns char* allocated string with the prettier version of the roman
- * numeral.
+ * numeral or NULL if malloc() fails.
  */
 char *numerus_pretty_print_long_numerals(char *roman) {
     int errcode;
@@ -582,6 +578,7 @@ char *numerus_pretty_print_value_as_double(double double_value) {
  * and a number of twelfths, with the twelfths shortened.
  *
  * Remember to free() the pretty-printed value when it's not useful anymore.
+ * If a malloc() error occurs during the operation, the returned value is NULL.
  *
  * Example: `-3, 2` (= -3 + 2/12) becomes "-2, -5/6" (= -2 -10/12).
  *
@@ -589,7 +586,8 @@ char *numerus_pretty_print_value_as_double(double double_value) {
  * and converted to a pretty string.
  * @param twelfths short integer as number of twelfths (1/12) to be added to the
  * integer part and converted to a pretty string.
- * @returns char* allocated string with the prettier version of the value
+ * @returns char* allocated string with the prettier version of the value or
+ * NULL if malloc() fails.
  */
 char *numerus_pretty_print_value_as_parts(long int_part, short twelfths) {
     char *pretty_value;
