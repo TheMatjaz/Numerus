@@ -704,6 +704,8 @@ void _num_shorten_and_prepare_parts(long *int_part, short *twelfths) {
  * Accepts any long within
  * [NUMERUS_MAX_LONG_NONFLOAT_VALUE, NUMERUS_MIN_LONG_NONFLOAT_VALUE].
  *
+ * Remember to free() the roman numeral when it's not useful anymore.
+ *
  * The conversion status is stored in the errcode passed as parameter, which
  * can be NULL to ignore the error, although it's not recommended. If the the
  * error code is different than NUMERUS_OK, an error occured during the
@@ -726,6 +728,8 @@ char *numerus_int_to_roman(long int_value, int *errcode) {
  *
  * Accepts any long within [NUMERUS_MAX_VALUE, NUMERUS_MIN_VALUE]. The decimal
  * part of the value is also converted.
+ *
+ * Remember to free() the roman numeral when it's not useful anymore.
  *
  * The conversion status is stored in the errcode passed as parameter, which
  * can be NULL to ignore the error, although it's not recommended. If the the
@@ -753,6 +757,8 @@ char *numerus_double_to_roman(double double_value, int *errcode) {
  *
  * Accepts any pair of integer value and twelfths so that their sum is within
  * [NUMERUS_MAX_VALUE, NUMERUS_MIN_VALUE].
+ *
+ * Remember to free() the roman numeral when it's not useful anymore.
  *
  * The conversion status is stored in the errcode passed as parameter, which
  * can be NULL to ignore the error, although it's not recommended. If the the
@@ -794,6 +800,11 @@ char *numerus_int_with_twelfth_to_roman(long int_part, short twelfths,
     if (int_part == 0 && twelfths == 0) {
         /* Return writable copy of NUMERUS_ZERO on the heap */
         char *zero_string = malloc(strlen(NUMERUS_ZERO) + 1);
+        if (zero_string == NULL) {
+            numerus_error_code = NUMERUS_ERROR_MALLOC_FAIL;
+            *errcode = NUMERUS_ERROR_MALLOC_FAIL;
+            return NULL;
+        }
         strcpy(zero_string, NUMERUS_ZERO);
         return zero_string;
     } else if (int_part < 0) {
