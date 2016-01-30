@@ -437,7 +437,8 @@ static size_t _num_overlining_alloc_size(char *roman) {
  */
 char *numerus_pretty_print_long_numerals(char *roman) {
     int errcode;
-    _num_headtrim_check_numeral_and_errcode(&roman, &errcode);
+    int *errcode_pnt = &errcode;
+    _num_headtrim_check_numeral_and_errcode(&roman, &errcode_pnt);
     if (errcode != NUMERUS_OK) {
         return NULL;
     }
