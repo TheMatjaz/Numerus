@@ -430,8 +430,6 @@ static size_t _num_overlining_alloc_size(char *roman) {
  * If a malloc() error occurs during the operation, the returned value is NULL.
  *
  * @param *roman string containing the roman numeral.
- * @param *errcode int where to store the analysis status: NUMERUS_OK or any
- * other error. Can be NULL to ignore the error (NOT recommended).
  * @returns char* allocated string with the prettier version of the roman
  * numeral or NULL if malloc() fails.
  */
@@ -617,6 +615,7 @@ char *numerus_pretty_print_value_as_parts(long int_part, short twelfths) {
 
 
 /**
+ * @internal
  * Struct containing an error code and it's human-frendly text description,
  * useful to be printed on stderr, stdout or a log file.
  *
@@ -632,7 +631,7 @@ struct _num_error_codes {
  * List of error codes and their human-frendly text description, useful to
  * be printed on stderr, stdout or a log file.
  */
-struct _num_error_codes _NUM_ERROR_CODES[] = {
+static struct _num_error_codes _NUM_ERROR_CODES[] = {
     {NUMERUS_ERROR_VALUE_OUT_OF_RANGE,
             "The value to be converted to roman is out of conversion range."},
     {NUMERUS_ERROR_ILLEGAL_CHARACTER,
@@ -716,7 +715,7 @@ double numerus_parts_to_double(long int_part, short twelfths) {
  * twelfts. The number of twelfths is stored in the passed parameter, while the
  * integer part is returned directly.
  *
- * @param double value to be split into integer part and number of twelfths.
+ * @param value double to be split into integer part and number of twelfths.
  * @param *twelfths number of twelfths. NULL is interpreted as 0 twelfths.
  * @returns long as the integer part of the value of the roman numeral.
  */

@@ -31,22 +31,22 @@ extern int numerus_error_code;
 
 
 /* Conversion function from value to roman numeral */
+char *numerus_double_to_roman(double double_value, int *errcode);
 char *numerus_int_to_roman(long int_value, int *errcode);
 char *numerus_int_with_twelfth_to_roman(long int_part, short twelfths,
                                         int *errcode);
-char *numerus_double_to_roman(double double_value, int *errcode);
 
 
 /* Conversion function from roman numeral to value */
+double numerus_roman_to_double(char *roman, int *errcode);
+long numerus_roman_to_int(char *roman, int *errcode);
 long numerus_roman_to_int_part_and_twelfths(char *roman, short *twelfths,
                                             int *errcode);
-long numerus_roman_to_int(char *roman, int *errcode);
-double numerus_roman_to_double(char *roman, int *errcode);
 
 
 /* Functions to manage twelfths */
-long numerus_double_to_parts(double value, short *twelfths);
 double numerus_parts_to_double(long int_part, short twelfths);
+long numerus_double_to_parts(double value, short *twelfths);
 void numerus_shorten_and_same_sign_to_parts(long *int_part, short *twelfths);
 
 

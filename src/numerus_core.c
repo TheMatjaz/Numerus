@@ -106,6 +106,7 @@ int numerus_error_code = NUMERUS_OK;
 
 
 /**
+ * @internal
  * Struct containing a basic roman char, its integer value and the maximum
  * consecutive repetitions of it that a roman numeral may have.
  *

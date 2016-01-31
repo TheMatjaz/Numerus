@@ -14,6 +14,9 @@
 #include "numerus.h"
 
 
+/**
+ * Numerus example main that only starts the Numerus CLI.
+ */
 int main(int argc, char **args) {
     numerus_cli(argc, args);
     return 0;

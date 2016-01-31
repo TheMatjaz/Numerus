@@ -22,7 +22,17 @@
 #include <string.h>  /* For `strcmp()` */
 #include "numerus.h"
 
+/**
+ * @internal
+ * Macro to indicate that the CLI should continue its execution.
+ */
 #define NUMERUS_PROMPT_AGAIN 1
+
+
+/**
+ * @internal
+ * Macro ro indicate that the CLI should terminate.
+ */
 #define NUMERUS_STOP_REPL 0
 
 static const char *PROMPT_TEXT = "numerus> ";
