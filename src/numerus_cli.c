@@ -40,7 +40,7 @@ static const char *MOO_TEXT = "This is not an easter egg. Try `ascii`.\n";
 static const char *PING_TEXT = "Pong.\n";
 static const char *AVE_TEXT = "Ave tibi!\n";
 static const char *HELP_TEXT = ""
-"For ANY information about the library or the syntax of roman numeral, "
+"For ANY information about the library or the syntax of roman numeral, \n"
 "check the documentation available on https://thematjaz.github.io/Numerus/\n\n"
 ""
 "To convert an (arabic) integer to a roman numeral or vice-versa,\n"
@@ -49,7 +49,7 @@ static const char *HELP_TEXT = ""
 ""
 "pretty        switches on/off the pretty printing of long roman numerals\n"
 "              (with overlined notation instead of underscore notation)\n"
-"              and the pretty printing of values as integer and fractional part"
+"              and the pretty printing of values as integer and fractional part\n"
 "?, help       shows this help text\n"
 "info, about   shows version, credits, licence, repository of Numerus\n"
 "exit, quit    ends this shell\n\n"
