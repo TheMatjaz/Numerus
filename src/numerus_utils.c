@@ -423,32 +423,36 @@ static size_t _num_overlining_alloc_size(char *roman) {
  * <pre>
  *                  ___
  * -_CXX_VIII  =>  -CXXVIII
- *
  * VIII        =>   VIII
  * </pre>
  *
- * If a malloc() error occurs during the operation, the returned value is NULL.
+ * The prettifying process status is stored in the errcode passed as parameter,
+ * which can be NULL to ignore the error, although it's not recommended. If the
+ * error code is different than NUMERUS_OK, an error occured during the
+ * prettifying process and the returned string is NULL. The error code may help
+ * find the specific error.
  *
  * @param *roman string containing the roman numeral.
+ * @param *errcode int where to store the comparition status: NUMERUS_OK or any
+ * other error. Can be NULL to ignore the error (NOT recommended).
  * @returns char* allocated string with the prettier version of the roman
  * numeral or NULL if malloc() fails.
  */
-char *numerus_pretty_print_long_numerals(char *roman) {
-    int errcode;
-    int *errcode_pnt = &errcode;
-    _num_headtrim_check_numeral_and_errcode(&roman, &errcode_pnt);
-    if (errcode != NUMERUS_OK) {
+char *numerus_overline_long_numerals(char *roman, int *errcode) {
+    _num_headtrim_check_numeral_and_errcode(&roman, &errcode);
+    if (*errcode != NUMERUS_OK) {
         return NULL;
     }
-    int length = numerus_count_roman_chars(roman, &errcode);
-    if (errcode != NUMERUS_OK) {
-        numerus_error_code = errcode;
+    int length = numerus_count_roman_chars(roman, errcode);
+    if (*errcode != NUMERUS_OK) {
+        numerus_error_code = *errcode;
         return NULL;
     }
-    if (numerus_is_long_numeral(roman, &errcode)) {
+    if (numerus_is_long_numeral(roman, errcode)) {
         char *pretty_roman_start = malloc(length + _num_overlining_alloc_size(roman));
         if (pretty_roman_start == NULL) {
             numerus_error_code = NUMERUS_ERROR_MALLOC_FAIL;
+            *errcode = NUMERUS_ERROR_MALLOC_FAIL;
             return NULL;
         }
         char *roman_start = roman;
@@ -483,13 +487,14 @@ char *numerus_pretty_print_long_numerals(char *roman) {
         return pretty_roman_start;
     } else {
         /* Not a long roman numeral or error */
-        if (errcode != NUMERUS_OK) {
-            numerus_error_code = errcode;
+        if (*errcode != NUMERUS_OK) {
+            numerus_error_code = *errcode;
             return NULL;
         } else {
             char *roman_copy = malloc(strlen(roman) + 1);
             if (roman_copy == NULL) {
                 numerus_error_code = NUMERUS_ERROR_MALLOC_FAIL;
+                *errcode = NUMERUS_ERROR_MALLOC_FAIL;
                 return NULL;
             }
             strcpy(roman_copy, roman);
@@ -559,16 +564,18 @@ void numerus_shorten_and_same_sign_to_parts(long *int_part, short *twelfths) {
  * roman numeral as integer part and shortened twelfth.
  *
  * Remember to free() the pretty-printed value when it's not useful anymore.
+ * If a malloc() error occurs during the operation, the returned value is NULL.
  *
  * Example: -12.5 becomes "-12, -1/2".
  *
  * @param double_value double value to be converted in a pretty string.
- * @returns char* allocated string with the prettier version of the value.
+ * @returns char* allocated string with the prettier version of the value or
+ * NULL if malloc() fails.
  */
-char *numerus_pretty_print_value_as_double(double double_value) {
+char *numerus_create_pretty_value_as_double(double double_value) {
     short twelfths;
     long int_part = numerus_double_to_parts(double_value, &twelfths);
-    return numerus_pretty_print_value_as_parts(int_part, twelfths);
+    return numerus_create_pretty_value_as_parts(int_part, twelfths);
 }
 
 
@@ -588,7 +595,7 @@ char *numerus_pretty_print_value_as_double(double double_value) {
  * @returns char* allocated string with the prettier version of the value or
  * NULL if malloc() fails.
  */
-char *numerus_pretty_print_value_as_parts(long int_part, short twelfths) {
+char *numerus_create_pretty_value_as_parts(long int_part, short twelfths) {
     char *pretty_value;
     if (twelfths == 0) {
         size_t needed_space = snprintf(NULL, 0, "%ld", int_part);

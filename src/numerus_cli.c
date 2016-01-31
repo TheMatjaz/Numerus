@@ -175,9 +175,10 @@ void _num_convert_to_other_form_and_print(char *string) {
         /* Successful conversion */
         if (pretty_printing == 1) {
             /* Enabled pretty printing */
-            char *roman_pretty = numerus_pretty_print_long_numerals(roman);
-            if (roman_pretty == NULL) {
-                printf("%s\n", numerus_explain_error(NUMERUS_ERROR_MALLOC_FAIL));
+            int errcode;
+            char *roman_pretty = numerus_overline_long_numerals(roman, &errcode);
+            if (errcode != NUMERUS_OK) {
+                printf("%s\n", numerus_explain_error(errcode));
             } else {
                 /* Successfull transformed into pretty format */
                 printf("%s\n", roman_pretty);
@@ -196,7 +197,7 @@ void _num_convert_to_other_form_and_print(char *string) {
         /* The string is a roman numeral */
         if (pretty_printing == 1) {
             /* Pretty printing enabled */
-            char *pretty_value = numerus_pretty_print_value_as_double(value);
+            char *pretty_value = numerus_create_pretty_value_as_double(value);
             if (pretty_value == NULL) {
                 printf("%s\n", numerus_explain_error(NUMERUS_ERROR_MALLOC_FAIL));
             } else {
