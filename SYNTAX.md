@@ -1,23 +1,39 @@
-# Numerus syntax an nomenclature #
+# Numerus syntax and nomenclature #
 
 Numerus nomenclature
 ===============================================================================
 
-numeral
-roman char
-value
-integer part and twelft
-long
-float
-pretty
-CLI
+- **Roman char** or 
+  **Roman character**:
+      a character from the latin alphabet that represents a numeric value, for 
+      instance `C` means `100`.
+- **Numeral** or
+  **Roman numeral**:
+      a sequence of roman characters that have to be summed to represent a more
+      complex value.
+- **Value**:
+      usually this word indicates the value a roman numeral represents
+- **Integer part**:
+      the integer part of a value is the part before the decimal separator 
+      (usually the dot or comma) or a value without considerating the twelfths.
+- **Long numeral**:
+      a Numerus syntax to indicate numerals that hold integer values outside 
+      `[-3999, 3999]` that are written with underscores representing the 
+      overlined notation - where overlined characters have their values 
+      multiplied by 1000.
+- **Float numeral**:
+      a Numerus syntax to indicate numerals that hold a non-zero number of 
+      twelfths as well, making them approximate a floating point value.
+- **CLI**:
+    stands for _Command Line Interface_, a Numerus shell where any roman 
+    numeral can be typed to be converted to a value or the other way around.
 
 
 Roman numerals syntax (briefly)
 ===============================================================================
 
 This is a short explanation on how roman numerals work. For a different
-explanation, check the 
+one, check the 
 [Wikipedia article](https://en.wikipedia.org/wiki/Roman_numerals) on them.
 
 
@@ -55,8 +71,8 @@ resulting in:
 
 The rules to read and write roman numerals are:
 
-1. When `I`, `X`, `C`, `M` (powers of 10) stand before `V`, `L`, `D` (5 * 
-   powers of 10)  subtract them as shown above.
+1. When a character with smaller value stand before a character with bigger
+   value, subtract the smaller from the bigger, as shown above.
 2. For everything else, sum from the left to the right.
 
 An example:
@@ -111,9 +127,8 @@ Negative values
 ----------------------------------------
 
 Numerus uses the minus `-` sign at the beginning of a roman numeral to indicate
-that its value is negative.
-
-This allows writing integer values in `[-3999, 3999]`.
+that its value is negative. This allows writing integer values in
+`[-3999, 3999]`.
 
 An example:
 
@@ -142,12 +157,14 @@ MIIXVI = 1002016
 
 Numerus adopted this syntax with a difference: instead of actually overlining
 the characters, making them impossible to parse, encloses the characters that
-_should_ be overlined with _underscores_ `_`. This allows a simple record of 
-characters with values multiplied by 1000. These are called _long numerals_
-in the numerus nomenclature, resembling the name of a `long int` value they 
-represent. Creating an actually overlined numeral (a two-line string with 
-underscores in the first line) is possible with the numeral prettifying 
-function.
+_should_ be overlined with _underscores_ `_`. This allows a simple record of
+characters with values that have to be multiplied by 1000. Creating an actually
+overlined numeral (a two-line string with underscores in the first line) is
+possible with the numeral prettifying function.
+
+These are called _long numerals_ in the Numerus nomenclature, resembling the
+name of a `long int` value they represent. This allows writing integer values in
+`[-3999999, 3999999]`.
 
 Long numerals have have the following syntax:
 
@@ -161,7 +178,42 @@ An example:
  _MII_XVI = 1002016
 -_IV_I    =   -4001
  _MCMLII_ = 1952000
-
+```
 
 Float numerals
 ----------------------------------------
+
+Roman numerals provide fractional values in _twelfths (1/12)_ using the 
+character central dot `•` to indicate a _twelfth_. Numerus uses the normal dot 
+(period) `.` instead for simplicity. The character `S` is used to indicate one 
+_half (6/12)_ - `S` stands for _semis_, which means _half_ in latin.
+
+Numerus implements that feature allowing a fractional part in all roman numerals
+(except `NULLA`) just by adding `S` or `.` at the end of the numeral.  These are
+called _float numerals_ in the Numerus nomenclature, resembling the name of a
+`float` value they approximate. This allows writing all twelfths values in
+`[-3999999.91666, 3999999.91666]`.
+
+Float numerals have have the following syntax:
+
+- at the end of any roman numeral append `S` to indicate a fractional part of
+  one half (6/12) or more, if that is the case;
+- append up to five `.` to indicate additional 1 to 5 twelfths.
+- instead of indicating 12/12, switch to the next roman numeral instead of
+  appending another twelfth.
+
+Please note that a float numeral can be at the same time a long numeral and
+vice-versa. The nomenclature is a pure formality to indicate the capability of
+the numeral.
+
+
+Regex matching them all
+---------------------------------------
+
+Just for the documenation a regex matching all long, float, negative and 
+standard roman numerals but not (`-`)`NULLA` is:
+
+```
+-?((_M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})_)|M{0,3})(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})S?\\.{0,5}
+```
+
