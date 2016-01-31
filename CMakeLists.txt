@@ -6,11 +6,14 @@
 # the BSD 3-clause license.
 # -----------------------------------------------------------------------------
 
-cmake_minimum_required(VERSION 3.0.0)
+cmake_minimum_required(VERSION 3.3)
 project(Numerus)
+
 set(CMAKE_C_FLAGS "-Wall --std=c99")
-add_executable(numerus src/numerus_core.c
-                       src/numerus_utils.c
-                       src/numerus_cli.c
-                       src/main.c)
+set(SOURCE_FILES
+    src/main.c
+    src/numerus_cli.c
+    src/numerus_core.c
+    src/numerus_utils.c)
+add_executable(numerus ${SOURCE_FILES})
 
