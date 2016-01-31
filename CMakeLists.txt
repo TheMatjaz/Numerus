@@ -16,4 +16,3 @@ set(SOURCE_FILES
     src/numerus_core.c
     src/numerus_utils.c)
 add_executable(numerus ${SOURCE_FILES})
-

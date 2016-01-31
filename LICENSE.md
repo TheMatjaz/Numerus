@@ -1,3 +1,5 @@
+# Numerus license #
+
 Numerus is released under the _BSD 3-clause License_, also known as 
 _Revised BSD License_, _New BSD License_ or _Modified BSD License_.
 The full text of the license follows.

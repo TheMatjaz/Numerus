@@ -112,4 +112,3 @@ The inspirations for the conversion functions were:
  
 The [SQLite3 library](http://sqlite.org/) offered many ideas on keeping the
 code clean and creating a nice API. 
-
