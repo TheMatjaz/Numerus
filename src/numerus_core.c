@@ -613,8 +613,7 @@ long numerus_roman_to_int_part_and_twelfths(char *roman, short *twelfths,
         return NUMERUS_MAX_LONG_NONFLOAT_VALUE + 10;
     }
     int_part = parser_data.numeral_sign * parser_data.int_part;
-    *twelfths = parser_data.twelfths;
-    *twelfths = SIGN(int_part) * ABS(*twelfths);
+    *twelfths = parser_data.numeral_sign * parser_data.twelfths;
     numerus_error_code = NUMERUS_OK;
     *errcode = NUMERUS_OK;
     return int_part;
