@@ -22,7 +22,17 @@
 #include <string.h>  /* For `strcmp()` */
 #include "numerus.h"
 
+/**
+ * @internal
+ * Macro to indicate that the CLI should continue its execution.
+ */
 #define NUMERUS_PROMPT_AGAIN 1
+
+
+/**
+ * @internal
+ * Macro ro indicate that the CLI should terminate.
+ */
 #define NUMERUS_STOP_REPL 0
 
 static const char *PROMPT_TEXT = "numerus> ";
@@ -40,7 +50,7 @@ static const char *MOO_TEXT = "This is not an easter egg. Try `ascii`.\n";
 static const char *PING_TEXT = "Pong.\n";
 static const char *AVE_TEXT = "Ave tibi!\n";
 static const char *HELP_TEXT = ""
-"For ANY information about the library or the syntax of roman numeral, "
+"For ANY information about the library or the syntax of roman numeral, \n"
 "check the documentation available on https://thematjaz.github.io/Numerus/\n\n"
 ""
 "To convert an (arabic) integer to a roman numeral or vice-versa,\n"
@@ -49,7 +59,7 @@ static const char *HELP_TEXT = ""
 ""
 "pretty        switches on/off the pretty printing of long roman numerals\n"
 "              (with overlined notation instead of underscore notation)\n"
-"              and the pretty printing of values as integer and fractional part"
+"              and the pretty printing of values as integer and fractional part\n"
 "?, help       shows this help text\n"
 "info, about   shows version, credits, licence, repository of Numerus\n"
 "exit, quit    ends this shell\n\n"
@@ -117,8 +127,12 @@ static short _num_string_is_double_zero(char *zero_as_string) {
     }
     if (*zero_as_string == '.' || *zero_as_string == ',') {
         zero_as_string++;
-        while(*zero_as_string == '0') {
-            zero_as_string++;
+        if (*zero_as_string == '0') {
+            while (*zero_as_string == '0') {
+                zero_as_string++;
+            }
+        } else {
+            return 0;
         }
     }
     if (*zero_as_string == '\0') {
@@ -165,11 +179,11 @@ void _num_convert_to_other_form_and_print(char *string) {
         /* Successful conversion */
         if (pretty_printing == 1) {
             /* Enabled pretty printing */
-            char *roman_pretty = numerus_pretty_print_long_numerals(roman);
-            if (roman_pretty == NULL) {
-                printf("%s\n", numerus_explain_error(NUMERUS_ERROR_MALLOC_FAIL));
+            char *roman_pretty = numerus_overline_long_numerals(roman, &errcode);
+            if (errcode != NUMERUS_OK) {
+                printf("%s\n", numerus_explain_error(errcode));
             } else {
-                /* Successfull transformed into pretty format */
+                /* Successful transformed into pretty format */
                 printf("%s\n", roman_pretty);
                 free(roman_pretty);
             }
@@ -186,11 +200,11 @@ void _num_convert_to_other_form_and_print(char *string) {
         /* The string is a roman numeral */
         if (pretty_printing == 1) {
             /* Pretty printing enabled */
-            char *pretty_value = numerus_pretty_print_value_as_double(value);
+            char *pretty_value = numerus_create_pretty_value_as_double(value);
             if (pretty_value == NULL) {
                 printf("%s\n", numerus_explain_error(NUMERUS_ERROR_MALLOC_FAIL));
             } else {
-                /* Successfull transformed into pretty format */
+                /* Successful transformed into pretty format */
                 printf("%s\n", pretty_value);
                 free(pretty_value);
             }
@@ -279,7 +293,7 @@ int numerus_cli(int argc, char **args) {
         return NUMERUS_ERROR_MALLOC_FAIL;
     }
     if (argc > 1) {
-        /* Interprete main arguments and exit */
+        /* Parse main arguments and exit */
         args++;
         pretty_printing = 0;
         while (argc > 1) {

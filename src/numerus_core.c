@@ -106,6 +106,7 @@ int numerus_error_code = NUMERUS_OK;
 
 
 /**
+ * @internal
  * Struct containing a basic roman char, its integer value and the maximum
  * consecutive repetitions of it that a roman numeral may have.
  *
@@ -460,7 +461,7 @@ static int _num_parse_decimal_part(
  * The parsing status of the roman numeral (any kind of wrong syntax)
  * is stored in the errcode passed as parameter, which can be NULL to ignore
  * the error, although it's not recommended. If the the error code is different
- * than NUMERUS_OK, an error occured during the conversion and the returned
+ * than NUMERUS_OK, an error occurred during the conversion and the returned
  * value is outside the possible range of values of roman numerals.
  * The error code may help find the specific error.
  *
@@ -494,7 +495,7 @@ double numerus_roman_to_double(char *roman, int *errcode) {
  * The parsing status of the roman numeral (any kind of wrong syntax)
  * is stored in the errcode passed as parameter, which can be NULL to ignore
  * the error, although it's not recommended. If the the error code is different
- * than NUMERUS_OK, an error occured during the conversion and the returned
+ * than NUMERUS_OK, an error occurred during the conversion and the returned
  * value is outside the possible range of values of roman numerals.
  * The error code may help find the specific error.
  *
@@ -526,7 +527,7 @@ long numerus_roman_to_int(char *roman, int *errcode) {
  * The parsing status of the roman numeral (any kind of wrong syntax)
  * is stored in the errcode passed as parameter, which can be NULL to ignore
  * the error, although it's not recommended. If the the error code is different
- * than NUMERUS_OK, an error occured during the conversion and the returned
+ * than NUMERUS_OK, an error occurred during the conversion and the returned
  * value is outside the possible range of values of roman numerals.
  * The error code may help find the specific error.
  *
@@ -612,8 +613,7 @@ long numerus_roman_to_int_part_and_twelfths(char *roman, short *twelfths,
         return NUMERUS_MAX_LONG_NONFLOAT_VALUE + 10;
     }
     int_part = parser_data.numeral_sign * parser_data.int_part;
-    *twelfths = parser_data.twelfths;
-    *twelfths = SIGN(int_part) * ABS(*twelfths);
+    *twelfths = parser_data.numeral_sign * parser_data.twelfths;
     numerus_error_code = NUMERUS_OK;
     *errcode = NUMERUS_OK;
     return int_part;
@@ -687,7 +687,7 @@ static char *_num_value_part_to_roman(long value, char *roman,
  *
  * The conversion status is stored in the errcode passed as parameter, which
  * can be NULL to ignore the error, although it's not recommended. If the the
- * error code is different than NUMERUS_OK, an error occured during the
+ * error code is different than NUMERUS_OK, an error occurred during the
  * conversion and the returned string is NULL. The error code may help find the
  * specific error.
  *
@@ -712,7 +712,7 @@ char *numerus_int_to_roman(long int_value, int *errcode) {
  *
  * The conversion status is stored in the errcode passed as parameter, which
  * can be NULL to ignore the error, although it's not recommended. If the the
- * error code is different than NUMERUS_OK, an error occured during the
+ * error code is different than NUMERUS_OK, an error occurred during the
  * conversion and the returned string is NULL. The error code may help find the
  * specific error.
  *
@@ -741,7 +741,7 @@ char *numerus_double_to_roman(double double_value, int *errcode) {
  *
  * The conversion status is stored in the errcode passed as parameter, which
  * can be NULL to ignore the error, although it's not recommended. If the the
- * error code is different than NUMERUS_OK, an error occured during the
+ * error code is different than NUMERUS_OK, an error occurred during the
  * conversion and the returned string is NULL. The error code may help find the
  * specific error.
  *

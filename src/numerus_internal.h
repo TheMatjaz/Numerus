@@ -6,8 +6,8 @@
  * @license This file is part of the Numerus project which is released under
  * the BSD 3-clause license.
  *
- * This header allows access to all public functionalities of Numerus and some
- * internal functionalities that the library files share within themselves.
+ * This header allows access to all public functionality of Numerus and some
+ * internal functionality that the library files share within themselves.
  * It's meant to be used just by library files, not for public usage.
  */
 
