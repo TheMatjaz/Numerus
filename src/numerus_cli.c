@@ -127,8 +127,12 @@ static short _num_string_is_double_zero(char *zero_as_string) {
     }
     if (*zero_as_string == '.' || *zero_as_string == ',') {
         zero_as_string++;
-        while(*zero_as_string == '0') {
-            zero_as_string++;
+        if (*zero_as_string == '0') {
+            while (*zero_as_string == '0') {
+                zero_as_string++;
+            }
+        } else {
+            return 0;
         }
     }
     if (*zero_as_string == '\0') {
