@@ -80,6 +80,8 @@ You'll probably need the **conversion functions**: those are the first 6
 functions in the
 [Numerus header file](http://thematjaz.github.io/Numerus/numerus_8h.html). 
 Check the
+[Numerus usage examples](http://thematjaz.github.io/Numerus/md_USAGE_EXAMPLES.html)
+for a quick tutorial on how to use Numerus and the
 [Numerus syntax page](http://thematjaz.github.io/Numerus/md_SYNTAX.html) for
 rules on how to write roman numerals and why Numerus uses some strange names
 such as _long numeral_. Everything else, including functions, parameters, 
@@ -109,7 +111,8 @@ Numerus was created:
 License
 ----------------------------------------
 
-Numerus is released under the [BSD 3-clause license](LICENSE.md) which
+Numerus is released under the 
+[BSD 3-clause license](http://thematjaz.github.io/Numerus/md_LICENSE.html) which
 basically allows you to do anything with it as long as you credit the original
 author (more or less).
 
