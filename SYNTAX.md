@@ -1,4 +1,4 @@
-# Numerus syntax and nomenclature #
+# Syntax and nomenclature #
 
 Numerus nomenclature
 ===============================================================================

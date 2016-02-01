@@ -1,4 +1,4 @@
-# Numerus usage example #
+# Usage example #
 
 First of all, include the library header file:
 
