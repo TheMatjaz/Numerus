@@ -21,14 +21,14 @@ Added
     2. check if a numeral is a _long numeral_;
     3. check if a numeral is a _float numeral_;
     4. count the number of roman character - and find any illegal ones.
-5. Twelfth managment functions:
+5. Twelfth management functions:
     1. convert a double from and to an integer value plus a number of twelfths;
-    2. shorten an integer value and a number of twelfts.
+    2. shorten an integer value and a number of twelfths.
 6. Human readability functions:
     1. prettify a long roman numerals with actual overlining;
     2. prettify an integer value and a number of twelfths with shortening;
     3. error code explanation generation.
-7. _Command Line Interface_ (CLI) to quickly convert any value; also interpretes
+7. _Command Line Interface_ (CLI) to quickly convert any value; also parses
    any command line arguments (main arguments) as a CLI command, allowing easy
    pipelining of the executable in the system shell.
 
@@ -36,7 +36,7 @@ Added
 Changed
 ----------------------------------------
 
-1. Roman numerals' syntax check is performed without regexes, making it ~75%
+1. Roman numerals' syntax check is performed without regex-es, making it ~75%
    faster, while making the conversion function support the new roman numeral
    formats as well.
 2. Because of the previous point, it's possible to catch a more precise error

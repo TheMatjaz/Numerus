@@ -461,7 +461,7 @@ static int _num_parse_decimal_part(
  * The parsing status of the roman numeral (any kind of wrong syntax)
  * is stored in the errcode passed as parameter, which can be NULL to ignore
  * the error, although it's not recommended. If the the error code is different
- * than NUMERUS_OK, an error occured during the conversion and the returned
+ * than NUMERUS_OK, an error occurred during the conversion and the returned
  * value is outside the possible range of values of roman numerals.
  * The error code may help find the specific error.
  *
@@ -495,7 +495,7 @@ double numerus_roman_to_double(char *roman, int *errcode) {
  * The parsing status of the roman numeral (any kind of wrong syntax)
  * is stored in the errcode passed as parameter, which can be NULL to ignore
  * the error, although it's not recommended. If the the error code is different
- * than NUMERUS_OK, an error occured during the conversion and the returned
+ * than NUMERUS_OK, an error occurred during the conversion and the returned
  * value is outside the possible range of values of roman numerals.
  * The error code may help find the specific error.
  *
@@ -527,7 +527,7 @@ long numerus_roman_to_int(char *roman, int *errcode) {
  * The parsing status of the roman numeral (any kind of wrong syntax)
  * is stored in the errcode passed as parameter, which can be NULL to ignore
  * the error, although it's not recommended. If the the error code is different
- * than NUMERUS_OK, an error occured during the conversion and the returned
+ * than NUMERUS_OK, an error occurred during the conversion and the returned
  * value is outside the possible range of values of roman numerals.
  * The error code may help find the specific error.
  *
@@ -687,7 +687,7 @@ static char *_num_value_part_to_roman(long value, char *roman,
  *
  * The conversion status is stored in the errcode passed as parameter, which
  * can be NULL to ignore the error, although it's not recommended. If the the
- * error code is different than NUMERUS_OK, an error occured during the
+ * error code is different than NUMERUS_OK, an error occurred during the
  * conversion and the returned string is NULL. The error code may help find the
  * specific error.
  *
@@ -712,7 +712,7 @@ char *numerus_int_to_roman(long int_value, int *errcode) {
  *
  * The conversion status is stored in the errcode passed as parameter, which
  * can be NULL to ignore the error, although it's not recommended. If the the
- * error code is different than NUMERUS_OK, an error occured during the
+ * error code is different than NUMERUS_OK, an error occurred during the
  * conversion and the returned string is NULL. The error code may help find the
  * specific error.
  *
@@ -741,7 +741,7 @@ char *numerus_double_to_roman(double double_value, int *errcode) {
  *
  * The conversion status is stored in the errcode passed as parameter, which
  * can be NULL to ignore the error, although it's not recommended. If the the
- * error code is different than NUMERUS_OK, an error occured during the
+ * error code is different than NUMERUS_OK, an error occurred during the
  * conversion and the returned string is NULL. The error code may help find the
  * specific error.
  *

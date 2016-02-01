@@ -84,8 +84,8 @@ void _num_headtrim_check_numeral_and_errcode(char **roman, int **errcode) {
  * Ignores any leading minus. It's case INsensitive.
  *
  * The analysis status is stored in the errcode passed as parameter, which
- * can be NULL to ignore the error, although it's not recommended. If the the
- * error code is different than NUMERUS_OK, an error occured during the
+ * can be NULL to ignore the error, although it's not recommended. If the
+ * error code is different than NUMERUS_OK, an error occurred during the
  * analysis and the returned value is false. The error code may help find the
  * specific error.
  *
@@ -114,8 +114,8 @@ short numerus_is_zero(char *roman, int *errcode) {
  * NUMERUS_OK.
  *
  * The analysis status is stored in the errcode passed as parameter, which
- * can be NULL to ignore the error, although it's not recommended. If the the
- * error code is different than NUMERUS_OK, an error occured during the
+ * can be NULL to ignore the error, although it's not recommended. If the
+ * error code is different than NUMERUS_OK, an error occurred during the
  * analysis and the returned value is false. The error code may help find the
  * specific error.
  *
@@ -172,8 +172,8 @@ short numerus_is_long_numeral(char *roman, int *errcode) {
  * and dot '.'. It's case INsensitive.
  *
  * The analysis status is stored in the errcode passed as parameter, which
- * can be NULL to ignore the error, although it's not recommended. If the the
- * error code is different than NUMERUS_OK, an error occured during the
+ * can be NULL to ignore the error, although it's not recommended. If the
+ * error code is different than NUMERUS_OK, an error occurred during the
  * analysis and the returned value is false. The error code may help find the
  * specific error.
  *
@@ -218,8 +218,8 @@ short numerus_is_float_numeral(char *roman, int *errcode) {
  * a leading minus '-', returns -1; otherwise +1.
  *
  * The analysis status is stored in the errcode passed as parameter, which
- * can be NULL to ignore the error, although it's not recommended. If the the
- * error code is different than NUMERUS_OK, an error occured during the
+ * can be NULL to ignore the error, although it's not recommended. If the
+ * error code is different than NUMERUS_OK, an error occurred during the
  * analysis and the returned value is 0 (zero). The error code may help find the
  * specific error.
  *
@@ -253,8 +253,8 @@ short numerus_sign(char *roman, int *errcode) {
  * whitespace.
  *
  * The analysis status is stored in the errcode passed as parameter, which
- * can be NULL to ignore the error, although it's not recommended. If the the
- * error code is different than NUMERUS_OK, an error occured during the
+ * can be NULL to ignore the error, although it's not recommended. If the
+ * error code is different than NUMERUS_OK, an error occurred during the
  * analysis and the returned value is negative. The error code may help find the
  * specific error.
  *
@@ -326,17 +326,17 @@ short numerus_count_roman_chars(char *roman, int *errcode) {
  * value, making it also a check for numeral equality, since two roman
  * numerals have the same value only if they are the same numeral.
  *
- * The comparition status is stored in the errcode passed as parameter, which
- * can be NULL to ignore the error, although it's not recommended. If the the
+ * The comparison status is stored in the errcode passed as parameter, which
+ * can be NULL to ignore the error, although it's not recommended. If the
  * error code is different than NUMERUS_OK, an error occured during the
- * comparition and the returned value is zero. The error code may help find the
+ * comparison and the returned value is zero. The error code may help find the
  * specific error.
  *
  * @param *roman_bigger string containing the roman numeral to compare with
  * roman_smaller
  * @param *roman_smaller string with a roman numeral to compare with the first
  * parameter
- * @param *errcode int where to store the comparition status: NUMERUS_OK or any
+ * @param *errcode int where to store the comparison status: NUMERUS_OK or any
  * other error. Can be NULL to ignore the error (NOT recommended).
  * @returns 1 if the first parameter has a bigger value, 0 if they have the
  * same, -1 if the second is bigger.
@@ -428,12 +428,12 @@ static size_t _num_overlining_alloc_size(char *roman) {
  *
  * The prettifying process status is stored in the errcode passed as parameter,
  * which can be NULL to ignore the error, although it's not recommended. If the
- * error code is different than NUMERUS_OK, an error occured during the
+ * error code is different than NUMERUS_OK, an error occurred during the
  * prettifying process and the returned string is NULL. The error code may help
  * find the specific error.
  *
  * @param *roman string containing the roman numeral.
- * @param *errcode int where to store the comparition status: NUMERUS_OK or any
+ * @param *errcode int where to store the comparison status: NUMERUS_OK or any
  * other error. Can be NULL to ignore the error (NOT recommended).
  * @returns char* allocated string with the prettier version of the roman
  * numeral or NULL if malloc() fails.
@@ -470,7 +470,6 @@ char *numerus_overline_long_numerals(char *roman, int *errcode) {
             *(pretty_roman++) = '_';
             roman++;
         }
-        roman++; /* Skip second underscore */
         *(pretty_roman++) = '\n';
 
         /* Copy the numeral in the second line */
@@ -512,7 +511,7 @@ char *numerus_overline_long_numerals(char *roman, int *errcode) {
  *
  * @param numerator first of two values to compute the GCD of.
  * @param denominator second of two values to compute the GCD of.
- * @returns short greatest common divisor of the the passed values.
+ * @returns short greatest common divisor of the passed values.
  */
 static short _num_greatest_common_divisor(short numerator, short denominator) {
     numerator = ABS(numerator);
@@ -623,7 +622,7 @@ char *numerus_create_pretty_value_as_parts(long int_part, short twelfths) {
 
 /**
  * @internal
- * Struct containing an error code and it's human-frendly text description,
+ * Struct containing an error code and it's human-friendly text description,
  * useful to be printed on stderr, stdout or a log file.
  *
  * It's used to create the _NUM_ERROR_CODES list of error codes explanation.
@@ -635,7 +634,7 @@ struct _num_error_codes {
 
 
 /**
- * List of error codes and their human-frendly text description, useful to
+ * List of error codes and their human-friendly text description, useful to
  * be printed on stderr, stdout or a log file.
  */
 static struct _num_error_codes _NUM_ERROR_CODES[] = {
@@ -677,14 +676,14 @@ static struct _num_error_codes _NUM_ERROR_CODES[] = {
 
 
 /**
- * Returns a pointer to the human-frendly text description of any
+ * Returns a pointer to the human-friendly text description of any
  * NUMERUS_ERROR_* error code.
  *
  * Useful to be printed on stderr, stdout or a log file. The error code is
  * hard-coded so no need to free() it afterwards.
  *
  * @param error_code one of the NUMERUS_ERROR_* error codes or NUMERUS_OK.
- * @returns char* pointer to a constant string with the human-frendly text
+ * @returns char* pointer to a constant string with the human-friendly text
  * description of the error code.
  */
 const char *numerus_explain_error(int error_code) {
@@ -719,7 +718,7 @@ double numerus_parts_to_double(long int_part, short twelfths) {
  * Splits a double value to a pair of its integer part and a number of twelfths.
  *
  * The twelfths are obtained by rounding the double value to the nearest
- * twelfts. The number of twelfths is stored in the passed parameter, while the
+ * twelfths. The number of twelfths is stored in the passed parameter, while the
  * integer part is returned directly.
  *
  * @param value double to be split into integer part and number of twelfths.

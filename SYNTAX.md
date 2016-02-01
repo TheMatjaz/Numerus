@@ -15,7 +15,7 @@ Numerus nomenclature
       usually this word indicates the value a roman numeral represents
 - **Integer part**:
       the integer part of a value is the part before the decimal separator 
-      (usually the dot or comma) or a value without considerating the twelfths.
+      (usually the dot or comma) or a value without considering the twelfths.
 - **Long numeral**:
       a Numerus syntax to indicate numerals that hold integer values outside 
       `[-3999, 3999]` that are written with underscores representing the 
@@ -210,7 +210,7 @@ the numeral.
 Regex matching them all
 ---------------------------------------
 
-Just for the documenation a regex matching all long, float, negative and 
+Just for the documentation a regex matching all long, float, negative and 
 standard roman numerals but not (`-`)`NULLA` is:
 
 ```

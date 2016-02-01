@@ -179,12 +179,11 @@ void _num_convert_to_other_form_and_print(char *string) {
         /* Successful conversion */
         if (pretty_printing == 1) {
             /* Enabled pretty printing */
-            int errcode;
             char *roman_pretty = numerus_overline_long_numerals(roman, &errcode);
             if (errcode != NUMERUS_OK) {
                 printf("%s\n", numerus_explain_error(errcode));
             } else {
-                /* Successfull transformed into pretty format */
+                /* Successful transformed into pretty format */
                 printf("%s\n", roman_pretty);
                 free(roman_pretty);
             }
@@ -205,7 +204,7 @@ void _num_convert_to_other_form_and_print(char *string) {
             if (pretty_value == NULL) {
                 printf("%s\n", numerus_explain_error(NUMERUS_ERROR_MALLOC_FAIL));
             } else {
-                /* Successfull transformed into pretty format */
+                /* Successful transformed into pretty format */
                 printf("%s\n", pretty_value);
                 free(pretty_value);
             }
@@ -294,7 +293,7 @@ int numerus_cli(int argc, char **args) {
         return NUMERUS_ERROR_MALLOC_FAIL;
     }
     if (argc > 1) {
-        /* Interprete main arguments and exit */
+        /* Parse main arguments and exit */
         args++;
         pretty_printing = 0;
         while (argc > 1) {

@@ -11,7 +11,7 @@ Convert a double to roman numeral with error checking.
 
 Create a value and an error code variable. Pass both to the conversion function
 `numerus_double_to_roman()` (pass a pointer to the error code). If the error 
-code is NUMERUS_OK, the conversion was successfull, otherwise something bad 
+code is NUMERUS_OK, the conversion was successful, otherwise something bad 
 happened, like your value was outside the allowed range or `malloc()` failed.
 
 `numerus_explain_error()` can help to understand the error, since it prints
@@ -59,7 +59,7 @@ Create a roman numeral, a variable to hold a number of twelfths and an error
 code variable. Pass all of them to the conversion function
 `numerus_roman_to_int_part_and_twelfths()`.
 
-If the error code is NUMERUS_OK, the conversion was successfull, otherwise 
+If the error code is NUMERUS_OK, the conversion was successful, otherwise 
 something bad happened, like your roman numeral had incorrect syntax (an illegal
 character, illegal character order, missing underscore, ...). In that case the 
 returned long integer_part will be bigger than the maximum value a roman numeral

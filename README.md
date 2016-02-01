@@ -1,4 +1,4 @@
-![The awesomnest roman numerals library](design/Numerus_Logo_75dpi.png)
+![The most awesomnest roman numerals library](design/Numerus_Logo_75dpi.png)
 
 Numerus is a comprehensive C library that allows conversion and manipulation of 
 roman numerals - now with it's own shell.
@@ -17,7 +17,7 @@ them.
 
 This library allows you to **convert roman numerals to values and values to 
 roman numerals**, adds some extensions to them to **support big and float 
-values** that other converters of the same kind usually don't, focalizes on 
+values** that other converters of the same kind usually don't, focuses on 
 **optimization, clean code and error handling**. Also offers a **Numerus 
 shell** to convert values on-the-fly or by pipelining (on Unix-like OS) without
 the need to incorporate the library in an existing project.
@@ -100,7 +100,7 @@ Numerus was created:
 
 - mostly for fun,
 - as a coding exercise,
-- to learnin how to create clean code,
+- to learn how to create clean code,
 - to learn C
 - to be able to optimize code,
 - to understand what a good in-code and web documentation is and how to write

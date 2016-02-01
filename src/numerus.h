@@ -6,7 +6,7 @@
  * @license This file is part of the Numerus project which is released under 
  * the BSD 3-clause license.
  *
- * This header allows access to all public functionalities of Numerus.
+ * This header allows access to all public functionality of Numerus.
  */
 
 #include "numerus_error_codes.h"
