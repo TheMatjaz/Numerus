@@ -9,6 +9,9 @@
  * This header allows access to all public functionality of Numerus.
  */
 
+#ifndef NUMERUS_H
+#define NUMERUS_H
+
 #include "numerus_error_codes.h"
 
 
@@ -69,3 +72,6 @@ const char *numerus_explain_error(int error_code);
 
 /* Command line interface */
 int numerus_cli(int argc, char **args);
+
+#endif	// NUMERUS_H
+

@@ -11,6 +11,9 @@
  * usage.
  */
 
+#ifndef NUMERUS_TEST_H
+#define NUMERUS_TEST_H
+
 int  numtest_convert_all_floats_with_doubles();
 void numtest_roman_syntax_errors();
 int  numtest_convert_all_integers_with_parts();
@@ -21,3 +24,6 @@ void numtest_null_handling_conversions();
 void numtest_null_handling_utils();
 int  numtest_pretty_print_all_numerals();
 int  numtest_pretty_print_all_values();
+
+#endif	// NUMERUS_TEST_H
+

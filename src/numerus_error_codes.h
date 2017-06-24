@@ -17,6 +17,9 @@
  * Usually this means that the processed numeral contained no syntax errors.
  * This is the opposite of any NUMERUS_ERROR_*.
  */
+#ifndef NUMERUS_ERROR_CODES_H
+#define NUMERUS_ERROR_CODES_H
+
 #define NUMERUS_OK 1
 
 
@@ -166,3 +169,6 @@
  * Remove the whitespace characters from inside the string and trim it.
  */
 #define NUMERUS_ERROR_WHITESPACE_CHARACTER 115
+
+#endif	// NUMERUS_ERROR_CODES_H
+
