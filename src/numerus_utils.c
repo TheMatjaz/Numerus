@@ -157,8 +157,8 @@ short numerus_is_long_numeral(char *roman, int *errcode) {
         *errcode = NUMERUS_ERROR_MISSING_SECOND_UNDERSCORE;
         return false;
     } else {
-        numerus_error_code = NUMERUS_ERROR_UNDERSCORE_AFTER_LONG_PART;
-        *errcode = NUMERUS_ERROR_UNDERSCORE_AFTER_LONG_PART;
+        numerus_error_code = NUMERUS_ERROR_TOO_MANY_UNDERSCORES;
+        *errcode = NUMERUS_ERROR_TOO_MANY_UNDERSCORES;
         return false;
     }
 }
@@ -304,8 +304,8 @@ short numerus_count_roman_chars(char *roman, int *errcode) {
             default:
             {
                 if (isspace(*roman)) {
-                    numerus_error_code = NUMERUS_ERROR_WHITESPACE_CHARACTER;
-                    *errcode = NUMERUS_ERROR_WHITESPACE_CHARACTER;
+                    numerus_error_code = NUMERUS_ERROR_WHITESPACE_CHARACTER_FOUND;
+                    *errcode = NUMERUS_ERROR_WHITESPACE_CHARACTER_FOUND;
                     return -3;
                 } else {
                     numerus_error_code = NUMERUS_ERROR_ILLEGAL_CHARACTER;
@@ -653,13 +653,13 @@ static struct _num_error_codes _NUM_ERROR_CODES[] = {
      "The roman numeral contains mispositioned characters."},
     {NUMERUS_ERROR_MISSING_SECOND_UNDERSCORE,
      "The roman numeral contains one underscore but not the second one."},
-    {NUMERUS_ERROR_UNDERSCORE_AFTER_LONG_PART,
+    {NUMERUS_ERROR_TOO_MANY_UNDERSCORES,
      "The long roman numeral contains one underscore after the second one."},
-    {NUMERUS_ERROR_UNDERSCORE_IN_NON_LONG,
+    {NUMERUS_ERROR_ILLEGAL_FIRST_UNDERSCORE_POSITION,
      "The non-long roman numeral contains one underscore."},
     {NUMERUS_ERROR_DECIMALS_IN_LONG_PART,
      "The long roman numeral contains decimal characters \"Ss.\" in the long part."},
-    {NUMERUS_ERROR_ILLEGAL_MINUS,
+    {NUMERUS_ERROR_ILLEGAL_MINUS_POSITION,
      "The roman numeral contains a misplaced minus '-' or more than one."},
     {NUMERUS_ERROR_M_IN_SHORT_PART,
      "The long roman numeral contains an 'M' character after the long part."},
@@ -669,7 +669,7 @@ static struct _num_error_codes _NUM_ERROR_CODES[] = {
      "The pointer to the roman numeral string is NULL."},
     {NUMERUS_ERROR_EMPTY_ROMAN,
      "The roman numeral string is empty or filled with whitespace."},
-    {NUMERUS_ERROR_WHITESPACE_CHARACTER,
+    {NUMERUS_ERROR_WHITESPACE_CHARACTER_FOUND,
      "The roman numeral string contains whitespace characters, even at the end."},
     {NUMERUS_OK,
      "Everything went all right."},

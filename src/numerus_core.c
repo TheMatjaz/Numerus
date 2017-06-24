@@ -352,7 +352,7 @@ static int _num_parse_part_in_underscores(
         return NUMERUS_ERROR_DECIMALS_IN_LONG_PART;
     }
     if (*(parser_data->current_numeral_position) == '-') {
-        return NUMERUS_ERROR_ILLEGAL_MINUS;
+        return NUMERUS_ERROR_ILLEGAL_MINUS_POSITION;
     }
     return NUMERUS_OK;
 }
@@ -391,16 +391,16 @@ static int _num_parse_part_after_underscores(
     }
     if (*(parser_data->current_numeral_position) == '_') {
         if (parser_data->numeral_is_long) {
-            return NUMERUS_ERROR_UNDERSCORE_AFTER_LONG_PART;
+            return NUMERUS_ERROR_TOO_MANY_UNDERSCORES;
         } else {
-            return NUMERUS_ERROR_UNDERSCORE_IN_NON_LONG;
+            return NUMERUS_ERROR_ILLEGAL_FIRST_UNDERSCORE_POSITION;
         }
     }
     if (*(parser_data->current_numeral_position) == 'M') {
         return NUMERUS_ERROR_M_IN_SHORT_PART;
     }
     if (*(parser_data->current_numeral_position) == '-') {
-        return NUMERUS_ERROR_ILLEGAL_MINUS;
+        return NUMERUS_ERROR_ILLEGAL_MINUS_POSITION;
     }
     return NUMERUS_OK;
 }
@@ -431,13 +431,13 @@ static int _num_parse_decimal_part(
     }
     if (*(parser_data->current_numeral_position) == '_') {
         if (parser_data->numeral_is_long) {
-            return NUMERUS_ERROR_UNDERSCORE_AFTER_LONG_PART;
+            return NUMERUS_ERROR_TOO_MANY_UNDERSCORES;
         } else {
-            return NUMERUS_ERROR_UNDERSCORE_IN_NON_LONG;
+            return NUMERUS_ERROR_ILLEGAL_FIRST_UNDERSCORE_POSITION;
         }
     }
     if (*(parser_data->current_numeral_position) == '-') {
-        return NUMERUS_ERROR_ILLEGAL_MINUS;
+        return NUMERUS_ERROR_ILLEGAL_MINUS_POSITION;
     }
     return NUMERUS_OK;
 }
