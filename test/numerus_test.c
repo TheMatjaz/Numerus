@@ -32,12 +32,12 @@
  * on success or outputs any error on stderr and returns 1.
  */
 int numtest_convert_all_floats_with_parts() {
-    long int_part;
-    short frac_part;
-    long int_part_converted;
-    short frac_part_converted;
+    int32_t int_part;
+    uint8_t frac_part;
+    int32_t int_part_converted;
+    uint8_t frac_part_converted;
     char *roman;
-    int errcode;
+    int8_t errcode;
     printf("Starting conversion of all roman numerals with parts\n");
     clock_t start_clock = clock();
     for (int_part = NUMERUS_MIN_LONG_NONFLOAT_VALUE; int_part <=
@@ -46,7 +46,7 @@ int numtest_convert_all_floats_with_parts() {
             frac_part = SIGN(int_part) * ABS(frac_part);
             roman = numerus_int_with_twelfth_to_roman(int_part, frac_part, &errcode);
             if (errcode != NUMERUS_OK) {
-                fprintf(stderr, "Error converting %ld, %d to roman: %s\n",
+                fprintf(stderr, "Error converting %d, %d to roman: %s\n",
                         int_part, frac_part, numerus_explain_error(errcode));
                 return 1;
             }
@@ -59,14 +59,14 @@ int numtest_convert_all_floats_with_parts() {
                 return 1;
             }
             if (int_part != int_part_converted || frac_part != frac_part_converted) {
-                fprintf(stderr, "Conversion mismatch: %ld, %d/12 (%f) -> %s -> %ld, %d/12 (%f)\n",
+                fprintf(stderr, "Conversion mismatch: %d, %d/12 (%f) -> %s -> %d, %d/12 (%f)\n",
                         int_part, frac_part, numerus_parts_to_double(int_part, frac_part), roman, int_part_converted, frac_part_converted, numerus_parts_to_double(int_part_converted, frac_part_converted));
                 return 1;
             }
             frac_part = ABS(frac_part);
             free(roman);
         }
-        if (int_part % 100000 == 0) {
+        if (int_part % PRINT_STATUS_DIVIDER == 0) {
             printf("\r> %6.2f%%", 100.0 * (int_part +
                                          NUMERUS_MAX_LONG_NONFLOAT_VALUE) / 7999999.0);
             fflush(stdout);
@@ -83,12 +83,12 @@ int numtest_convert_all_floats_with_parts() {
 
 
 int numtest_convert_all_floats_with_doubles() {
-    long int_part;
-    short frac_part;
+    int32_t int_part;
+    uint8_t frac_part;
     double to_convert;
     double converted;
     char *roman;
-    int errcode;
+    int8_t errcode;
     printf("Starting conversion of all roman numerals with doubles \n");
     clock_t start_clock = clock();
     for (int_part = NUMERUS_MIN_LONG_NONFLOAT_VALUE; int_part <=
@@ -98,7 +98,7 @@ int numtest_convert_all_floats_with_doubles() {
             to_convert = numerus_parts_to_double(int_part, frac_part);
             roman = numerus_double_to_roman(to_convert, &errcode);
             if (errcode != NUMERUS_OK) {
-                fprintf(stderr, "Error converting %ld, %d (%f) to roman: %s.\n",
+                fprintf(stderr, "Error converting %d, %d (%f) to roman: %s.\n",
                         int_part, frac_part, to_convert, numerus_explain_error(errcode));
                 return 1;
             }
@@ -109,14 +109,14 @@ int numtest_convert_all_floats_with_doubles() {
                 return 1;
             }
             if ((float) to_convert != (float) converted) {
-                fprintf(stderr, "Conversion mismatch: %f (%ld, %d/12) -> %s -> %f\n",
+                fprintf(stderr, "Conversion mismatch: %f (%d, %d/12) -> %s -> %f\n",
                         to_convert, int_part, frac_part, roman, converted);
                 return 1;
             }
             frac_part = ABS(frac_part);
             free(roman);
         }
-        if (int_part % 100000 == 0) {
+        if (int_part % PRINT_STATUS_DIVIDER == 0) {
             printf("\r> %6.2f%%", 100.0 * (int_part +
                                          NUMERUS_MAX_LONG_NONFLOAT_VALUE) / 7999999.0);
             fflush(stdout);
@@ -133,17 +133,17 @@ int numtest_convert_all_floats_with_doubles() {
 
 
 int numtest_convert_all_integers_with_parts() {
-    long int_part;
-    long converted;
+    int32_t int_part;
+    int32_t converted;
     char *roman;
-    int errcode;
+    int8_t errcode;
     printf("Starting conversion of all integer roman numerals with parts \n");
     clock_t start_clock = clock();
     for (int_part = NUMERUS_MIN_LONG_NONFLOAT_VALUE; int_part <=
          NUMERUS_MAX_LONG_NONFLOAT_VALUE; int_part++) {
         roman = numerus_int_to_roman(int_part, &errcode);
         if (errcode != NUMERUS_OK) {
-            fprintf(stderr, "Error converting %ld to roman: %s\n",
+            fprintf(stderr, "Error converting %d to roman: %s\n",
                     int_part, numerus_explain_error(errcode));
             return 1;
         }
@@ -154,12 +154,12 @@ int numtest_convert_all_integers_with_parts() {
             return 1;
         }
         if (int_part != converted) {
-            fprintf(stderr, "Conversion mismatch: %ld -> %s -> %ld",
+            fprintf(stderr, "Conversion mismatch: %d -> %s -> %d",
                     int_part, roman, converted);
             return 1;
         }
         free(roman);
-        if (int_part % 100000 == 0) {
+        if (int_part % PRINT_STATUS_DIVIDER == 0) {
             printf("\r> %6.2f%%", 100.0 * (int_part +
                                          NUMERUS_MAX_LONG_NONFLOAT_VALUE) / 7999999.0);
             fflush(stdout);
@@ -176,11 +176,11 @@ int numtest_convert_all_integers_with_parts() {
 
 
 int numtest_convert_all_integers_with_doubles() {
-    long int_part;
+    int32_t int_part;
     double to_convert;
     double converted;
     char *roman;
-    int errcode;
+    int8_t errcode;
     printf("Starting conversion of all integer roman numerals with doubles \n");
     clock_t start_clock = clock();
     for (int_part = NUMERUS_MIN_LONG_NONFLOAT_VALUE; int_part <=
@@ -199,12 +199,12 @@ int numtest_convert_all_integers_with_doubles() {
             return 1;
         }
         if (int_part != converted) {
-            fprintf(stderr, "Conversion mismatch: %f (%ld) -> %s -> %f",
+            fprintf(stderr, "Conversion mismatch: %f (%d) -> %s -> %f",
                     to_convert, int_part, roman, converted);
             return 1;
         }
         free(roman);
-        if (int_part % 100000 == 0) {
+        if (int_part % PRINT_STATUS_DIVIDER == 0) {
             printf("\r> %6.2f%%", 100.0 * (int_part +
                                          NUMERUS_MAX_LONG_NONFLOAT_VALUE) / 7999999.0);
             fflush(stdout);
@@ -225,7 +225,7 @@ int numtest_convert_all_integers_with_doubles() {
  * conversion when the syntax is correct.
  */
 static void _num_test_for_error(char *roman, int error_code) {
-    int errcode;
+    int8_t errcode;
     numerus_roman_to_double(roman, &errcode);
     if (errcode == error_code) {
         fprintf(stderr, "Test passed: %s raises error \"%s\"\n",
@@ -312,8 +312,8 @@ void numtest_parts_to_from_double_functions() {
     if (d1 != d2 || d1 != d3 || d1 != d4) {
         fprintf(stderr, "Error at transforming parts into double.\n");
     }
-    short frac_part;
-    long int_part = numerus_double_to_parts(12.08333, &frac_part);
+    uint8_t frac_part;
+    int32_t int_part = numerus_double_to_parts(12.08333, &frac_part);
     if (int_part != 12 || frac_part != 1) {
         fprintf(stderr, "Error at transforming double into parts.\n");
     }
@@ -326,9 +326,9 @@ void numtest_parts_to_from_double_functions() {
 
 void numtest_null_handling_conversions() {
     char *roman = "M";
-    int errcode;
-    short frac_part;
-    long int_part;
+    int8_t errcode;
+    uint8_t frac_part;
+    int32_t int_part;
     double value_double;
     value_double = numerus_roman_to_double(roman, NULL);
     value_double = numerus_roman_to_double("", NULL);
@@ -355,8 +355,8 @@ void numtest_null_handling_conversions() {
 
 
 void numtest_null_handling_utils() {
-    int errcode;
-    int result;
+    int8_t errcode;
+    int8_t result;
     result = numerus_is_zero(NULL, &errcode);
     result = numerus_is_zero("", &errcode);
     result = numerus_is_zero(NULL, NULL);
@@ -396,11 +396,11 @@ void numtest_null_handling_utils() {
 
 
 int numtest_pretty_print_all_numerals() {
-    long int_part;
-    short frac_part;
+    int32_t int_part;
+    uint8_t frac_part;
     char *roman;
     char *pretty_roman;
-    int errcode;
+    int8_t errcode;
     printf("Starting pretty printing of all roman numerals with parts\n");
     clock_t start_clock = clock();
     for (int_part = NUMERUS_MIN_LONG_NONFLOAT_VALUE;
@@ -409,13 +409,13 @@ int numtest_pretty_print_all_numerals() {
             frac_part = SIGN(int_part) * ABS(frac_part);
             roman = numerus_int_with_twelfth_to_roman(int_part, frac_part, &errcode);
             if (errcode != NUMERUS_OK) {
-                fprintf(stderr, "Error converting %ld, %d to roman (%s): %s\n",
+                fprintf(stderr, "Error converting %d, %d to roman (%s): %s\n",
                         int_part, frac_part, roman, numerus_explain_error(errcode));
                 return 1;
             }
             pretty_roman = numerus_overline_long_numerals(roman, NULL);
             if (errcode != NUMERUS_OK) {
-                fprintf(stderr, "Error pretty printing %s (%ld, %d) to value: %s.\n",
+                fprintf(stderr, "Error pretty printing %s (%d, %d) to value: %s.\n",
                         roman, int_part, frac_part, numerus_explain_error(errcode));
                 return 1;
             }
@@ -423,7 +423,7 @@ int numtest_pretty_print_all_numerals() {
             free(roman);
             free(pretty_roman);
         }
-        if (int_part % 100000 == 0) {
+        if (int_part % PRINT_STATUS_DIVIDER == 0) {
             printf("\r> %6.2f%%", 100.0 * (int_part +
                                          NUMERUS_MAX_LONG_NONFLOAT_VALUE) / 7999999.0);
             fflush(stdout);
@@ -440,8 +440,8 @@ int numtest_pretty_print_all_numerals() {
 
 
 int numtest_pretty_print_all_values() {
-    long int_part;
-    short frac_part;
+    int32_t int_part;
+    uint8_t frac_part;
     char *pretty_roman;
     printf("Starting pretty printing of all values with parts\n");
     clock_t start_clock = clock();
@@ -451,14 +451,14 @@ int numtest_pretty_print_all_values() {
             frac_part = SIGN(int_part) * ABS(frac_part);
             pretty_roman = numerus_create_pretty_value_as_parts(int_part, frac_part);
             if (pretty_roman == NULL) {
-                fprintf(stderr, "Error pretty printing %ld, %d to value.\n",
+                fprintf(stderr, "Error pretty printing %d, %d to value.\n",
                         int_part, frac_part);
                 return 1;
             }
             frac_part = ABS(frac_part);
             free(pretty_roman);
         }
-        if (int_part % 100000 == 0) {
+        if (int_part % PRINT_STATUS_DIVIDER == 0) {
             printf("\r> %6.2f%%", 100.0 * (int_part +
                                          NUMERUS_MAX_LONG_NONFLOAT_VALUE) / 7999999.0);
             fflush(stdout);

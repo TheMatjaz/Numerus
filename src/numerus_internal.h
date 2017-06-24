@@ -18,7 +18,7 @@
 #include "../include/numerus.h"
 
 
-short _num_is_zero(char *roman);
+bool _num_is_zero(char *roman);
 #define SIGN(x)    (((x) >= 0)  - ((x) < 0))
 #define ABS(x)     (((x) < 0) ? -(x) : (x))
 

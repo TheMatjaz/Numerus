@@ -15,8 +15,6 @@
 #include <ctype.h>    /* For `isspace()` */
 #include <stdlib.h>   /* For `malloc()` */
 #include <string.h>   /* For `strlen()`, `strncasecmp()`, `strcpy()` */
-#include <stdbool.h>  /* To use booleans `true` and `false` */
-#include <stdint.h>   /* To use integers with bit-lengths like int8, uint16 */
 #include "numerus_internal.h"
 
 
@@ -27,7 +25,7 @@
 /**
  * The maximum value a roman numeral with underscores without decimals may have.
  */
-const long NUMERUS_MAX_LONG_NONFLOAT_VALUE = 3999999;
+const int32_t NUMERUS_MAX_LONG_NONFLOAT_VALUE = 3999999;
 
 
 /**
@@ -45,7 +43,8 @@ const double NUMERUS_MAX_VALUE = NUMERUS_MAX_LONG_NONFLOAT_VALUE + 11.5 / 12.0;
  *
  * It's the opposite of NUMERUS_MAX_LONG_NONFLOAT_VALUE.s
  */
-const long int NUMERUS_MIN_LONG_NONFLOAT_VALUE = -NUMERUS_MAX_LONG_NONFLOAT_VALUE;
+const int32_t NUMERUS_MIN_LONG_NONFLOAT_VALUE =
+        -NUMERUS_MAX_LONG_NONFLOAT_VALUE;
 
 
 /**
@@ -90,7 +89,7 @@ const char *NUMERUS_ZERO = "NULLA";
  * The roman numeral `"-_MMMDCCCLXXXVIII_DCCCLXXXVIIIS....."`
  * (value: -3888888, -11/12) + `\0` is a string long 36+1 = 37 chars.
  */
-const short int NUMERUS_MAX_LENGTH = 37;
+const uint8_t NUMERUS_MAX_LENGTH = 37;
 
 
 
@@ -102,7 +101,7 @@ const short int NUMERUS_MAX_LENGTH = 37;
  *
  * It may contain any of the NUMERUS_ERROR_* error codes or NUMERUS_OK.
  */
-int numerus_error_code = NUMERUS_OK;
+int8_t numerus_error_code = NUMERUS_OK;
 
 
 /**
@@ -114,9 +113,9 @@ int numerus_error_code = NUMERUS_OK;
  * conversion functions.
  */
 struct _num_dictionary_char {
-    const int value;
+    const uint16_t value;
     const char *characters;
-    const short max_repetitions;
+    const uint8_t max_repetitions;
 } ;
 
 
@@ -160,10 +159,10 @@ struct _num_numeral_parser_data {
     char *current_numeral_position;
     const struct _num_dictionary_char *current_dictionary_char;
     bool  numeral_is_long;
-    short numeral_sign;
-    long  int_part;
-    short twelfths;
-    short char_repetitions;
+    int8_t numeral_sign;
+    int32_t  int_part;
+    uint8_t twelfths;
+    uint8_t char_repetitions;
 } ;
 
 
@@ -181,16 +180,16 @@ struct _num_numeral_parser_data {
  * the pattern
  * @param *pattern the position in the string  from the dictionary containing
  * the 1 or 2 characters that may be in to_be_compared
- * @returns length of the match as short: 0 if they don't match or 1 or 2
+ * @returns length of the match as uint8_t: 0 if they don't match or 1 or 2
  * if they match for that number of characters.
  */
-static short _num_string_begins_with(char *to_be_compared,
+static uint8_t _num_string_begins_with(char *to_be_compared,
         const char *pattern) {
 
     size_t pattern_length = strlen(pattern);
     /* Compare the first `pattern_length` characters */
     if (strncasecmp(to_be_compared, pattern, pattern_length) == 0) {
-        return (short) pattern_length;
+        return (uint8_t) pattern_length;
     } else {
         return 0;
     }
@@ -240,7 +239,7 @@ static bool _num_char_is_in_string(char current, char *terminating_chars) {
 
 
 /**
- * Moves the pointer to the current dictionary character to the next that has
+ * Moves the pointer from the current dictionary character to the next that has
  * max_repetitions more than 1.
  *
  * As an exception to this rule, if the dictionary character at the start of
@@ -258,7 +257,7 @@ static bool _num_char_is_in_string(char current, char *terminating_chars) {
 static void _num_skip_to_next_non_unique_dictionary_char(
         struct _num_numeral_parser_data *parser_data) {
 
-    short current_char_is_multiple_of_five =
+    bool current_char_is_multiple_of_five =
             strlen(parser_data->current_dictionary_char->characters) == 1;
     while (parser_data->current_dictionary_char->max_repetitions == 1) {
         parser_data->current_dictionary_char++;
@@ -285,10 +284,10 @@ static void _num_skip_to_next_non_unique_dictionary_char(
  * @param *parser_data of the numeral that is currently being converted to value
  * @returns result code as an error or NUMERUS_OK.
  */
-static int _num_compare_numeral_position_with_dictionary(
+static int8_t _num_compare_numeral_position_with_dictionary(
         struct _num_numeral_parser_data *parser_data) {
 
-    short num_of_matching_chars = _num_string_begins_with(
+    uint8_t num_of_matching_chars = _num_string_begins_with(
             parser_data->current_numeral_position,
             parser_data->current_dictionary_char->characters);
 
@@ -333,12 +332,12 @@ static int _num_compare_numeral_position_with_dictionary(
  * @param *parser_data of the numeral that is currently being converted to value
  * @returns result code as an error or NUMERUS_OK.
  */
-static int _num_parse_part_in_underscores(
+static int8_t _num_parse_part_in_underscores(
         struct _num_numeral_parser_data *parser_data) {
 
     while (!_num_char_is_in_string(*(parser_data->current_numeral_position),
            "_Ss.-")) {
-        int result_code = _num_compare_numeral_position_with_dictionary(
+        int8_t result_code = _num_compare_numeral_position_with_dictionary(
                 parser_data);
         if (result_code != NUMERUS_OK) {
             return result_code;
@@ -372,7 +371,7 @@ static int _num_parse_part_in_underscores(
  * @param *parser_data of the numeral that is currently being converted to value
  * @returns result code as an error or NUMERUS_OK.
  */
-static int _num_parse_part_after_underscores(
+static int8_t _num_parse_part_after_underscores(
         struct _num_numeral_parser_data *parser_data) {
 
     char *stop_chars;
@@ -383,7 +382,7 @@ static int _num_parse_part_after_underscores(
     }
     while (!_num_char_is_in_string(*(parser_data->current_numeral_position),
            stop_chars)) {
-        int result_code = _num_compare_numeral_position_with_dictionary(
+        int8_t result_code = _num_compare_numeral_position_with_dictionary(
                 parser_data);
         if (result_code != NUMERUS_OK) {
             return result_code;
@@ -418,12 +417,12 @@ static int _num_parse_part_after_underscores(
  * @param *parser_data of the numeral that is currently being converted to value
  * @returns result code as an error or NUMERUS_OK.
  */
-static int _num_parse_decimal_part(
+static int8_t _num_parse_decimal_part(
         struct _num_numeral_parser_data *parser_data) {
 
     while (!_num_char_is_in_string(*(parser_data->current_numeral_position),
            "_-")) {
-        int result_code = _num_compare_numeral_position_with_dictionary(
+        int8_t result_code = _num_compare_numeral_position_with_dictionary(
                 parser_data);
         if (result_code != NUMERUS_OK) {
             return result_code;
@@ -464,14 +463,14 @@ static int _num_parse_decimal_part(
  * The error code may help find the specific error.
  *
  * @param *roman string with a roman numeral
- * @param *errcode int where to store the conversion status: NUMERUS_OK or any
+ * @param *errcode int8_t where to store the conversion status: NUMERUS_OK or any
  * other error. Can be NULL to ignore the error (NOT recommended).
  * @returns double value of the roman numeral or a value outside the the
  * possible range of values when an error occurs.
  */
-double numerus_roman_to_double(char *roman, int *errcode) {
-    long int_part;
-    short twelfths;
+double numerus_roman_to_double(char *roman, int8_t *errcode) {
+    int32_t int_part;
+    uint8_t twelfths;
     int_part = numerus_roman_to_int_part_and_twelfths(roman, &twelfths, errcode);
     return numerus_parts_to_double(int_part, twelfths);
 }
@@ -498,12 +497,12 @@ double numerus_roman_to_double(char *roman, int *errcode) {
  * The error code may help find the specific error.
  *
  * @param *roman string with a roman numeral
- * @param *errcode int where to store the conversion status: NUMERUS_OK or any
+ * @param *errcode int8_t where to store the conversion status: NUMERUS_OK or any
  * other error. Can be NULL to ignore the error (NOT recommended).
  * @returns long value of the roman numeral or a value outside the the
  * possible range of values when an error occurs.
  */
-long numerus_roman_to_int(char *roman, int *errcode) {
+int32_t numerus_roman_to_int(char *roman, int8_t *errcode) {
     return numerus_roman_to_int_part_and_twelfths(roman, 0, errcode);
 }
 
@@ -537,15 +536,15 @@ long numerus_roman_to_int(char *roman, int *errcode) {
  * other error. Can be NULL to ignore the error (NOT recommended).
  * @param *twelfths number of twelfths from 0 to 11. NULL is interpreted as 0
  * twelfths.
- * @returns long as the integer part of the value of the roman numeral or a
+ * @returns int32_t as the integer part of the value of the roman numeral or a
  * value outside the the possible range of values when an error occurs.
  */
-long numerus_roman_to_int_part_and_twelfths(char *roman, short *twelfths,
-        int *errcode) {
+int32_t numerus_roman_to_int_part_and_twelfths(char *roman, uint8_t *twelfths,
+        int8_t *errcode) {
     /* Prepare variables */
-    long int_part;
-    int response_code;
-    short zero_twelfths = 0;
+    int32_t int_part;
+    int8_t response_code;
+    uint8_t zero_twelfths = 0;
     if (twelfths == NULL) {
         twelfths = &zero_twelfths;
     }
@@ -652,14 +651,14 @@ static char *_num_copy_char_from_dictionary(const char *source,
  * already allocated. Starts comparing the values with the specified dictionary
  * char.
  *
- * @param value long to be converted to a roman numeral
- * @param *roman string where to add the generated roman numral
- * @param dictionary_start_char int index of the dictionary to specify the
+ * @param value int32_t to be converted to a roman numeral
+ * @param *roman string where to add the generated roman numeral
+ * @param dictionary_start_char uint8_t index of the dictionary to specify the
  * starting dictionary entry to compare the characters with
  * @returns position after the inserted string
  */
-static char *_num_value_part_to_roman(long value, char *roman,
-        int dictionary_start_char) {
+static char *_num_value_part_to_roman(int32_t value, char *roman,
+        uint8_t dictionary_start_char) {
 
     const struct _num_dictionary_char *current_dictionary_char
             = &_NUM_DICTIONARY[dictionary_start_char];
@@ -676,7 +675,7 @@ static char *_num_value_part_to_roman(long value, char *roman,
 
 
 /**
- * Converts a long integer value to a roman numeral with its value.
+ * Converts an int32_t integer value to a roman numeral with its value.
  *
  * Accepts any long within
  * [NUMERUS_MAX_LONG_NONFLOAT_VALUE, NUMERUS_MIN_LONG_NONFLOAT_VALUE].
@@ -689,13 +688,13 @@ static char *_num_value_part_to_roman(long value, char *roman,
  * conversion and the returned string is NULL. The error code may help find the
  * specific error.
  *
- * @param int_value long integer to be converted to roman numeral.
- * @param *errcode int where to store the conversion status: NUMERUS_OK or any
+ * @param int_value int32_t to be converted to roman numeral.
+ * @param *errcode int8_t where to store the conversion status: NUMERUS_OK or any
  * other error. Can be NULL to ignore the error (NOT recommended).
  * @returns char* a string containing the roman numeral or NULL when an error
  * occurs.
  */
-char *numerus_int_to_roman(long int_value, int *errcode) {
+char *numerus_int_to_roman(int32_t int_value, int8_t *errcode) {
     return numerus_int_with_twelfth_to_roman(int_value, 0, errcode);
 }
 
@@ -721,9 +720,9 @@ char *numerus_int_to_roman(long int_value, int *errcode) {
  * @returns char* a string containing the roman numeral or NULL when an error
  * occurs.
  */
-char *numerus_double_to_roman(double double_value, int *errcode) {
-    short twelfths;
-    long int_part = numerus_double_to_parts(double_value, &twelfths);
+char *numerus_double_to_roman(double double_value, int8_t *errcode) {
+    uint8_t twelfths;
+    int32_t int_part = numerus_double_to_parts(double_value, &twelfths);
     return numerus_int_with_twelfth_to_roman(int_part, twelfths, errcode);
 }
 
@@ -743,17 +742,17 @@ char *numerus_double_to_roman(double double_value, int *errcode) {
  * conversion and the returned string is NULL. The error code may help find the
  * specific error.
  *
- * @param int_part long integer part of a value to be added to the twelfths
+ * @param int_part int32_t part of a value to be added to the twelfths
  * and converted to roman numeral.
- * @param twelfths short integer as number of twelfths (1/12) to be added to the
+ * @param twelfths uint8_t as number of twelfths (1/12) to be added to the
  * integer part and converted to roman numeral.
- * @param *errcode int where to store the conversion status: NUMERUS_OK or any
+ * @param *errcode int8_t where to store the conversion status: NUMERUS_OK or any
  * other error. Can be NULL to ignore the error (NOT recommended).
  * @returns char* a string containing the roman numeral or NULL when an error
  * occurs.
  */
-char *numerus_int_with_twelfth_to_roman(long int_part, short twelfths,
-        int *errcode) {
+char *numerus_int_with_twelfth_to_roman(int32_t int_part, uint8_t twelfths,
+        int8_t *errcode) {
 
     /* Prepare variables */
     numerus_shorten_and_same_sign_to_parts(&int_part, &twelfths);

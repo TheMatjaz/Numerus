@@ -16,6 +16,8 @@
 
 #include "../src/numerus_internal.h"
 
+#define PRINT_STATUS_DIVIDER 400000
+
 int numtest_convert_all_floats_with_doubles();
 void numtest_roman_syntax_errors();
 int numtest_convert_all_integers_with_parts();

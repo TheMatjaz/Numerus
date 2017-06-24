@@ -157,7 +157,7 @@ static short _num_string_is_double_zero(char *zero_as_string) {
 void _num_convert_to_other_form_and_print(char *string) {
     double value;
     char *roman;
-    int errcode;
+    int8_t errcode;
     /* This check is necessary because strtod() returns 0 in case of errors
      * AND in case finds an actual zero. Duh! */
     if (_num_string_is_double_zero(string)) {
@@ -282,7 +282,7 @@ static int _num_parse_command(char *command) {
  * @returns int status code: 0 if everything went OK or a NUMERUS_ERROR_*
  * otherwise.
  */
-int numerus_cli(int argc, char **args) {
+int8_t numerus_cli(int argc, char **args) {
     char *command;
     /* line_buffer_size = 50 enough for every command,
      * gets reallocated by getline() if not enough */
