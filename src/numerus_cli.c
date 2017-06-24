@@ -20,7 +20,7 @@
 #include <stdlib.h>  /* For `malloc()`, `free()`, `strtod()` */
 #include <ctype.h>   /* For `isspace()`, `tolower()` */
 #include <string.h>  /* For `strcmp()` */
-#include "numerus.h"
+#include "../include/numerus.h"
 
 /**
  * @internal

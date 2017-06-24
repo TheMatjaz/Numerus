@@ -16,8 +16,8 @@
 #include <stdlib.h>   /* For `malloc()` */
 #include <string.h>   /* For `strlen()`, `strncasecmp()`, `strcpy()` */
 #include <stdbool.h>  /* To use booleans `true` and `false` */
+#include <stdint.h>   /* To use integers with bit-lengths like int8, uint16 */
 #include "numerus_internal.h"
-
 
 
 

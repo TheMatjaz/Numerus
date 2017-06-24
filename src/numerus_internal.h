@@ -15,7 +15,7 @@
 #ifndef NUMERUS_INTERNAL_H
 #define NUMERUS_INTERNAL_H
 
-#include "numerus.h"
+#include "../include/numerus.h"
 
 
 short _num_is_zero(char *roman);

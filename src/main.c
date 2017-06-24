@@ -11,7 +11,7 @@
  * user-friendly conversion of roman numerals.s
  */
 
-#include "numerus.h"
+#include "../include/numerus.h"
 
 
 /**
