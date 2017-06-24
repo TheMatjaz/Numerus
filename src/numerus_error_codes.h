@@ -1,8 +1,8 @@
 /**
  * @file numerus_error_codes.h
  * @brief Numerus error codes with their description.
- * @copyright Copyright © 2015-2016, Matjaž Guštin <dev@matjaz.it>
- * <http://matjaz.it>. All rights reserved.
+ * @copyright Copyright © 2015-2017, Matjaž Guštin <dev@matjaz.it>
+ * <https://matjaz.it>. All rights reserved.
  * @license This file is part of the Numerus project which is released under
  * the BSD 3-clause license.
  *

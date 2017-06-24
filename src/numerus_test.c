@@ -1,8 +1,8 @@
 /**
  * @file numerus_test.c
  * @brief Numerus test functions to verify the correctness of the library.
- * @copyright Copyright © 2015-2016, Matjaž Guštin <dev@matjaz.it>
- * <http://matjaz.it>. All rights reserved.
+ * @copyright Copyright © 2015-2017, Matjaž Guštin <dev@matjaz.it>
+ * <https://matjaz.it>. All rights reserved.
  * @license This file is part of the Numerus project which is released under
  * the BSD 3-clause license.
  *
