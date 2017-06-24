@@ -14,7 +14,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <stdlib.h>
-#include "numerus_internal.h"
+#include "numerus_test.h"
 
 
 /**
@@ -67,13 +67,14 @@ int numtest_convert_all_floats_with_parts() {
             free(roman);
         }
         if (int_part % 100000 == 0) {
-            printf("%5.2f%%\n", 100.0 * (int_part +
+            printf("\r> %6.2f%%", 100.0 * (int_part +
                                          NUMERUS_MAX_LONG_NONFLOAT_VALUE) / 7999999.0);
+            fflush(stdout);
         }
     }
     clock_t end_clock = clock();
     double seconds_taken = (end_clock - start_clock) / (double) CLOCKS_PER_SEC;
-    printf("Time to convert all 96000001 float roman numerals both ways as parts: %f\n",
+    printf("\rTime to convert all 96000001 float roman numerals both ways as parts: %f\n",
             seconds_taken);
     printf("It's %f bidirectional conversions per second.\n",
             96000001.0 / seconds_taken);
@@ -116,13 +117,14 @@ int numtest_convert_all_floats_with_doubles() {
             free(roman);
         }
         if (int_part % 100000 == 0) {
-            printf("%5.2f%%\n", 100.0 * (int_part +
+            printf("\r> %6.2f%%", 100.0 * (int_part +
                                          NUMERUS_MAX_LONG_NONFLOAT_VALUE) / 7999999.0);
+            fflush(stdout);
         }
     }
     clock_t end_clock = clock();
     double seconds_taken = (end_clock - start_clock) / (double) CLOCKS_PER_SEC;
-    printf("Time to convert all 96000001 float roman numerals both ways as doubles: %f\n",
+    printf("\rTime to convert all 96000001 float roman numerals both ways as doubles: %f\n",
             seconds_taken);
     printf("It's %f bidirectional conversions per second.\n",
             96000001.0 / seconds_taken);
@@ -158,13 +160,14 @@ int numtest_convert_all_integers_with_parts() {
         }
         free(roman);
         if (int_part % 100000 == 0) {
-            printf("%5.2f%%\n", 100.0 * (int_part +
+            printf("\r> %6.2f%%", 100.0 * (int_part +
                                          NUMERUS_MAX_LONG_NONFLOAT_VALUE) / 7999999.0);
+            fflush(stdout);
         }
     }
     clock_t end_clock = clock();
     double seconds_taken = (end_clock - start_clock) / (double) CLOCKS_PER_SEC;
-    printf("Time to convert all 7999999 integer roman numerals both ways as parts: %f\n",
+    printf("\rTime to convert all 7999999 integer roman numerals both ways as parts: %f\n",
             seconds_taken);
     printf("It's %f bidirectional conversions per second.\n",
             7999999.0 / seconds_taken);
@@ -202,13 +205,14 @@ int numtest_convert_all_integers_with_doubles() {
         }
         free(roman);
         if (int_part % 100000 == 0) {
-            printf("%5.2f%%\n", 100.0 * (int_part +
+            printf("\r> %6.2f%%", 100.0 * (int_part +
                                          NUMERUS_MAX_LONG_NONFLOAT_VALUE) / 7999999.0);
+            fflush(stdout);
         }
     }
     clock_t end_clock = clock();
     double seconds_taken = (end_clock - start_clock) / (double) CLOCKS_PER_SEC;
-    printf("Time to convert all 7999999 integer roman numerals both ways as doubles: %f\n",
+    printf("\rTime to convert all 7999999 integer roman numerals both ways as doubles: %f\n",
             seconds_taken);
     printf("It's %f bidirectional conversions per second.\n",
             7999999.0 / seconds_taken);
@@ -222,7 +226,7 @@ int numtest_convert_all_integers_with_doubles() {
  */
 static void _num_test_for_error(char *roman, int error_code) {
     int errcode;
-    double value = numerus_roman_to_double(roman, &errcode);
+    numerus_roman_to_double(roman, &errcode);
     if (errcode == error_code) {
         fprintf(stderr, "Test passed: %s raises error \"%s\"\n",
                 roman, numerus_explain_error(errcode));
@@ -243,12 +247,11 @@ static void _num_test_for_error(char *roman, int error_code) {
  * @see _num_test_for_error(char *roman, int error_code)
  */
 void numtest_roman_syntax_errors() {
-    _num_test_for_error("-_MCM_XX_I", NUMERUS_ERROR_UNDERSCORE_AFTER_LONG_PART);
-    _num_test_for_error("-_MCM__I", NUMERUS_ERROR_UNDERSCORE_AFTER_LONG_PART);
-    _num_test_for_error("-_MCM_LI_", NUMERUS_ERROR_UNDERSCORE_AFTER_LONG_PART);
+    _num_test_for_error("-_MCM_XX_I", NUMERUS_ERROR_TOO_MANY_UNDERSCORES);
+    _num_test_for_error("-_MCM__I", NUMERUS_ERROR_TOO_MANY_UNDERSCORES);
 
-    _num_test_for_error("-MMCM-LI", NUMERUS_ERROR_ILLEGAL_MINUS);
-    _num_test_for_error("--_MCM_LI", NUMERUS_ERROR_ILLEGAL_MINUS);
+    _num_test_for_error("-MMCM-LI", NUMERUS_ERROR_ILLEGAL_MINUS_POSITION);
+    _num_test_for_error("--_MCM_LI", NUMERUS_ERROR_ILLEGAL_MINUS_POSITION);
 
     _num_test_for_error("MMMCMLCI", NUMERUS_ERROR_ILLEGAL_CHAR_SEQUENCE);
     _num_test_for_error("MMMCMLIIIX", NUMERUS_ERROR_ILLEGAL_CHAR_SEQUENCE);
@@ -277,8 +280,8 @@ void numtest_roman_syntax_errors() {
 
     _num_test_for_error("_MCM_MLI", NUMERUS_ERROR_M_IN_SHORT_PART);
 
-    _num_test_for_error("CCX_II", NUMERUS_ERROR_UNDERSCORE_IN_NON_LONG);
-    _num_test_for_error("-CCX_II", NUMERUS_ERROR_UNDERSCORE_IN_NON_LONG);
+    _num_test_for_error("CCX_II", NUMERUS_ERROR_ILLEGAL_FIRST_UNDERSCORE_POSITION);
+    _num_test_for_error("-CCX_II", NUMERUS_ERROR_ILLEGAL_FIRST_UNDERSCORE_POSITION);
 
     _num_test_for_error("IVI", NUMERUS_ERROR_ILLEGAL_CHAR_SEQUENCE);
 }
@@ -382,21 +385,19 @@ void numtest_null_handling_utils() {
     result = numerus_compare_value("i.", "i", &errcode);
     result = numerus_compare_value("i.", "i", NULL);
     result = numerus_compare_value(NULL, NULL, NULL);
-    char *pretty = numerus_pretty_print_long_numerals("");
-    pretty = numerus_pretty_print_long_numerals(NULL);
-    pretty = numerus_pretty_print_long_numerals("_");
-    pretty = numerus_pretty_print_long_numerals("i..");
-    pretty = numerus_pretty_print_long_numerals("i..");
-    pretty = numerus_pretty_print_value_as_parts(20492, 3);
-    pretty = numerus_pretty_print_value_as_parts(20492, 0);
+    char *pretty = numerus_overline_long_numerals("", NULL);
+    pretty = numerus_overline_long_numerals(NULL, NULL);
+    pretty = numerus_overline_long_numerals("_", NULL);
+    pretty = numerus_overline_long_numerals("i..", NULL);
+    pretty = numerus_overline_long_numerals("i..", NULL);
+    pretty = numerus_create_pretty_value_as_parts(20492, 3);
+    pretty = numerus_create_pretty_value_as_parts(20492, 0);
 }
 
 
 int numtest_pretty_print_all_numerals() {
     long int_part;
     short frac_part;
-    long int_part_converted;
-    short frac_part_converted;
     char *roman;
     char *pretty_roman;
     int errcode;
@@ -412,7 +413,7 @@ int numtest_pretty_print_all_numerals() {
                         int_part, frac_part, roman, numerus_explain_error(errcode));
                 return 1;
             }
-            pretty_roman = numerus_pretty_print_long_numerals(roman);
+            pretty_roman = numerus_overline_long_numerals(roman, NULL);
             if (errcode != NUMERUS_OK) {
                 fprintf(stderr, "Error pretty printing %s (%ld, %d) to value: %s.\n",
                         roman, int_part, frac_part, numerus_explain_error(errcode));
@@ -423,8 +424,9 @@ int numtest_pretty_print_all_numerals() {
             free(pretty_roman);
         }
         if (int_part % 100000 == 0) {
-            printf("%5.2f%%\n", 100.0 * (int_part +
+            printf("\r> %6.2f%%", 100.0 * (int_part +
                                          NUMERUS_MAX_LONG_NONFLOAT_VALUE) / 7999999.0);
+            fflush(stdout);
         }
     }
     clock_t end_clock = clock();
@@ -440,16 +442,14 @@ int numtest_pretty_print_all_numerals() {
 int numtest_pretty_print_all_values() {
     long int_part;
     short frac_part;
-    char *roman;
     char *pretty_roman;
-    int errcode;
     printf("Starting pretty printing of all values with parts\n");
     clock_t start_clock = clock();
     for (int_part = NUMERUS_MIN_LONG_NONFLOAT_VALUE;
          int_part <= NUMERUS_MAX_LONG_NONFLOAT_VALUE; int_part++) {
         for (frac_part = 0; frac_part < 12; frac_part++) {
             frac_part = SIGN(int_part) * ABS(frac_part);
-            pretty_roman = numerus_pretty_print_value_as_parts(int_part, frac_part);
+            pretty_roman = numerus_create_pretty_value_as_parts(int_part, frac_part);
             if (pretty_roman == NULL) {
                 fprintf(stderr, "Error pretty printing %ld, %d to value.\n",
                         int_part, frac_part);
@@ -459,8 +459,9 @@ int numtest_pretty_print_all_values() {
             free(pretty_roman);
         }
         if (int_part % 100000 == 0) {
-            printf("%5.2f%%\n", 100.0 * (int_part +
+            printf("\r> %6.2f%%", 100.0 * (int_part +
                                          NUMERUS_MAX_LONG_NONFLOAT_VALUE) / 7999999.0);
+            fflush(stdout);
         }
     }
     clock_t end_clock = clock();
