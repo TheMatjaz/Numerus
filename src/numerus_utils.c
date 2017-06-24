@@ -261,9 +261,9 @@ int8_t numerus_sign(char *roman, int8_t *errcode) {
  * @param *roman string containing the roman numeral.
  * @param *errcode int8_t where to store the analysis status: NUMERUS_OK or any
  * other error. Can be NULL to ignore the error (NOT recommended).
- * @returns uint8_t with the number of roman characters excluding underscores.
+ * @returns int8_t with the number of roman characters excluding underscores.
  */
-uint8_t numerus_count_roman_chars(char *roman, int8_t *errcode) {
+int8_t numerus_count_roman_chars(char *roman, int8_t *errcode) {
     _num_headtrim_check_numeral_and_errcode(&roman, &errcode);
     if (*errcode != NUMERUS_OK) {
         return -1;

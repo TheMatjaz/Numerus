@@ -27,7 +27,6 @@ message(STATUS "Chosen build type: ${CMAKE_BUILD_TYPE}")
 if(CMAKE_BUILD_TYPE MATCHES Debug)
     set(SOURCE_FILES
         test/main.c
-        src/numerus_cli.c
         src/numerus_core.c
         src/numerus_utils.c
         test/numerus_test.c)
@@ -52,8 +51,8 @@ elseif(CMAKE_BUILD_TYPE MATCHES StaticLib)
 else(CMAKE_BUILD_TYPE MATCHES Debug)
     # CLI is the default build type
     set(SOURCE_FILES
-        src/main.c
-        src/numerus_cli.c
+        src/cli/main.c
+        src/cli/numerus_cli.c
         src/numerus_core.c
         src/numerus_utils.c)
     set(EXECUTABLE_NAME numerus)

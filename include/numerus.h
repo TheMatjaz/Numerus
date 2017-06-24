@@ -14,6 +14,7 @@
 
 #include <stdbool.h>  /* To use booleans `true` and `false` */
 #include <stdint.h>   /* To use integers with bit-lengths like int8, uint16 */
+
 #include "numerus_error_codes.h"
 
 
@@ -60,7 +61,7 @@ bool numerus_is_zero(char *roman, int8_t *errcode);
 bool numerus_is_long_numeral(char *roman, int8_t *errcode);
 bool numerus_is_float_numeral(char *roman, int8_t *errcode);
 int8_t numerus_sign(char *roman, int8_t *errcode);
-uint8_t numerus_count_roman_chars(char *roman, int8_t *errcode);
+int8_t numerus_count_roman_chars(char *roman, int8_t *errcode);
 int8_t numerus_compare_value(char *roman_bigger, char *roman_smaller,
         int8_t *errcode);
 
@@ -75,5 +76,6 @@ const char *numerus_explain_error(int8_t error_code);
 /* Command line interface */
 int8_t numerus_cli(int argc, char **args);
 
-#endif // NUMERUS_H
+
+#endif /* NUMERUS_H */
 

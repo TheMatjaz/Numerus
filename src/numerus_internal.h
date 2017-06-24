@@ -17,10 +17,10 @@
 
 #include "../include/numerus.h"
 
+#define SIGN(x) (((x) >= 0)  - ((x) < 0))
+#define ABS(x)  (((x) < 0) ? -(x) : (x))
 
 bool _num_is_zero(char *roman);
-#define SIGN(x)    (((x) >= 0)  - ((x) < 0))
-#define ABS(x)     (((x) < 0) ? -(x) : (x))
 
-#endif // NUMERUS_INTERNAL_H
+#endif /* NUMERUS_INTERNAL_H */
 
