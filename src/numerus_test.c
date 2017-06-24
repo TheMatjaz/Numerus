@@ -41,7 +41,7 @@ int numtest_convert_all_floats_with_parts() {
     printf("Starting conversion of all roman numerals with parts\n");
     clock_t start_clock = clock();
     for (int_part = NUMERUS_MIN_LONG_NONFLOAT_VALUE; int_part <=
-                                                     NUMERUS_MAX_LONG_NONFLOAT_VALUE; int_part++) {
+         NUMERUS_MAX_LONG_NONFLOAT_VALUE; int_part++) {
         for (frac_part = 0; frac_part < 12; frac_part++) {
             frac_part = SIGN(int_part) * ABS(frac_part);
             roman = numerus_int_with_twelfth_to_roman(int_part, frac_part, &errcode);
@@ -51,8 +51,8 @@ int numtest_convert_all_floats_with_parts() {
                 return 1;
             }
             int_part_converted = numerus_roman_to_int_part_and_twelfths(roman,
-                                                                        &frac_part_converted,
-                                                                        &errcode);
+                    &frac_part_converted,
+                    &errcode);
             if (errcode != NUMERUS_OK) {
                 fprintf(stderr, "Error converting %s to value: %s.\n",
                         roman, numerus_explain_error(errcode));
@@ -74,11 +74,12 @@ int numtest_convert_all_floats_with_parts() {
     clock_t end_clock = clock();
     double seconds_taken = (end_clock - start_clock) / (double) CLOCKS_PER_SEC;
     printf("Time to convert all 96000001 float roman numerals both ways as parts: %f\n",
-           seconds_taken);
+            seconds_taken);
     printf("It's %f bidirectional conversions per second.\n",
-           96000001.0/seconds_taken);
+            96000001.0 / seconds_taken);
     return 0;
 }
+
 
 int numtest_convert_all_floats_with_doubles() {
     long int_part;
@@ -90,7 +91,7 @@ int numtest_convert_all_floats_with_doubles() {
     printf("Starting conversion of all roman numerals with doubles \n");
     clock_t start_clock = clock();
     for (int_part = NUMERUS_MIN_LONG_NONFLOAT_VALUE; int_part <=
-                                                     NUMERUS_MAX_LONG_NONFLOAT_VALUE; int_part++) {
+         NUMERUS_MAX_LONG_NONFLOAT_VALUE; int_part++) {
         for (frac_part = 0; frac_part < 12; frac_part++) {
             frac_part = SIGN(int_part) * ABS(frac_part);
             to_convert = numerus_parts_to_double(int_part, frac_part);
@@ -122,11 +123,12 @@ int numtest_convert_all_floats_with_doubles() {
     clock_t end_clock = clock();
     double seconds_taken = (end_clock - start_clock) / (double) CLOCKS_PER_SEC;
     printf("Time to convert all 96000001 float roman numerals both ways as doubles: %f\n",
-           seconds_taken);
+            seconds_taken);
     printf("It's %f bidirectional conversions per second.\n",
-           96000001.0/seconds_taken);
+            96000001.0 / seconds_taken);
     return 0;
 }
+
 
 int numtest_convert_all_integers_with_parts() {
     long int_part;
@@ -136,7 +138,7 @@ int numtest_convert_all_integers_with_parts() {
     printf("Starting conversion of all integer roman numerals with parts \n");
     clock_t start_clock = clock();
     for (int_part = NUMERUS_MIN_LONG_NONFLOAT_VALUE; int_part <=
-                                                     NUMERUS_MAX_LONG_NONFLOAT_VALUE; int_part++) {
+         NUMERUS_MAX_LONG_NONFLOAT_VALUE; int_part++) {
         roman = numerus_int_to_roman(int_part, &errcode);
         if (errcode != NUMERUS_OK) {
             fprintf(stderr, "Error converting %ld to roman: %s\n",
@@ -163,11 +165,12 @@ int numtest_convert_all_integers_with_parts() {
     clock_t end_clock = clock();
     double seconds_taken = (end_clock - start_clock) / (double) CLOCKS_PER_SEC;
     printf("Time to convert all 7999999 integer roman numerals both ways as parts: %f\n",
-           seconds_taken);
+            seconds_taken);
     printf("It's %f bidirectional conversions per second.\n",
-           7999999.0/seconds_taken);
+            7999999.0 / seconds_taken);
     return 0;
 }
+
 
 int numtest_convert_all_integers_with_doubles() {
     long int_part;
@@ -178,7 +181,7 @@ int numtest_convert_all_integers_with_doubles() {
     printf("Starting conversion of all integer roman numerals with doubles \n");
     clock_t start_clock = clock();
     for (int_part = NUMERUS_MIN_LONG_NONFLOAT_VALUE; int_part <=
-                                                     NUMERUS_MAX_LONG_NONFLOAT_VALUE; int_part++) {
+         NUMERUS_MAX_LONG_NONFLOAT_VALUE; int_part++) {
         to_convert = numerus_parts_to_double(int_part, 0);
         roman = numerus_double_to_roman(to_convert, &errcode);
         if (errcode != NUMERUS_OK) {
@@ -206,9 +209,9 @@ int numtest_convert_all_integers_with_doubles() {
     clock_t end_clock = clock();
     double seconds_taken = (end_clock - start_clock) / (double) CLOCKS_PER_SEC;
     printf("Time to convert all 7999999 integer roman numerals both ways as doubles: %f\n",
-           seconds_taken);
+            seconds_taken);
     printf("It's %f bidirectional conversions per second.\n",
-           7999999.0/seconds_taken);
+            7999999.0 / seconds_taken);
     return 0;
 }
 
@@ -280,6 +283,7 @@ void numtest_roman_syntax_errors() {
     _num_test_for_error("IVI", NUMERUS_ERROR_ILLEGAL_CHAR_SEQUENCE);
 }
 
+
 void numtest_parts_to_from_double_functions() {
     double a1 = numerus_parts_to_double(12, 3);
     double a2 = numerus_parts_to_double(12, -3);
@@ -316,6 +320,7 @@ void numtest_parts_to_from_double_functions() {
     }
 }
 
+
 void numtest_null_handling_conversions() {
     char *roman = "M";
     int errcode;
@@ -335,7 +340,7 @@ void numtest_null_handling_conversions() {
     int_part = numerus_roman_to_int_part_and_twelfths(roman, &frac_part, NULL);
     int_part = numerus_roman_to_int_part_and_twelfths(roman, NULL, &errcode);
     int_part = numerus_roman_to_int_part_and_twelfths(NULL, &frac_part,
-                                                      &errcode);
+            &errcode);
     int_part = numerus_roman_to_int_part_and_twelfths(roman, NULL, NULL);
     int_part = numerus_roman_to_int_part_and_twelfths(NULL, NULL, &errcode);
     int_part = numerus_roman_to_int_part_and_twelfths(NULL, &frac_part, NULL);
@@ -425,12 +430,11 @@ int numtest_pretty_print_all_numerals() {
     clock_t end_clock = clock();
     double seconds_taken = (end_clock - start_clock) / (double) CLOCKS_PER_SEC;
     printf("Time to pretty print all 96000001 float roman numerals both ways as parts: %f\n",
-           seconds_taken);
+            seconds_taken);
     printf("It's %f string generations (with conversions) per second.\n",
-           96000001.0/seconds_taken);
+            96000001.0 / seconds_taken);
     return 0;
 }
-
 
 
 int numtest_pretty_print_all_values() {
@@ -462,8 +466,8 @@ int numtest_pretty_print_all_values() {
     clock_t end_clock = clock();
     double seconds_taken = (end_clock - start_clock) / (double) CLOCKS_PER_SEC;
     printf("Time to pretty print all 96000001 float values as parts: %f\n",
-           seconds_taken);
+            seconds_taken);
     printf("It's %f string generations per second.\n",
-           96000001.0/seconds_taken);
+            96000001.0 / seconds_taken);
     return 0;
 }

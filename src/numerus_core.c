@@ -117,7 +117,7 @@ struct _num_dictionary_char {
     const int value;
     const char *characters;
     const short max_repetitions;
-};
+} ;
 
 
 /**
@@ -164,7 +164,7 @@ struct _num_numeral_parser_data {
     long  int_part;
     short twelfths;
     short char_repetitions;
-};
+} ;
 
 
 
@@ -185,7 +185,7 @@ struct _num_numeral_parser_data {
  * if they match for that number of characters.
  */
 static short _num_string_begins_with(char *to_be_compared,
-                                     const char *pattern) {
+        const char *pattern) {
 
     size_t pattern_length = strlen(pattern);
     /* Compare the first `pattern_length` characters */
@@ -203,7 +203,7 @@ static short _num_string_begins_with(char *to_be_compared,
  * Sets the fields to be ready to start the conversion from roman to value.
  */
 static void _num_init_parser_data(struct _num_numeral_parser_data *parser_data,
-                                  char *roman) {
+        char *roman) {
 
     parser_data->current_numeral_position = roman;
     parser_data->current_dictionary_char = &_NUM_DICTIONARY[0];
@@ -268,6 +268,7 @@ static void _num_skip_to_next_non_unique_dictionary_char(
         parser_data->current_dictionary_char++;
     }
 }
+
 
 /**
  * Parses one single roman character of a roman numeral, comparing it to the
@@ -336,7 +337,7 @@ static int _num_parse_part_in_underscores(
         struct _num_numeral_parser_data *parser_data) {
 
     while (!_num_char_is_in_string(*(parser_data->current_numeral_position),
-                                   "_Ss.-")) {
+           "_Ss.-")) {
         int result_code = _num_compare_numeral_position_with_dictionary(
                 parser_data);
         if (result_code != NUMERUS_OK) {
@@ -347,7 +348,7 @@ static int _num_parse_part_in_underscores(
         return NUMERUS_ERROR_MISSING_SECOND_UNDERSCORE;
     }
     if (_num_char_is_in_string(*(parser_data->current_numeral_position),
-                               "sS.")) {
+        "sS.")) {
         return NUMERUS_ERROR_DECIMALS_IN_LONG_PART;
     }
     if (*(parser_data->current_numeral_position) == '-') {
@@ -381,7 +382,7 @@ static int _num_parse_part_after_underscores(
         stop_chars = "Ss._-";
     }
     while (!_num_char_is_in_string(*(parser_data->current_numeral_position),
-                                   stop_chars)) {
+           stop_chars)) {
         int result_code = _num_compare_numeral_position_with_dictionary(
                 parser_data);
         if (result_code != NUMERUS_OK) {
@@ -421,7 +422,7 @@ static int _num_parse_decimal_part(
         struct _num_numeral_parser_data *parser_data) {
 
     while (!_num_char_is_in_string(*(parser_data->current_numeral_position),
-                                   "_-")) {
+           "_-")) {
         int result_code = _num_compare_numeral_position_with_dictionary(
                 parser_data);
         if (result_code != NUMERUS_OK) {
@@ -440,9 +441,6 @@ static int _num_parse_decimal_part(
     }
     return NUMERUS_OK;
 }
-
-
-
 
 
 /**
@@ -543,7 +541,7 @@ long numerus_roman_to_int(char *roman, int *errcode) {
  * value outside the the possible range of values when an error occurs.
  */
 long numerus_roman_to_int_part_and_twelfths(char *roman, short *twelfths,
-                                            int *errcode) {
+        int *errcode) {
     /* Prepare variables */
     long int_part;
     int response_code;
@@ -632,12 +630,12 @@ long numerus_roman_to_int_part_and_twelfths(char *roman, short *twelfths,
  *
  * @param *source the string of 1-2 characters to copy
  * @param *destination the string, already allocated, to copy the *source into
- * @returns the new position of the destination pointer after the characters 
+ * @returns the new position of the destination pointer after the characters
  * have been copied
  */
 static char *_num_copy_char_from_dictionary(const char *source,
-                                            char *destination) {
-    
+        char *destination) {
+
     *destination = *(source++);
     if (*source != '\0') {
         *(++destination) = *source;
@@ -661,7 +659,7 @@ static char *_num_copy_char_from_dictionary(const char *source,
  * @returns position after the inserted string
  */
 static char *_num_value_part_to_roman(long value, char *roman,
-                                      int dictionary_start_char) {
+        int dictionary_start_char) {
 
     const struct _num_dictionary_char *current_dictionary_char
             = &_NUM_DICTIONARY[dictionary_start_char];
@@ -755,7 +753,7 @@ char *numerus_double_to_roman(double double_value, int *errcode) {
  * occurs.
  */
 char *numerus_int_with_twelfth_to_roman(long int_part, short twelfths,
-                                        int *errcode) {
+        int *errcode) {
 
     /* Prepare variables */
     numerus_shorten_and_same_sign_to_parts(&int_part, &twelfths);
@@ -798,7 +796,7 @@ char *numerus_int_with_twelfth_to_roman(long int_part, short twelfths,
         /* Underscores are needed */
         *(roman_numeral++) = '_';
         roman_numeral = _num_value_part_to_roman(int_part / 1000,
-                                                 roman_numeral, 0);
+                roman_numeral, 0);
         int_part -= (int_part / 1000) * 1000; /* Remove 3 left-most digits */
         *(roman_numeral++) = '_';
         /* Part after underscores without "M" char, start with "CM" */

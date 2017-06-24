@@ -13,7 +13,7 @@
  *
  * with `argc` and `args` the arguments of the main. This allows any command
  * line parameters passed to the numerus executable to be interpreted as if
- * they were written withing the command line interface.
+ * they were written within the command line interface.
  */
 
 #include <stdio.h>   /* For `printf()` */
@@ -31,48 +31,48 @@
 
 /**
  * @internal
- * Macro ro indicate that the CLI should terminate.
+ * Macro to indicate that the CLI should terminate.
  */
 #define NUMERUS_STOP_REPL 0
 
 static const char *PROMPT_TEXT = "numerus> ";
 static const char *WELCOME_TEXT = ""
-"+-----------------+\n"
-"|  N V M E R V S  |\n"
-"+-----------------+\n";
+        "+-----------------+\n"
+        "|  N V M E R V S  |\n"
+        "+-----------------+\n";
 static const char *INFO_TEXT = ""
-"Numerus, C library for conversion and manipulation of roman numerals.\n"
-"Version 2.0.0, Command Line Interface\n"
-"Copyright (c) 2015-2017 Matjaž Guštin <dev@matjaz.it> https://matjaz.it\n"
-"This software is subject to the terms of the BSD 3-Clause license.\n"
-"Project page and source code: https://github.com/TheMatjaz/Numerus\n";
+        "Numerus, C library for conversion and manipulation of roman numerals.\n"
+        "Version 2.0.0, Command Line Interface\n"
+        "Copyright (c) 2015-2017 Matjaž Guštin <dev@matjaz.it> https://matjaz.it\n"
+        "This software is subject to the terms of the BSD 3-Clause license.\n"
+        "Project page and source code: https://github.com/TheMatjaz/Numerus\n";
 static const char *MOO_TEXT = "This is not an easter egg. Try `ascii`.\n";
 static const char *PING_TEXT = "Pong.\n";
 static const char *AVE_TEXT = "Ave tibi!\n";
 static const char *HELP_TEXT = ""
-"For ANY information about the library or the syntax of roman numeral, \n"
-"check the documentation available on https://thematjaz.github.io/Numerus/\n\n"
-""
-"To convert an (arabic) integer to a roman numeral or vice-versa,\n"
-"just type it in the shell and press enter.\n"
-"Other Numerus commands are:\n\n"
-""
-"pretty        switches on/off the pretty printing of long roman numerals\n"
-"              (with overlined notation instead of underscore notation)\n"
-"              and the pretty printing of values as integer and fractional part\n"
-"?, help       shows this help text\n"
-"info, about   shows version, credits, licence, repository of Numerus\n"
-"exit, quit    ends this shell\n\n"
-""
-"We also have: moo, ping, ave.\n";
+        "For ANY information about the library or the syntax of roman numeral, \n"
+        "check the documentation available on https://thematjaz.github.io/Numerus/\n\n"
+        ""
+        "To convert an (arabic) integer to a roman numeral or vice-versa,\n"
+        "just type it in the shell and press enter.\n"
+        "Other Numerus commands are:\n\n"
+        ""
+        "pretty        switches on/off the pretty printing of long roman numerals\n"
+        "              (with overlined notation instead of underscore notation)\n"
+        "              and the pretty printing of values as integer and fractional part\n"
+        "?, help       shows this help text\n"
+        "info, about   shows version, credits, license, repository of Numerus\n"
+        "exit, quit    ends this shell\n\n"
+        ""
+        "We also have: moo, ping, ave.\n";
 static const char *QUIT_TEXT = "Vale!\n";
 static const char *ASCII_TEXT = ""
-" ____  _____   ____   ____   ____    ____   _________   _______    ____   ____    _______ \n"
-"|_   \\|_   _| |_  _| |_  _| |_   \\  /   _| |_   ___  | |_   __ \\  |_  _| |_  _|  /  ___  |\n"
-"  |   \\ | |     \\ \\   / /     |   \\/   |     | |_  \\_|   | |__) |   \\ \\   / /   |  (__ \\_|\n"
-"  | |\\ \\| |      \\ \\ / /      | |\\  /| |     |  _|  _    |  __ /     \\ \\ / /     '.___`-. \n"
-" _| |_\\   |_      \\ ' /      _| |_\\/_| |_   _| |___/ |  _| |  \\ \\_    \\ ' /     |`\\____) |\n"
-"|_____|\\____|      \\_/      |_____||_____| |_________| |____| |___|    \\_/      |_______.'\n";
+        " ____  _____   ____   ____   ____    ____   _________   _______    ____   ____    _______ \n"
+        "|_   \\|_   _| |_  _| |_  _| |_   \\  /   _| |_   ___  | |_   __ \\  |_  _| |_  _|  /  ___  |\n"
+        "  |   \\ | |     \\ \\   / /     |   \\/   |     | |_  \\_|   | |__) |   \\ \\   / /   |  (__ \\_|\n"
+        "  | |\\ \\| |      \\ \\ / /      | |\\  /| |     |  _|  _    |  __ /     \\ \\ / /     '.___`-. \n"
+        " _| |_\\   |_      \\ ' /      _| |_\\/_| |_   _| |___/ |  _| |  \\ \\_    \\ ' /     |`\\____) |\n"
+        "|_____|\\____|      \\_/      |_____||_____| |_________| |____| |___|    \\_/      |_______.'\n";
 static const char *UNKNOWN_COMMAND_TEXT = "Unknown command or wrong roman numeral syntax:\n";
 static const char *PRETTY_ON_TEXT = "Pretty printing is enabled.\n";
 static const char *PRETTY_OFF_TEXT = "Pretty printing is disabled.\n";
@@ -93,10 +93,10 @@ static int pretty_printing = 0;
  * @returns char* pointer to the start of the first word in the passed string.
  */
 static char *_num_get_first_word_trimmed_lowercased(char *string) {
-    while(isspace(*string)) {
+    while (isspace(*string)) {
         string++;
     }
-    if(*string == '\0') {
+    if (*string == '\0') {
         /* The string was full of whitespaces */
         return string;
     }
@@ -273,13 +273,13 @@ static int _num_parse_command(char *command) {
  *
  * The `argc` and `args` arguments of the main may be passed to it. This allows
  * any command line parameters passed to the numerus executable to be
- * interpreted as if they were written withing the command line interface.
+ * interpreted as if they were written within the command line interface.
  * To avoid this option, set `argc` to 0 and `args` to anything, e.g. NULL.
  *
  * @param argc int number of main arguments. Set to 0 to disable parsing of
  * main arguments.
  * @param args array of main arguments to be parsed as commands.
- * @returns int status code: 0 if everything went ok or a NUMERUS_ERROR_*
+ * @returns int status code: 0 if everything went OK or a NUMERUS_ERROR_*
  * otherwise.
  */
 int numerus_cli(int argc, char **args) {

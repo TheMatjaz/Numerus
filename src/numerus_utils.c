@@ -148,11 +148,11 @@ short numerus_is_long_numeral(char *roman, int *errcode) {
         numerus_error_code = NUMERUS_OK;
         *errcode = NUMERUS_OK;
         return true;
-    } else if (underscores_found == 0){
+    } else if (underscores_found == 0) {
         numerus_error_code = NUMERUS_OK;
         *errcode = NUMERUS_OK;
         return false;
-    } else if (underscores_found == 1){
+    } else if (underscores_found == 1) {
         numerus_error_code = NUMERUS_ERROR_MISSING_SECOND_UNDERSCORE;
         *errcode = NUMERUS_ERROR_MISSING_SECOND_UNDERSCORE;
         return false;
@@ -281,7 +281,8 @@ short numerus_count_roman_chars(char *roman, int *errcode) {
             return -2;
         }
         switch (toupper(*roman)) {
-            case '_': {
+            case '_':
+            {
                 roman++; // ignore underscores
                 break;
             }
@@ -294,12 +295,14 @@ short numerus_count_roman_chars(char *roman, int *errcode) {
             case 'V':
             case 'I':
             case 'S':
-            case '.': {
+            case '.':
+            {
                 roman++;
                 i++; // count every other roman char
                 break;
             }
-            default: {
+            default:
+            {
                 if (isspace(*roman)) {
                     numerus_error_code = NUMERUS_ERROR_WHITESPACE_CHARACTER;
                     *errcode = NUMERUS_ERROR_WHITESPACE_CHARACTER;
@@ -347,8 +350,8 @@ short numerus_compare_value(char *roman_bigger, char *roman_smaller, int *errcod
     }
     short twelfths_bigger;
     long int_part_bigger = numerus_roman_to_int_part_and_twelfths(roman_bigger,
-                                                                  &twelfths_bigger,
-                                                                  errcode);
+            &twelfths_bigger,
+            errcode);
     if (*errcode != NUMERUS_OK) {
         numerus_error_code = *errcode;
         return 0;
@@ -608,13 +611,13 @@ char *numerus_create_pretty_value_as_parts(long int_part, short twelfths) {
         numerus_shorten_and_same_sign_to_parts(&int_part, &twelfths);
         /* Shorten twelfth fraction */
         short gcd = _num_greatest_common_divisor(twelfths, 12);
-        size_t needed_space = snprintf(NULL, 0, "%ld, %d/%d", int_part, twelfths/gcd, 12/gcd);
+        size_t needed_space = snprintf(NULL, 0, "%ld, %d/%d", int_part, twelfths / gcd, 12 / gcd);
         pretty_value = malloc(needed_space + 1); /* +1 for '\0' */
         if (pretty_value == NULL) {
             numerus_error_code = NUMERUS_ERROR_MALLOC_FAIL;
             return NULL;
         }
-        sprintf(pretty_value, "%ld, %d/%d", int_part, twelfths/gcd, 12/gcd);
+        sprintf(pretty_value, "%ld, %d/%d", int_part, twelfths / gcd, 12 / gcd);
     }
     return pretty_value;
 }
@@ -630,7 +633,7 @@ char *numerus_create_pretty_value_as_parts(long int_part, short twelfths) {
 struct _num_error_codes {
     const int code;
     const char *message;
-};
+} ;
 
 
 /**
@@ -639,39 +642,39 @@ struct _num_error_codes {
  */
 static struct _num_error_codes _NUM_ERROR_CODES[] = {
     {NUMERUS_ERROR_VALUE_OUT_OF_RANGE,
-            "The value to be converted to roman is out of conversion range."},
+     "The value to be converted to roman is out of conversion range."},
     {NUMERUS_ERROR_ILLEGAL_CHARACTER,
-            "The roman numeral contains a character that is not part of the syntax of roman numerals."},
+     "The roman numeral contains a character that is not part of the syntax of roman numerals."},
     {NUMERUS_ERROR_TOO_LONG_NUMERAL,
-            "The roman numeral is too long to be syntactically correct."},
+     "The roman numeral is too long to be syntactically correct."},
     {NUMERUS_ERROR_TOO_MANY_REPEATED_CHARS,
-            "The roman numeral contains too many consecutive repetitions of a repeatable character."},
+     "The roman numeral contains too many consecutive repetitions of a repeatable character."},
     {NUMERUS_ERROR_ILLEGAL_CHAR_SEQUENCE,
-            "The roman numeral contains mispositioned characters."},
+     "The roman numeral contains mispositioned characters."},
     {NUMERUS_ERROR_MISSING_SECOND_UNDERSCORE,
-            "The roman numeral contains one underscore but not the second one."},
+     "The roman numeral contains one underscore but not the second one."},
     {NUMERUS_ERROR_UNDERSCORE_AFTER_LONG_PART,
-            "The long roman numeral contains one underscore after the second one."},
+     "The long roman numeral contains one underscore after the second one."},
     {NUMERUS_ERROR_UNDERSCORE_IN_NON_LONG,
-            "The non-long roman numeral contains one underscore."},
+     "The non-long roman numeral contains one underscore."},
     {NUMERUS_ERROR_DECIMALS_IN_LONG_PART,
-            "The long roman numeral contains decimal characters \"Ss.\" in the long part."},
+     "The long roman numeral contains decimal characters \"Ss.\" in the long part."},
     {NUMERUS_ERROR_ILLEGAL_MINUS,
-            "The roman numeral contains a misplaced minus '-' or more than one."},
+     "The roman numeral contains a misplaced minus '-' or more than one."},
     {NUMERUS_ERROR_M_IN_SHORT_PART,
-            "The long roman numeral contains an 'M' character after the long part."},
+     "The long roman numeral contains an 'M' character after the long part."},
     {NUMERUS_ERROR_MALLOC_FAIL,
-            "Heap memory allocation failure."},
+     "Heap memory allocation failure."},
     {NUMERUS_ERROR_NULL_ROMAN,
-            "The pointer to the roman numeral string is NULL."},
+     "The pointer to the roman numeral string is NULL."},
     {NUMERUS_ERROR_EMPTY_ROMAN,
-            "The roman numeral string is empty or filled with whitespace."},
+     "The roman numeral string is empty or filled with whitespace."},
     {NUMERUS_ERROR_WHITESPACE_CHARACTER,
-            "The roman numeral string contains whitespace characters, even at the end."},
+     "The roman numeral string contains whitespace characters, even at the end."},
     {NUMERUS_OK,
-            "Everything went all right."},
+     "Everything went all right."},
     {NUMERUS_ERROR_GENERIC,
-            "An unknown or unspecified error happened."}
+     "An unknown or unspecified error happened."}
 };
 
 
