@@ -1,7 +1,7 @@
 /**
  * @file numerus_cli.c
  * @brief Numerus command line interface for user-friendly conversions.
- * @copyright Copyright © 2015-2017, Matjaž Guštin <dev@matjaz.it>
+ * @copyright Copyright © 2015-2018, Matjaž Guštin <dev@matjaz.it>
  * <https://matjaz.it>. All rights reserved.
  * @license This file is part of the Numerus project which is released under
  * the BSD 3-clause license.
@@ -43,7 +43,7 @@ static const char *WELCOME_TEXT = ""
 static const char *INFO_TEXT = ""
         "Numerus, C library for conversion and manipulation of roman numerals.\n"
         "Version 2.0.0, Command Line Interface\n"
-        "Copyright (c) 2015-2017 Matjaž Guštin <dev@matjaz.it> https://matjaz.it\n"
+        "Copyright (c) 2015-2018 Matjaž Guštin <dev@matjaz.it> https://matjaz.it\n"
         "This software is subject to the terms of the BSD 3-Clause license.\n"
         "Project page and source code: https://github.com/TheMatjaz/Numerus\n";
 static const char *MOO_TEXT = "This is not an easter egg. Try `ascii`.\n";

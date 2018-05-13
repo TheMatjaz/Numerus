@@ -1,6 +1,6 @@
 # -----------------------------------------------------------------------------
 # Numerus cmake to use it as CLI.
-# Copyright © 2015-2017, Matjaž Guštin <dev@matjaz.it> https://matjaz.it
+# Copyright © 2015-2018, Matjaž Guštin <dev@matjaz.it> https://matjaz.it
 # All rights reserved.
 # This file is part of the Numerus project which is released under
 # the BSD 3-clause license.
