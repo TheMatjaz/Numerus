@@ -3,9 +3,8 @@
  * @brief Numerus command line interface for user-friendly conversions.
  * @copyright Copyright © 2015-2018, Matjaž Guštin <dev@matjaz.it>
  * <https://matjaz.it>. All rights reserved.
- * @license This file is part of the Numerus project which is released under
- * the BSD 3-clause license.
- *
+ * @license BSD 3-Clause license
+  *
  * This file contains a command line interface that converts any typed value
  * to a roman numeral or vice-versa. To use it, just call
  *

@@ -3,9 +3,8 @@
  * @brief Numerus utility functions for roman numerals and values manipulation.
  * @copyright Copyright © 2015-2018, Matjaž Guštin <dev@matjaz.it>
  * <https://matjaz.it>. All rights reserved.
- * @license This file is part of the Numerus project which is released under
- * the BSD 3-clause license.
- *
+ * @license BSD 3-Clause license
+  *
  * This file contains functions that analyze roman numerals, perform some checks
  * on them or convert some values in other formats. Functions that create a
  * more human-readable output are also placed in this file.

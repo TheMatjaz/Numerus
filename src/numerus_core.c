@@ -3,9 +3,8 @@
  * @brief Numerus constants and functions for roman numerals conversion.
  * @copyright Copyright © 2015-2018, Matjaž Guštin <dev@matjaz.it>
  * <https://matjaz.it>. All rights reserved.
- * @license This file is part of the Numerus project which is released under
- * the BSD 3-clause license.
- *
+ * @license BSD 3-Clause license
+  *
  * This file contains all constants with special values or extremes as well as
  * the conversion functions from value to roman numeral and vice versa. Some
  * functions from the numerus_utils.c file are also used to perform some checks

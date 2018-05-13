@@ -3,10 +3,7 @@
  * @brief Numerus roman numerals library API.
  * @copyright Copyright © 2015-2018, Matjaž Guštin <dev@matjaz.it>
  * <https://matjaz.it>. All rights reserved.
- * @license This file is part of the Numerus project which is released under
- * the BSD 3-clause license.
- *
- * This header allows access to all public functionality of Numerus.
+ * @license BSD 3-clause license.
  */
 
 #ifndef NUMERUS_H
