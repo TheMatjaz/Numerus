@@ -776,8 +776,9 @@ WARN_LOGFILE           =
 # Note: If this tag is empty the current directory is searched.
 
 INPUT  = CHANGELOG.md LICENSE.md SYNTAX.md USAGE_EXAMPLES.md
-INPUT += src/main.c src/numerus_core.c src/numerus_utils.c src/numerus_cli.c
-INPUT += src/numerus.h src/numerus_error_codes.h
+INPUT += include/numerus.h
+INPUT += src/numerus_core.c src/numerus.utils.c src/numerus_internal.h
+INPUT += src/cli/numerus_cli.c src/cli/main.c
 
 # Include the README.md file and make it the source for the main page of the
 # documentation website. See the variable USE_MDFILE_AS_MAINPAGE
