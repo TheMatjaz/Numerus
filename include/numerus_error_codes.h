@@ -1,14 +1,23 @@
 /**
  * @file numerus_error_codes.h
  * @brief Numerus error codes with their description.
- * @copyright Copyright © 2015-2016, Matjaž Guštin <dev@matjaz.it>
- * <http://matjaz.it>. All rights reserved.
+ * @copyright Copyright © 2015-2017, Matjaž Guštin <dev@matjaz.it>
+ * <https://matjaz.it>. All rights reserved.
  * @license This file is part of the Numerus project which is released under
  * the BSD 3-clause license.
  *
- * This header contains all macros for the Numerus error codes and
- * is a part of the numerus.h header file.
+ * This header contains all macros for the Numerus error codes.
+ *
+ * A few considerations:
+ *
+ * - All error codes start with NUMERUS_ERROR_*.
+ * - All error codes fit into a signed int8.
+ * - All error codes are equivalent to "true" if cast into boolean. There is no
+ *   "false" error code.
  */
+
+#ifndef NUMERUS_ERROR_CODES_H
+#define NUMERUS_ERROR_CODES_H
 
 
 /**
@@ -23,7 +32,8 @@
 /**
  * An unknown or unspecified error happened.
  *
- * The error did not match any foreseen case.
+ * The error did not match any other error scenario Numerus is prepared to
+ * handle.
  */
 #define NUMERUS_ERROR_GENERIC 100
 
@@ -40,8 +50,8 @@
  * The roman numeral contains a character that is not part of the syntax of
  * roman numerals.
  *
- * The only allowed characters are: "MDCLXVIS_.-" both down- and upcase and
- * the NUMERUS_NULLA string, which is a special case.
+ * The only allowed characters are: "MDCLXVIS_.-" both lowercase and uppercase.
+ * The only exception is the NUMERUS_ZERO string.
  */
 #define NUMERUS_ERROR_ILLEGAL_CHARACTER 102
 
@@ -49,7 +59,7 @@
 /**
  * The roman numeral is too long to be syntactically correct.
  *
- * The max length of a roman numeral is NUMERUS_MAX_LENGTH.
+ * The max allowed length of a roman numeral is NUMERUS_MAX_LENGTH.
  */
 #define NUMERUS_ERROR_TOO_LONG_NUMERAL 103
 
@@ -85,24 +95,21 @@
 
 
 /**
- * The long roman numeral contains one underscore after the second one.
+ * The long roman numeral contains more than two underscores.
  *
- * A roman numeral may contain 0 or 2 underscores, the latter being a long
- * numeral. In this case it contains 3 (or more) underscores, thus being a long
- * numeral with an extra underscore.
+ * A roman numeral may contain either 0 or 2 underscores, the latter being a
+ * long numeral.
  */
-#define NUMERUS_ERROR_UNDERSCORE_AFTER_LONG_PART 107
+#define NUMERUS_ERROR_TOO_MANY_UNDERSCORES 107
 
 
 /**
- * The non-long roman numeral contains one underscore.
+ * The roman numeral contains the first underscore not at the numeral start.
  *
- * A roman numeral may contain 0 or 2 underscores, the latter being a long
- * numeral. In this case it contains 1 underscore (or more) which is not placed
- * at the first position of the numeral (eventually after the minus), making
- * the numeral a non-long with an unwanted underscore.
+ * The first underscore has to be placed at the first position of the numeral
+ * (after the minus, in case there is one).
  */
-#define NUMERUS_ERROR_UNDERSCORE_IN_NON_LONG 108
+#define NUMERUS_ERROR_ILLEGAL_FIRST_UNDERSCORE_POSITION 108
 
 
 /**
@@ -121,7 +128,7 @@
  * A roman numeral may contain only one minus which, if existing, must be at the
  * first position of the numeral.
  */
-#define NUMERUS_ERROR_ILLEGAL_MINUS 110
+#define NUMERUS_ERROR_ILLEGAL_MINUS_POSITION 110
 
 
 /**
@@ -139,7 +146,6 @@
  *
  * The malloc() function failed to allocate memory within one of the Numerus
  * functions. This is an error depending on the OS and its current status.
- * Please retry.
  */
 #define NUMERUS_ERROR_MALLOC_FAIL 112
 
@@ -165,4 +171,7 @@
  *
  * Remove the whitespace characters from inside the string and trim it.
  */
-#define NUMERUS_ERROR_WHITESPACE_CHARACTER 115
+#define NUMERUS_ERROR_WHITESPACE_CHARACTER_FOUND 115
+
+
+#endif /* NUMERUS_ERROR_CODES_H */

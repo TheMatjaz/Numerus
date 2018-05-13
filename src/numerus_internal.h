@@ -1,8 +1,8 @@
 /**
  * @file numerus_internal.h
  * @brief Numerus roman numerals library internal header
- * @copyright Copyright © 2015-2016, Matjaž Guštin <dev@matjaz.it>
- * <http://matjaz.it>. All rights reserved.
+ * @copyright Copyright © 2015-2017, Matjaž Guštin <dev@matjaz.it>
+ * <https://matjaz.it>. All rights reserved.
  * @license This file is part of the Numerus project which is released under
  * the BSD 3-clause license.
  *
@@ -12,10 +12,15 @@
  */
 
 
-#include "numerus.h"
-#include "numerus_test.h"
+#ifndef NUMERUS_INTERNAL_H
+#define NUMERUS_INTERNAL_H
 
+#include "../include/numerus.h"
 
-short _num_is_zero(char *roman);
-#define SIGN(x)    (((x) >= 0)  - ((x) < 0))
-#define ABS(x)     (((x) < 0) ? -(x) : (x))
+#define SIGN(x) (((x) >= 0)  - ((x) < 0))
+#define ABS(x)  (((x) < 0) ? -(x) : (x))
+
+bool _num_is_zero(char *roman);
+
+#endif /* NUMERUS_INTERNAL_H */
+

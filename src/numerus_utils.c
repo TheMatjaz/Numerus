@@ -1,8 +1,8 @@
 /**
  * @file numerus_utils.c
  * @brief Numerus utility functions for roman numerals and values manipulation.
- * @copyright Copyright © 2015-2016, Matjaž Guštin <dev@matjaz.it>
- * <http://matjaz.it>. All rights reserved.
+ * @copyright Copyright © 2015-2017, Matjaž Guštin <dev@matjaz.it>
+ * <https://matjaz.it>. All rights reserved.
  * @license This file is part of the Numerus project which is released under
  * the BSD 3-clause license.
  *
@@ -26,10 +26,10 @@
  * Ignores any leading minus. It's case INsensitive.
  *
  * @param *roman string containing the roman numeral.
- * @returns short as boolean: true if the numeral is NUMERUS_ZERO, false
+ * @returns boolean: true if the numeral is NUMERUS_ZERO, false
  * otherwise.
  */
-short _num_is_zero(char *roman) {
+bool _num_is_zero(char *roman) {
     if (*roman == '-') {
         roman++;
     }
@@ -56,7 +56,7 @@ short _num_is_zero(char *roman) {
  * other error.
  * @returns void as the result is stored in **errcode.
  */
-void _num_headtrim_check_numeral_and_errcode(char **roman, int **errcode) {
+void _num_headtrim_check_numeral_and_errcode(char **roman, int8_t **errcode) {
     if (*errcode == NULL) {
         *errcode = &numerus_error_code;
     }
@@ -92,10 +92,10 @@ void _num_headtrim_check_numeral_and_errcode(char **roman, int **errcode) {
  * @param *roman string containing the roman numeral.
  * @param *errcode int where to store the analysis status: NUMERUS_OK or any
  * other error. Can be NULL to ignore the error (NOT recommended).
- * @returns short as boolean: true if the numeral is NUMERUS_ZERO, false
+ * @returns boolean: true if the numeral is NUMERUS_ZERO, false
  * otherwise.
  */
-short numerus_is_zero(char *roman, int *errcode) {
+bool numerus_is_zero(char *roman, int8_t *errcode) {
     _num_headtrim_check_numeral_and_errcode(&roman, &errcode);
     if (*errcode != NUMERUS_OK) {
         return false;
@@ -122,16 +122,16 @@ short numerus_is_zero(char *roman, int *errcode) {
  * @param *roman string containing the roman numeral.
  * @param *errcode int where to store the analysis status: NUMERUS_OK or any
  * other error. Can be NULL to ignore the error (NOT recommended).
- * @returns short as boolean: true if the numeral is long, false
+ * @returns boolean: true if the numeral is long, false
  * otherwise.
  */
-short numerus_is_long_numeral(char *roman, int *errcode) {
+bool numerus_is_long_numeral(char *roman, int8_t *errcode) {
     _num_headtrim_check_numeral_and_errcode(&roman, &errcode);
     if (*errcode != NUMERUS_OK) {
         return false;
     }
-    short i = 0;
-    short underscores_found = 0;
+    uint8_t i = 0;
+    uint8_t underscores_found = 0;
     while (*roman != '\0') {
         if (i > NUMERUS_MAX_LENGTH) {
             numerus_error_code = NUMERUS_ERROR_TOO_LONG_NUMERAL;
@@ -148,17 +148,17 @@ short numerus_is_long_numeral(char *roman, int *errcode) {
         numerus_error_code = NUMERUS_OK;
         *errcode = NUMERUS_OK;
         return true;
-    } else if (underscores_found == 0){
+    } else if (underscores_found == 0) {
         numerus_error_code = NUMERUS_OK;
         *errcode = NUMERUS_OK;
         return false;
-    } else if (underscores_found == 1){
+    } else if (underscores_found == 1) {
         numerus_error_code = NUMERUS_ERROR_MISSING_SECOND_UNDERSCORE;
         *errcode = NUMERUS_ERROR_MISSING_SECOND_UNDERSCORE;
         return false;
     } else {
-        numerus_error_code = NUMERUS_ERROR_UNDERSCORE_AFTER_LONG_PART;
-        *errcode = NUMERUS_ERROR_UNDERSCORE_AFTER_LONG_PART;
+        numerus_error_code = NUMERUS_ERROR_TOO_MANY_UNDERSCORES;
+        *errcode = NUMERUS_ERROR_TOO_MANY_UNDERSCORES;
         return false;
     }
 }
@@ -178,17 +178,17 @@ short numerus_is_long_numeral(char *roman, int *errcode) {
  * specific error.
  *
  * @param *roman string containing the roman numeral.
- * @param *errcode int where to store the analysis status: NUMERUS_OK or any
+ * @param *errcode int8_t where to store the analysis status: NUMERUS_OK or any
  * other error. Can be NULL to ignore the error (NOT recommended).
- * @returns short as boolean: true if the numeral contains 'S' or dot '.', false
+ * @returns boolean: true if the numeral contains 'S' or dot '.', false
  * otherwise.
  */
-short numerus_is_float_numeral(char *roman, int *errcode) {
+bool numerus_is_float_numeral(char *roman, int8_t *errcode) {
     _num_headtrim_check_numeral_and_errcode(&roman, &errcode);
     if (*errcode != NUMERUS_OK) {
         return false;
     }
-    short i = 0;
+    uint8_t i = 0;
     while (*roman != '\0') {
         if (i > NUMERUS_MAX_LENGTH) {
             numerus_error_code = NUMERUS_ERROR_TOO_LONG_NUMERAL;
@@ -226,10 +226,10 @@ short numerus_is_float_numeral(char *roman, int *errcode) {
  * @param *roman string containing the roman numeral.
  * @param *errcode int where to store the analysis status: NUMERUS_OK or any
  * other error. Can be NULL to ignore the error (NOT recommended).
- * @returns short with the sign of the roman numeral: 0 if has value zero, -1
+ * @returns int8_t with the sign of the roman numeral: 0 if has value zero, -1
  * if negative, +1 if positive.
  */
-short numerus_sign(char *roman, int *errcode) {
+int8_t numerus_sign(char *roman, int8_t *errcode) {
     _num_headtrim_check_numeral_and_errcode(&roman, &errcode);
     if (*errcode != NUMERUS_OK) {
         return 0;
@@ -259,11 +259,11 @@ short numerus_sign(char *roman, int *errcode) {
  * specific error.
  *
  * @param *roman string containing the roman numeral.
- * @param *errcode int where to store the analysis status: NUMERUS_OK or any
+ * @param *errcode int8_t where to store the analysis status: NUMERUS_OK or any
  * other error. Can be NULL to ignore the error (NOT recommended).
- * @returns short with the number of roman characters excluding underscores.
+ * @returns int8_t with the number of roman characters excluding underscores.
  */
-short numerus_count_roman_chars(char *roman, int *errcode) {
+int8_t numerus_count_roman_chars(char *roman, int8_t *errcode) {
     _num_headtrim_check_numeral_and_errcode(&roman, &errcode);
     if (*errcode != NUMERUS_OK) {
         return -1;
@@ -273,7 +273,7 @@ short numerus_count_roman_chars(char *roman, int *errcode) {
         *errcode = NUMERUS_OK;
         return (short) strlen(NUMERUS_ZERO);
     }
-    short i = 0;
+    uint8_t i = 0;
     while (*roman != '\0') {
         if (i > NUMERUS_MAX_LENGTH) {
             numerus_error_code = NUMERUS_ERROR_TOO_LONG_NUMERAL;
@@ -281,7 +281,8 @@ short numerus_count_roman_chars(char *roman, int *errcode) {
             return -2;
         }
         switch (toupper(*roman)) {
-            case '_': {
+            case '_':
+            {
                 roman++; // ignore underscores
                 break;
             }
@@ -294,15 +295,17 @@ short numerus_count_roman_chars(char *roman, int *errcode) {
             case 'V':
             case 'I':
             case 'S':
-            case '.': {
+            case '.':
+            {
                 roman++;
                 i++; // count every other roman char
                 break;
             }
-            default: {
+            default:
+            {
                 if (isspace(*roman)) {
-                    numerus_error_code = NUMERUS_ERROR_WHITESPACE_CHARACTER;
-                    *errcode = NUMERUS_ERROR_WHITESPACE_CHARACTER;
+                    numerus_error_code = NUMERUS_ERROR_WHITESPACE_CHARACTER_FOUND;
+                    *errcode = NUMERUS_ERROR_WHITESPACE_CHARACTER_FOUND;
                     return -3;
                 } else {
                     numerus_error_code = NUMERUS_ERROR_ILLEGAL_CHARACTER;
@@ -336,25 +339,25 @@ short numerus_count_roman_chars(char *roman, int *errcode) {
  * roman_smaller
  * @param *roman_smaller string with a roman numeral to compare with the first
  * parameter
- * @param *errcode int where to store the comparison status: NUMERUS_OK or any
+ * @param *errcode int8_t where to store the comparison status: NUMERUS_OK or any
  * other error. Can be NULL to ignore the error (NOT recommended).
  * @returns 1 if the first parameter has a bigger value, 0 if they have the
  * same, -1 if the second is bigger.
  */
-short numerus_compare_value(char *roman_bigger, char *roman_smaller, int *errcode) {
+int8_t numerus_compare_value(char *roman_bigger, char *roman_smaller, int8_t *errcode) {
     if (errcode == NULL) {
         errcode = &numerus_error_code;
     }
-    short twelfths_bigger;
-    long int_part_bigger = numerus_roman_to_int_part_and_twelfths(roman_bigger,
-                                                                  &twelfths_bigger,
-                                                                  errcode);
+    uint8_t twelfths_bigger;
+    int32_t int_part_bigger = numerus_roman_to_int_part_and_twelfths(roman_bigger,
+            &twelfths_bigger,
+            errcode);
     if (*errcode != NUMERUS_OK) {
         numerus_error_code = *errcode;
         return 0;
     }
-    short twelfths_smaller;
-    long int_part_smaller = numerus_roman_to_int_part_and_twelfths(
+    uint8_t twelfths_smaller;
+    int32_t int_part_smaller = numerus_roman_to_int_part_and_twelfths(
             roman_smaller, &twelfths_smaller, errcode);
     if (*errcode != NUMERUS_OK) {
         numerus_error_code = *errcode;
@@ -438,7 +441,7 @@ static size_t _num_overlining_alloc_size(char *roman) {
  * @returns char* allocated string with the prettier version of the roman
  * numeral or NULL if malloc() fails.
  */
-char *numerus_overline_long_numerals(char *roman, int *errcode) {
+char *numerus_overline_long_numerals(char *roman, int8_t *errcode) {
     _num_headtrim_check_numeral_and_errcode(&roman, &errcode);
     if (*errcode != NUMERUS_OK) {
         return NULL;
@@ -513,7 +516,7 @@ char *numerus_overline_long_numerals(char *roman, int *errcode) {
  * @param denominator second of two values to compute the GCD of.
  * @returns short greatest common divisor of the passed values.
  */
-static short _num_greatest_common_divisor(short numerator, short denominator) {
+static int8_t _num_greatest_common_divisor(int8_t numerator, int8_t denominator) {
     numerator = ABS(numerator);
     denominator = ABS(denominator);
     while (numerator != denominator) {
@@ -545,7 +548,7 @@ static short _num_greatest_common_divisor(short numerator, short denominator) {
  * @param *twelfths twelfth of the value.
  * @returns void since modifies the passed values.
  */
-void numerus_shorten_and_same_sign_to_parts(long *int_part, short *twelfths) {
+void numerus_shorten_and_same_sign_to_parts(int32_t *int_part, uint8_t *twelfths) {
     *int_part += *twelfths / 12;
     *twelfths = *twelfths % (short) 12;
     if (*int_part > 0 && *twelfths < 0) {
@@ -572,8 +575,8 @@ void numerus_shorten_and_same_sign_to_parts(long *int_part, short *twelfths) {
  * NULL if malloc() fails.
  */
 char *numerus_create_pretty_value_as_double(double double_value) {
-    short twelfths;
-    long int_part = numerus_double_to_parts(double_value, &twelfths);
+    uint8_t twelfths;
+    int32_t int_part = numerus_double_to_parts(double_value, &twelfths);
     return numerus_create_pretty_value_as_parts(int_part, twelfths);
 }
 
@@ -594,27 +597,27 @@ char *numerus_create_pretty_value_as_double(double double_value) {
  * @returns char* allocated string with the prettier version of the value or
  * NULL if malloc() fails.
  */
-char *numerus_create_pretty_value_as_parts(long int_part, short twelfths) {
+char *numerus_create_pretty_value_as_parts(int32_t int_part, uint8_t twelfths) {
     char *pretty_value;
     if (twelfths == 0) {
-        size_t needed_space = snprintf(NULL, 0, "%ld", int_part);
+        size_t needed_space = snprintf(NULL, 0, "%d", int_part);
         pretty_value = malloc(needed_space + 1); /* +1 for '\0' */
         if (pretty_value == NULL) {
             numerus_error_code = NUMERUS_ERROR_MALLOC_FAIL;
             return NULL;
         }
-        sprintf(pretty_value, "%ld", int_part);
+        sprintf(pretty_value, "%d", int_part);
     } else {
         numerus_shorten_and_same_sign_to_parts(&int_part, &twelfths);
         /* Shorten twelfth fraction */
-        short gcd = _num_greatest_common_divisor(twelfths, 12);
-        size_t needed_space = snprintf(NULL, 0, "%ld, %d/%d", int_part, twelfths/gcd, 12/gcd);
+        int8_t gcd = _num_greatest_common_divisor(twelfths, 12);
+        size_t needed_space = snprintf(NULL, 0, "%d, %d/%d", int_part, twelfths / gcd, 12 / gcd);
         pretty_value = malloc(needed_space + 1); /* +1 for '\0' */
         if (pretty_value == NULL) {
             numerus_error_code = NUMERUS_ERROR_MALLOC_FAIL;
             return NULL;
         }
-        sprintf(pretty_value, "%ld, %d/%d", int_part, twelfths/gcd, 12/gcd);
+        sprintf(pretty_value, "%d, %d/%d", int_part, twelfths / gcd, 12 / gcd);
     }
     return pretty_value;
 }
@@ -628,9 +631,9 @@ char *numerus_create_pretty_value_as_parts(long int_part, short twelfths) {
  * It's used to create the _NUM_ERROR_CODES list of error codes explanation.
  */
 struct _num_error_codes {
-    const int code;
+    const int8_t code;
     const char *message;
-};
+} ;
 
 
 /**
@@ -639,39 +642,39 @@ struct _num_error_codes {
  */
 static struct _num_error_codes _NUM_ERROR_CODES[] = {
     {NUMERUS_ERROR_VALUE_OUT_OF_RANGE,
-            "The value to be converted to roman is out of conversion range."},
+     "The value to be converted to roman is out of conversion range."},
     {NUMERUS_ERROR_ILLEGAL_CHARACTER,
-            "The roman numeral contains a character that is not part of the syntax of roman numerals."},
+     "The roman numeral contains a character that is not part of the syntax of roman numerals."},
     {NUMERUS_ERROR_TOO_LONG_NUMERAL,
-            "The roman numeral is too long to be syntactically correct."},
+     "The roman numeral is too long to be syntactically correct."},
     {NUMERUS_ERROR_TOO_MANY_REPEATED_CHARS,
-            "The roman numeral contains too many consecutive repetitions of a repeatable character."},
+     "The roman numeral contains too many consecutive repetitions of a repeatable character."},
     {NUMERUS_ERROR_ILLEGAL_CHAR_SEQUENCE,
-            "The roman numeral contains mispositioned characters."},
+     "The roman numeral contains mispositioned characters."},
     {NUMERUS_ERROR_MISSING_SECOND_UNDERSCORE,
-            "The roman numeral contains one underscore but not the second one."},
-    {NUMERUS_ERROR_UNDERSCORE_AFTER_LONG_PART,
-            "The long roman numeral contains one underscore after the second one."},
-    {NUMERUS_ERROR_UNDERSCORE_IN_NON_LONG,
-            "The non-long roman numeral contains one underscore."},
+     "The roman numeral contains one underscore but not the second one."},
+    {NUMERUS_ERROR_TOO_MANY_UNDERSCORES,
+     "The long roman numeral contains one underscore after the second one."},
+    {NUMERUS_ERROR_ILLEGAL_FIRST_UNDERSCORE_POSITION,
+     "The non-long roman numeral contains one underscore."},
     {NUMERUS_ERROR_DECIMALS_IN_LONG_PART,
-            "The long roman numeral contains decimal characters \"Ss.\" in the long part."},
-    {NUMERUS_ERROR_ILLEGAL_MINUS,
-            "The roman numeral contains a misplaced minus '-' or more than one."},
+     "The long roman numeral contains decimal characters \"Ss.\" in the long part."},
+    {NUMERUS_ERROR_ILLEGAL_MINUS_POSITION,
+     "The roman numeral contains a misplaced minus '-' or more than one."},
     {NUMERUS_ERROR_M_IN_SHORT_PART,
-            "The long roman numeral contains an 'M' character after the long part."},
+     "The long roman numeral contains an 'M' character after the long part."},
     {NUMERUS_ERROR_MALLOC_FAIL,
-            "Heap memory allocation failure."},
+     "Heap memory allocation failure."},
     {NUMERUS_ERROR_NULL_ROMAN,
-            "The pointer to the roman numeral string is NULL."},
+     "The pointer to the roman numeral string is NULL."},
     {NUMERUS_ERROR_EMPTY_ROMAN,
-            "The roman numeral string is empty or filled with whitespace."},
-    {NUMERUS_ERROR_WHITESPACE_CHARACTER,
-            "The roman numeral string contains whitespace characters, even at the end."},
+     "The roman numeral string is empty or filled with whitespace."},
+    {NUMERUS_ERROR_WHITESPACE_CHARACTER_FOUND,
+     "The roman numeral string contains whitespace characters, even at the end."},
     {NUMERUS_OK,
-            "Everything went all right."},
+     "Everything went all right."},
     {NUMERUS_ERROR_GENERIC,
-            "An unknown or unspecified error happened."}
+     "An unknown or unspecified error happened."}
 };
 
 
@@ -686,7 +689,7 @@ static struct _num_error_codes _NUM_ERROR_CODES[] = {
  * @returns char* pointer to a constant string with the human-friendly text
  * description of the error code.
  */
-const char *numerus_explain_error(int error_code) {
+const char *numerus_explain_error(int8_t error_code) {
     const struct _num_error_codes *current_code = &_NUM_ERROR_CODES[0];
     while (current_code->code != 0) {
         if (error_code == current_code->code) {
@@ -709,7 +712,7 @@ const char *numerus_explain_error(int error_code) {
  * integer part and converted to double.
  * @returns double value as the sum of the integer part and the twelfths.
  */
-double numerus_parts_to_double(long int_part, short twelfths) {
+double numerus_parts_to_double(int32_t int_part, uint8_t twelfths) {
     return (double) (int_part) + twelfths / 12.0;
 }
 
@@ -725,15 +728,15 @@ double numerus_parts_to_double(long int_part, short twelfths) {
  * @param *twelfths number of twelfths. NULL is interpreted as 0 twelfths.
  * @returns long as the integer part of the value of the roman numeral.
  */
-long numerus_double_to_parts(double value, short *twelfths) {
-    short zero_twelfths = 0;
+int32_t numerus_double_to_parts(double value, uint8_t *twelfths) {
+    uint8_t zero_twelfths = 0;
     if (twelfths == NULL) {
         twelfths = &zero_twelfths;
     }
-    long int_part = (long) value;
+    int32_t int_part = (int32_t) value;
     value -= int_part; /* Get only decimal part */
     value = round(value * 12) / 12; /* Round to nearest twelfth */
     value = round(value * 12); /* Get numerator of that twelfth */
-    *twelfths = (short) value;
+    *twelfths = (uint8_t) value;
     return int_part;
 }
