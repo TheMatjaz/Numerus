@@ -83,8 +83,9 @@ extern const int32_t NUMERUS_MIN_EXTENDED_VALUE_INT_PART;
 extern const int32_t NUMERUS_MAX_EXTENDED_VALUE_INT_PART;
 
 /**
- * The maximum length a basic roman numeral string may have, including the null
- * terminator `\0`.
+ * The maximum length a basic roman numeral string may hav.
+ *
+ * It includes the null terminator `\0`.
  *
  * That is the length of the roman numeral `-MMMDCCCLXXXVIII\0`
  * with value 3888.
@@ -92,14 +93,32 @@ extern const int32_t NUMERUS_MAX_EXTENDED_VALUE_INT_PART;
 extern const uint8_t NUMERUS_MAX_BASIC_LENGTH;
 
 /**
- * The maximum length an extended roman numeral string may have, including the
- * null terminator `\0`.
+ * The maximum length an extended roman numeral string may have
+ *
+ * It includes the null terminator `\0`.
  *
  * That is the length of the roman numeral
  * `-_MMMDCCCLXXXVIII_DCCCLXXXVIIIS.....\0`
  * with value (-3888888 and -11/12) = -3888888.9166666665.
  */
 extern const uint8_t NUMERUS_MAX_EXTENDED_LENGTH;
+
+/**
+ * The maximum length an overlined extended roman numeral string may have.
+ *
+ * It includes the null terminator `\0`.
+ *
+ * This is the length of the maximum string that numerus_overline() may
+ * output.
+ *
+ * Specifically it is the length of the roman numeral
+ * @verbatim
+ *  _______________\n
+ * -MMMDCCCLXXXVIIIDCCCLXXXVIIIS.....\0
+ * @endverbatim
+ * with value (-3888888 and -11/12) = -3888888.9166666665.
+ */
+extern const uint8_t NUMERUS_MAX_EXTENDED_OVERLINED_LENGTH;
 
 /**
  * The roman numeral of value 0 (zero).
