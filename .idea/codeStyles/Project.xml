@@ -8,7 +8,6 @@
       <option name="FORCE_COMMANDS_CASE" value="1" />
     </CMakeCodeStyleSettings>
     <Objective-C>
-      <option name="INDENT_BLOCK_COMMENT" value="false" />
       <option name="INDENT_DIRECTIVE_AS_CODE" value="true" />
       <option name="NAMESPACE_BRACE_PLACEMENT" value="2" />
       <option name="FUNCTION_BRACE_PLACEMENT" value="2" />
