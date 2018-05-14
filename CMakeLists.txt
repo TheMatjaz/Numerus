@@ -9,54 +9,45 @@
 cmake_minimum_required(VERSION 3.3)
 project(Numerus)
 
-set(CMAKE_C_FLAGS "-Wall -pedantic -Wextra --std=c99")
-set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS} -g3 -gdwarf-2")
-set(CMAKE_C_FLAGS_CLI "${CMAKE_C_FLAGS} -O3 -DNDEBUG")
-set(CMAKE_C_FLAGS_SHAREDLIB "${CMAKE_C_FLAGS} -O3 -DNDEBUG")
-set(CMAKE_C_FLAGS_STATICLIB "${CMAKE_C_FLAGS} -O3 -DNDEBUG")
+set(OUTPUT_FILE_NAME_NOEXTENSION numerus)
+set(COMPILER_FLAGS_WARNINGS
+        "-Wall \
+        -Wextra \
+        -pedantic \
+        --std=c11")
+set(LIBRARY_SOURCE_FILES
+    src/allocation.c
+    src/analysis.c
+    src/constants.c
+    src/formatting.c
+    src/numeral_to_value.c
+    src/twelfths.c
+    src/utils.c
+    src/value_to_numeral.c)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-if(NOT CMAKE_BUILD_TYPE)
-   message(STATUS "Setting build type to 'CLI' as none was specified.")
-   set(CMAKE_BUILD_TYPE CLI CACHE STRING "Choose the type of build." FORCE)
-   # Set the possible values of build type for cmake-gui
-   set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "CLI"
-     "SharedLib" "StaticLib")
-endif()
-message(STATUS "Chosen build type: ${CMAKE_BUILD_TYPE}")
 
-if(CMAKE_BUILD_TYPE MATCHES Debug)
-    set(SOURCE_FILES
-        test/main.c
-        src/numerus_core.c
-        src/numerus_utils.c
-        test/numerus_test.c)
-    set(EXECUTABLE_NAME numerus_debug)
-    message(STATUS "Executable fill will be ${EXECUTABLE_NAME}")
-    add_executable(${EXECUTABLE_NAME} ${SOURCE_FILES})
+# Debug targets
+set(COMPILER_FLAGS_DEBUG "${COMPILER_FLAGS_WARNINGS} -g3 -gdwarf-2")
 
-elseif(CMAKE_BUILD_TYPE MATCHES SharedLib)
-    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
-    set(SOURCE_FILES
-        src/numerus_core.c
-        src/numerus_utils.c)
-    add_library(numerus SHARED ${SOURCE_FILES})
+set(DEBUG_SOURCE_FILES
+    test/main.c
+    test/numerus_test.c
+    ${LIBRARY_SOURCE_FILES})
+set(CMAKE_C_FLAGS ${COMPILER_FLAGS_DEBUG})
+add_executable(${OUTPUT_FILE_NAME_NOEXTENSION}_debug ${DEBUG_SOURCE_FILES})
 
-elseif(CMAKE_BUILD_TYPE MATCHES StaticLib)
-    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
-    set(SOURCE_FILES
-        src/numerus_core.c
-        src/numerus_utils.c)
-    add_library(numerus STATIC ${SOURCE_FILES})
 
-else(CMAKE_BUILD_TYPE MATCHES Debug)
-    # CLI is the default build type
-    set(SOURCE_FILES
-        src/cli/main.c
-        src/cli/numerus_cli.c
-        src/numerus_core.c
-        src/numerus_utils.c)
-    set(EXECUTABLE_NAME numerus)
-    message(STATUS "Executable fill will be ${EXECUTABLE_NAME}")
-    add_executable(${EXECUTABLE_NAME} ${SOURCE_FILES})
-endif(CMAKE_BUILD_TYPE MATCHES Debug)
+# Release targets
+set(COMPILER_FLAGS_RELEASE "${COMPILER_FLAGS_WARNINGS} -O3 -DNDEBUG")
+set(CMAKE_C_FLAGS ${COMPILER_FLAGS_RELEASE})
 
+add_library(lib${OUTPUT_FILE_NAME_NOEXTENSION}.dll SHARED ${LIBRARY_SOURCE_FILES})
+
+add_library(lib${OUTPUT_FILE_NAME_NOEXTENSION}.a STATIC ${LIBRARY_SOURCE_FILES})
+
+set(CLI_SOURCE_FILES
+    src/cli/main.c
+    src/cli/numerus_cli.c
+    ${LIBRARY_SOURCE_FILES})
+add_executable(${OUTPUT_FILE_NAME_NOEXTENSION} ${CLI_SOURCE_FILES})
