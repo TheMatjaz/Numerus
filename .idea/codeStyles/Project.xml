@@ -45,8 +45,8 @@
         <option name="com.jetbrains.cidr.lang.util.OCDeclarationKind" value="DeallocMethod" />
       </class>
       <extensions>
-        <pair source="cpp" header="h" fileNamingConvention="SNAKE_CASE" />
         <pair source="c" header="h" fileNamingConvention="SNAKE_CASE" />
+        <pair source="cpp" header="h" fileNamingConvention="SNAKE_CASE" />
       </extensions>
     </Objective-C-extensions>
     <Python>
