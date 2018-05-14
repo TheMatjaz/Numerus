@@ -366,7 +366,7 @@ typedef enum
  *   \endcode
  *
  * @param[in] value the integer value of the numeral. Can be negative.
- * @param[in, out] numeral pointer to the generated numeral string. Check its
+ * @param[in, out] p_numeral pointer to the generated numeral string. Check its
  *        **remarks**, as it can be either allocated by the user or by
  *        this function. It's up to the user to free this string.
  * @return status code, indicating operation success or failure.
@@ -374,7 +374,7 @@ typedef enum
  * @see numerus_double_to_extended_roman
  */
 numerus_status_t numerus_int_to_basic_numeral(
-        int16_t value, char** numeral);
+        int16_t value, char** p_numeral);
 
 /**
  * Converts an integer and a fractional part (in twelfths) to an extended
@@ -444,7 +444,7 @@ numerus_status_t numerus_int_parts_to_double(
         int32_t int_part, uint8_t twelfths, double* result);
 numerus_status_t numerus_double_to_int_parts(
         double value, int32_t* int_part, int8_t* twelfths);
-numerus_status_t numerus_shorten_and_same_sign_to_parts(
+numerus_status_t numerus_simplify_twelfths(
         int32_t* int_part, int8_t* twelfths);
 
 
