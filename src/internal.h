@@ -56,13 +56,13 @@ extern const uint8_t ZERO_NUMERAL_SIZE;
  */
 typedef struct
 {
-    char* const current_numeral_position;
-    const dictionary_char_t* current_dictionary_char;
     int32_t int_part;
+    uint8_t current_numeral_position;
+    uint8_t current_dictionary_char_index;
     uint8_t twelfths;
     uint8_t char_repetitions;
     int8_t numeral_sign;
-    bool numeral_is_long;
+    bool numeral_is_extended;
 } numeral_parser_data_t;
 
 numerus_status_t prepare_for_analysis(const char** p_numeral);
