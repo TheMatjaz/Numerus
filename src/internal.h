@@ -53,6 +53,11 @@ extern "C"
 #define ABS(x) (((x) < 0) ? (-(x)) : (x))
 
 /**
+ * Size of the NUMERUS_ZERO_STRING including null terminator.
+ */
+#define ZERO_NUMERAL_SIZE 6U
+
+/**
  * Size of the dictionary used to convert roman numeral character to values
  * and vice versa.
  */
