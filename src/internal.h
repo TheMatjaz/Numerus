@@ -19,7 +19,7 @@ extern "C"
 #endif
 
 #include "../include/numerus.h"
-
+#include "dictionary.h"
 
 /**
  * @internal
@@ -42,34 +42,8 @@ extern "C"
  */
 extern const uint8_t ZERO_NUMERAL_SIZE;
 
-
-/**
- * Size of the dictionary used to convert roman numeral character to values
- * and vice versa.
- */
-#define NUMERUS_DICTIONARY_SIZE 15U
-
-/**
- * @internal
- * Struct containing a basic roman char, its integer value and the maximum
- * consecutive repetitions of it that a roman numeral may have.
- *
- * It's used to create the _NUM_DICTIONARY dictionary which in turn is used by
- * conversion functions.
- */
-typedef struct
-{
-    const uint16_t value:10; // 10 bits to store up to 1000
-    const uint8_t max_repetitions:3; // 3 bits to store up to 5
-    const char character_1;
-    const char character_2;
-} dictionary_char_t;
-
-extern const dictionary_char_t DICTIONARY[NUMERUS_DICTIONARY_SIZE];
-#define DICTIONARY_INDEX_FOR_M 0U
-#define DICTIONARY_INDEX_FOR_C 1U
-#define DICTIONARY_INDEX_FOR_S 13U
-
+#define MAX_INT_PART_BITSIZE 22U /* 3999999 fits in 22 bits. */
+#define MAX_TWELFTHS_BITSIZE 4U /* 12 fits in 4 bits. */
 /**
  * @internal
  * Structure containing data about the numeral that is being converted to value.
