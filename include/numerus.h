@@ -1,5 +1,5 @@
 /**
- * @file numerus3.h
+ * @file numerus.h
  * @brief Numerus roman numerals library API.
  * @copyright Copyright © 2015-2018, Matjaž Guštin <dev@matjaz.it>
  * <https://matjaz.it>. All rights reserved.
@@ -106,7 +106,7 @@ extern const uint8_t NUMERUS_MAX_EXTENDED_LENGTH;
  *
  * Both for positive and negative zero.
  */
-extern const char* const NUMERUS_ZERO_STRING;
+extern const char* const NUMERUS_ZERO_NUMERAL;
 
 
 /**
