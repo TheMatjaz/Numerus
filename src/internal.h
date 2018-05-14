@@ -59,10 +59,10 @@ extern const uint8_t ZERO_NUMERAL_SIZE;
  */
 typedef struct
 {
-    const uint16_t value;
+    const uint16_t value:10; // 10 bits to store up to 1000
+    const uint8_t max_repetitions:3; // 3 bits to store up to 5
     const char character_1;
     const char character_2;
-    const uint8_t max_repetitions;
 } dictionary_char_t;
 
 extern const dictionary_char_t DICTIONARY[NUMERUS_DICTIONARY_SIZE];
