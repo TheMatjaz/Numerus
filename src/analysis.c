@@ -198,7 +198,7 @@ numerus_status_t numerus_is_basic_numeral(
 }
 
 // TODO doxygen
-static bool contains_extended_characters(const char* numeral)
+bool contains_extended_characters(const char* numeral)
 {
     while (*numeral != '\0')
     {

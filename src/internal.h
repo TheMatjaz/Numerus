@@ -94,6 +94,7 @@ typedef struct
 numerus_status_t prepare_for_analysis(const char** p_numeral);
 numerus_status_t obtain_numeral_buffer(
         char** p_result_numeral, uint8_t size);
+bool contains_extended_characters(const char* numeral);
 
 #ifdef __cplusplus
 }
