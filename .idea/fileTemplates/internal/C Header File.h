@@ -1,6 +1,7 @@
-#parse("C File Header.h")
-#[[#ifndef]]# ${INCLUDE_GUARD}
-#[[#define]]# ${INCLUDE_GUARD}
+#parse("Doxygen file header.h")
+
+#[[#ifndef]]# ${INCLUDE_GUARD}_
+#[[#define]]# ${INCLUDE_GUARD}_
 
 #ifdef __cplusplus
 extern "C"
@@ -13,4 +14,4 @@ extern "C"
 }
 #endif
 
-#[[#endif]]# //${INCLUDE_GUARD}
+#[[#endif]]#  /* ${INCLUDE_GUARD}_ */
