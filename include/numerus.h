@@ -256,7 +256,9 @@ typedef enum
      *
      * Decimal characters `S.` are allowed only at the end of the numeral.
      */
-            NUMERUS_ERROR_DECIMALS_NOT_AT_END,
+            NUMERUS_ERROR_FRACTIONAL_CHARS_NOT_AT_END,
+            NUMERUS_ERROR_FRACTIONAL_CHARS_BETWEEN_UNDERSCORES,
+
 
     /**
      * The roman numeral contains a misplaced minus `-` or more than one.
@@ -274,7 +276,7 @@ typedef enum
      * represented between underscores, making an `M` character after the
      * underscores illogical.
      */
-            NUMERUS_ERROR_M_NOT_BETWEEN_UNDERSCORES,
+            NUMERUS_ERROR_M_AFTER_UNDERSCORES,
 
     /**
      * Heap memory allocation failure.
@@ -288,6 +290,11 @@ typedef enum
      * The pointer to the roman numeral string is NULL.
      */
             NUMERUS_ERROR_NULL_NUMERAL,
+
+    /**
+     * The pointer to a number is NULL.
+     */
+            NUMERUS_ERROR_NULL_NUMBER,
 
     /**
      * The roman numeral string is empty or filled with only whitespace.
