@@ -37,10 +37,11 @@ extern "C"
  */
 #define ABS(x) (((x) < 0) ? (-(x)) : (x))
 
-/**
+/** @internal
  * Size of the NUMERUS_ZERO_STRING including null terminator.
  */
-#define ZERO_NUMERAL_SIZE 6U
+extern const uint8_t ZERO_NUMERAL_SIZE;
+
 
 /**
  * Size of the dictionary used to convert roman numeral character to values
@@ -64,6 +65,10 @@ typedef struct
     const uint8_t max_repetitions;
 } dictionary_char_t;
 
+extern const dictionary_char_t DICTIONARY[NUMERUS_DICTIONARY_SIZE];
+#define DICTIONARY_INDEX_FOR_M 0U
+#define DICTIONARY_INDEX_FOR_C 1U
+#define DICTIONARY_INDEX_FOR_S 13U
 
 /**
  * @internal

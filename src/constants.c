@@ -9,6 +9,7 @@
 #include "numerus.h"
 #include "internal.h"
 
+
 const int16_t NUMERUS_MAX_BASIC_VALUE = 3999;
 const int16_t NUMERUS_MIN_BASIC_VALUE = -NUMERUS_MAX_BASIC_VALUE;
 
@@ -20,7 +21,7 @@ const int32_t NUMERUS_MIN_EXTENDED_VALUE_INT_PART =
 // representable number as the conversion function would round it down to
 // 11.0/12.0 before converting it.
 const double NUMERUS_MAX_EXTENDED_VALUE =
-        NUMERUS_MAX_EXTENDED_VALUE_INT_PART + 11.0/12.0;
+        NUMERUS_MAX_EXTENDED_VALUE_INT_PART + 11.0 / 12.0;
 const double NUMERUS_MIN_EXTENDED_VALUE = -NUMERUS_MAX_EXTENDED_VALUE;
 
 
@@ -29,6 +30,7 @@ const uint8_t NUMERUS_MAX_EXTENDED_LENGTH = 37U;
 const uint8_t NUMERUS_MAX_EXTENDED_OVERLINED_LENGTH = 52U;
 
 const char* const NUMERUS_ZERO_NUMERAL = "NULLA";
+const uint8_t ZERO_NUMERAL_SIZE = 6U;
 
 
 /**
