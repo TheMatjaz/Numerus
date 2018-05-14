@@ -18,23 +18,8 @@ extern "C"
 {
 #endif
 
-#include "numerus.h"
+#include "../include/numerus.h"
 
-/**
- * @internal
- * Minimalistic extraction of an integer's sign into +1 or -1.
- *
- * @param x an integer, also unsigned.
- */
-#define INT_SIGN(x) (((x) >= 0) - ((x) < 0))
-
-/**
- * @internal
- * Checks if the first character of the string is a minus.
- *
- * Does not skip initial whitespace.
- */
-#define NUMERAL_IS_NEGATIVE(s) (*(s) == '-')
 
 /**
  * @internal
@@ -101,8 +86,8 @@ typedef struct
     bool numeral_is_long;
 } numeral_parser_data_t;
 
-char* strip_whitespace(char* string);
-
+// Does not check for NULL pointers
+void skip_head_whitespace(const char** p_string);
 
 #ifdef __cplusplus
 }
