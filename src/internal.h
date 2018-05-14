@@ -86,8 +86,7 @@ typedef struct
     bool numeral_is_long;
 } numeral_parser_data_t;
 
-// Does not check for NULL pointers
-void skip_head_whitespace(const char** p_string);
+numerus_status_t prepare_for_analysis(const char** p_numeral);
 
 #ifdef __cplusplus
 }

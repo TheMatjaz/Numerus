@@ -84,7 +84,7 @@ static bool numeral_is_zero_minus_ignored(const char* numeral)
  * other error.
  * @returns void as the result is stored in **errcode.
  */
-static numerus_status_t prepare_for_analysis(const char** p_numeral)
+numerus_status_t prepare_for_analysis(const char** p_numeral)
 {
     if (*p_numeral == NULL)
     {
