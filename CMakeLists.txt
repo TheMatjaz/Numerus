@@ -14,7 +14,17 @@ set(COMPILER_FLAGS_WARNINGS
         "-Wall \
         -Wextra \
         -pedantic \
-        --std=c11")
+        -Wconversion \
+        -Wswitch-default \
+        -Wswitch-enum \
+        -Wuninitialized \
+        -Wshadow \
+        -Wpacked \
+        -Wdouble-promotion
+        -Werror \
+        -pedantic-errors \
+        --std=c11 \
+    ")
 set(LIBRARY_SOURCE_FILES
     src/allocation.c
     src/analysis.c
@@ -28,7 +38,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 
 # Debug targets
-set(COMPILER_FLAGS_DEBUG "${COMPILER_FLAGS_WARNINGS} -g3 -gdwarf-2")
+set(COMPILER_FLAGS_DEBUG "${COMPILER_FLAGS_WARNINGS} -O0 -g3 -gdwarf-2")
 
 set(DEBUG_SOURCE_FILES
     test/main.c
