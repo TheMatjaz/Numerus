@@ -92,6 +92,8 @@ typedef struct
 } numeral_parser_data_t;
 
 numerus_status_t prepare_for_analysis(const char** p_numeral);
+numerus_status_t obtain_numeral_buffer(
+        char** p_result_numeral, uint8_t size);
 
 #ifdef __cplusplus
 }
