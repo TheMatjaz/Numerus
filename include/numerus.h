@@ -323,7 +323,7 @@ typedef enum
  *   \endcode
  * - if \p numeral points to a NULL pointer, a string will be allocated on the
  *   heap memory using #numerus_malloc and returned through the same parameter.
- *   It's **up to the user to free it!** It stays NULL in case of errors;
+ *   It's **up to the user to free it!** It stays unchanged in case of errors;
  *   \code{C}
  *   char* numeral = NULL;
  *   numerus_status_t status;
@@ -332,10 +332,12 @@ typedef enum
  *   // status == NUMERUS_OK
  *   // numeral points to "XLII\0", which was allocated in the function.
  *
- *   numerus_free(numeral);
  *   status = numerus_int_to_basic_roman(983492875, &numeral);
  *   // status == NUMERUS_ERROR_BASIC_VALUE_OUT_OF_RANGE
- *   // numeral == NULL
+ *   // numeral still points to "XLII\0".
+ *
+ *   numerus_free(numeral);
+ *   // The "XLII\0" string is freed.
  *   \endcode
  * - if \p numeral points to a non-NULL location, that will be considered as
  *   the buffer to fill with the numeral. The buffer will be **ASSUMED** to
