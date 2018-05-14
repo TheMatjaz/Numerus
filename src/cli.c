@@ -19,7 +19,7 @@
 #include <stdlib.h>  /* For `malloc()`, `free()`, `strtod()` */
 #include <ctype.h>   /* For `isspace()`, `tolower()` */
 #include <string.h>  /* For `strcmp()` */
-#include "../include/numerus.h"
+#include "numerus.h"
 
 /**
  * @internal
@@ -77,6 +77,14 @@ static const char *PRETTY_ON_TEXT = "Pretty printing is enabled.\n";
 static const char *PRETTY_OFF_TEXT = "Pretty printing is disabled.\n";
 static int pretty_printing = 0;
 
+int8_t numerus_cli(int argc, char **args);
+
+/**
+ * Main that only starts the Numerus CLI.
+ */
+int main(int argc, char **args) {
+    return numerus_cli(argc, args);
+}
 
 /**
  * Returns a pointer the first word of string that is terminated after that.

@@ -32,7 +32,6 @@ set(LIBRARY_SOURCE_FILES
     src/formatting.c
     src/numeral_to_value.c
     src/twelfths.c
-    src/utils.c
     src/value_to_numeral.c)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
@@ -57,7 +56,6 @@ add_library(lib${OUTPUT_FILE_NAME_NOEXTENSION}.dll SHARED ${LIBRARY_SOURCE_FILES
 add_library(lib${OUTPUT_FILE_NAME_NOEXTENSION}.a STATIC ${LIBRARY_SOURCE_FILES})
 
 set(CLI_SOURCE_FILES
-    src/cli/main.c
-    src/cli/numerus_cli.c
+    src/cli.c
     ${LIBRARY_SOURCE_FILES})
 add_executable(${OUTPUT_FILE_NAME_NOEXTENSION} ${CLI_SOURCE_FILES})
