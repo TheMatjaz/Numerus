@@ -456,9 +456,7 @@ numerus_status_t numerus_count_roman_chars(
 // Pass the string two times to overwrite it??
 // Max result size #NUMERUS_MAX_EXTENDED_OVERLINED_LENGTH
 numerus_status_t numerus_overline(
-        const char* const numeral_to_format, char** const result);
-numerus_status_t numerus_explain_status_code(
-        const numerus_status_t status, char** const result);
+        const char* numeral, char** p_formatted);
 
 
 #ifdef __cplusplus
