@@ -364,8 +364,8 @@ typedef enum
  * @see numerus_int_to_extended_roman
  * @see numerus_double_to_extended_roman
  */
-numerus_status_t numerus_int_to_basic_roman(
-        int16_t value, char** const numeral);
+numerus_status_t numerus_int_to_basic_numeral(
+        int16_t value, char** numeral);
 
 /**
  * Converts an integer and a fractional part (in twelfths) to an extended
@@ -393,8 +393,8 @@ numerus_status_t numerus_int_to_basic_roman(
  * @see numerus_int_to_basic_roman
  * @see numerus_double_to_extended_roman
  */
-numerus_status_t numerus_int_to_extended_roman(
-        int32_t integer_part, int8_t twelfths, char** const numeral);
+numerus_status_t numerus_int_to_extended_numeral(
+        int32_t integer_part, int8_t twelfths, char** numeral);
 
 /**
  * Converts a double-precision floating point value to an extended
@@ -417,46 +417,44 @@ numerus_status_t numerus_int_to_extended_roman(
  * @see numerus_int_to_basic_roman
  * @see numerus_int_to_extended_roman
  */
-numerus_status_t numerus_double_to_extended_roman(
-        double double_value, char** const numeral);
+numerus_status_t numerus_double_to_extended_numeral(
+        double double_value, char** numeral);
 
 
 /* Conversion function from roman numeral to value */
-numerus_status_t numerus_basic_roman_to_int(
-        const char* const roman, int16_t* const value);
-numerus_status_t numerus_extended_roman_to_int(
-        const char* const roman, int32_t* const integer_part,
-        int8_t* const twelfths);
-numerus_status_t numerus_extended_roman_to_double(
-        const char* const roman, double* const value);
+numerus_status_t numerus_basic_numeral_to_int(
+        const char* numeral, int16_t* value);
+numerus_status_t numerus_extended_numeral_to_int(
+        const char* numeral, int32_t* integer_part, int8_t* twelfths);
+numerus_status_t numerus_extended_numeral_to_double(
+        const char* numeral, double* value);
 
 
 /* Functions to manage twelfths */
 numerus_status_t numerus_int_parts_to_double(
-        const int32_t int_part, const uint8_t twelfths, double* const result);
+        int32_t int_part, uint8_t twelfths, double* result);
 numerus_status_t numerus_double_to_int_parts(
-        const double value, int32_t* const int_part, int8_t* const twelfths);
+        double value, int32_t* int_part, int8_t* twelfths);
 numerus_status_t numerus_shorten_and_same_sign_to_parts(
-        int32_t* const int_part, int8_t* const twelfths);
+        int32_t* int_part, int8_t* twelfths);
 
 
 /* Numeral analysis functions */
 numerus_status_t numerus_is_zero(
-        const char* const roman, bool* const result);
-numerus_status_t numerus_is_long_numeral(
-        const char* const roman, bool* const result);
-numerus_status_t numerus_is_float_numeral(
-        const char* const roman, bool* const result);
+        const char* numeral, bool* p_result);
 numerus_status_t numerus_sign(
-        const char* const roman, int8_t* const result);
+        const char* numeral, int8_t* p_result);
+numerus_status_t numerus_is_basic_numeral(
+        const char* numeral, bool* p_result);
 numerus_status_t numerus_count_roman_chars(
-        const char* const roman, uint8_t* const result);
+        const char* numeral, uint8_t* p_result);
 
 
 /* Output formatting functions */
 // Pass the string two times to overwrite it??
-numerus_status_t numerus_overline_long_numerals(
-        const char* const roman_to_format, char** const result);
+// Max result size #NUMERUS_MAX_EXTENDED_OVERLINED_LENGTH
+numerus_status_t numerus_overline(
+        const char* const numeral_to_format, char** const result);
 numerus_status_t numerus_explain_status_code(
         const numerus_status_t status, char** const result);
 
