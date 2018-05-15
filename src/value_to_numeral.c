@@ -61,13 +61,12 @@ numerus_status_t numerus_int_to_basic_numeral(
     {
         **p_numeral = '-';
         (*p_numeral)++;
-        value *= -1;
+        value = ABS(value);
     }
     cleaned_value_to_basic_numeral(value, *p_numeral, DICTIONARY_INDEX_FOR_M);
     (*p_numeral)++;
     **p_numeral = '\0';
     return NUMERUS_OK;
-
 }
 
 
@@ -93,11 +92,19 @@ numerus_status_t numerus_int_to_basic_numeral(
  * occurs.
  */
 numerus_status_t numerus_double_to_extended_numeral(
-        double double_value, char** numeral)
+        const double double_value, char** p_numeral)
 {
-    uint8_t twelfths;
-    int32_t int_part = numerus_double_to_parts(double_value, &twelfths);
-    return numerus_int_with_twelfth_to_roman(int_part, twelfths, errcode);
+    int32_t int_part;
+    int8_t twelfths;
+    numerus_status_t status;
+
+    status = numerus_double_to_int_parts(double_value, &int_part, &twelfths);
+    if (status == NUMERUS_OK)
+    {
+        status = numerus_int_to_extended_numeral(
+                int_part, twelfths, p_numeral);
+    }
+    return status;
 }
 
 
@@ -126,7 +133,7 @@ numerus_status_t numerus_double_to_extended_numeral(
  * occurs.
  */
 numerus_status_t numerus_int_to_extended_numeral(
-        int32_t integer_part, int8_t twelfths, char** numeral)
+        int32_t integer_part, int8_t twelfths, char** p_numeral)
 {
     /* ALGORITHM
     sing
@@ -134,86 +141,61 @@ numerus_status_t numerus_int_to_extended_numeral(
     + value_to_basic(integer_part - integer_part/1000)
     + decimal_part(twelfths)
      */
+    numerus_status_t status;
 
-    /* Prepare variables */
-    numerus_simplify_twelfths(&int_part, &twelfths);
-    double double_value = numerus_parts_to_double(int_part, twelfths);
-    if (errcode == NULL)
+    status = obtain_numeral_buffer(p_numeral, NUMERUS_MAX_EXTENDED_LENGTH);
+    if (status != NUMERUS_OK)
     {
-        errcode = &numerus_error_code;
+        return status;
+    }
+    status = numerus_simplify_twelfths(&integer_part, &twelfths);
+    if (status != NUMERUS_OK)
+    {
+        return status;
+    }
+    if (integer_part < NUMERUS_MIN_EXTENDED_VALUE_INT_PART
+        || integer_part > NUMERUS_MAX_EXTENDED_VALUE_INT_PART)
+    {
+        return NUMERUS_ERROR_EXTENDED_VALUE_OUT_OF_RANGE;
     }
 
-    /* Out of range check */
-    if (double_value < NUMERUS_MIN_VALUE || double_value > NUMERUS_MAX_VALUE)
-    {
-        numerus_error_code = NUMERUS_ERROR_VALUE_OUT_OF_RANGE;
-        *errcode = NUMERUS_ERROR_VALUE_OUT_OF_RANGE;
-        return NULL;
-    }
-
-    /* Create pointer to the building buffer */
-    char building_buffer[NUMERUS_MAX_LENGTH];
-    char* roman_numeral = building_buffer;
-
-    /* Save sign or return NUMERUS_ZERO for 0 */
-    if (int_part == 0 && twelfths == 0)
+    if (integer_part == 0 && twelfths == 0)
     {
         /* Return writable copy of NUMERUS_ZERO on the heap */
-        char* zero_string = malloc(strlen(NUMERUS_ZERO) + 1);
-        if (zero_string == NULL)
-        {
-            numerus_error_code = NUMERUS_ERROR_MALLOC_FAIL;
-            *errcode = NUMERUS_ERROR_MALLOC_FAIL;
-            return NULL;
-        }
-        strcpy(zero_string, NUMERUS_ZERO);
-        return zero_string;
+        strncpy(*p_numeral, NUMERUS_ZERO_NUMERAL, ZERO_NUMERAL_SIZE);
+        return NUMERUS_OK;
     }
-    else if (int_part < 0 || (int_part == 0 && twelfths < 0))
+    else if (integer_part < 0 || (integer_part == 0 && twelfths < 0))
     {
-        int_part = ABS(int_part);
+        **p_numeral = '-';
+        (*p_numeral)++;
+        integer_part = ABS(integer_part);
         twelfths = ABS(twelfths);
-        double_value = ABS(double_value);
-        *(roman_numeral++) = '-';
     }
 
     /* Create part between underscores */
-    if (double_value > NUMERUS_MAX_NONLONG_FLOAT_VALUE)
+    if (integer_part > NUMERUS_MAX_BASIC_VALUE)
     {
         /* Underscores are needed */
-        *(roman_numeral++) = '_';
-        roman_numeral = cleaned_value_to_basic_numeral(int_part / 1000,
-                                                       roman_numeral, 0);
-        int_part -= (int_part / 1000) * 1000; /* Remove 3 left-most digits */
-        *(roman_numeral++) = '_';
+        **p_numeral = '_';
+        (*p_numeral)++;
+        cleaned_value_to_basic_numeral(integer_part / 1000, *p_numeral, DICTIONARY_INDEX_FOR_M);
+        integer_part -= (integer_part / 1000) * 1000; /* Remove 3 left-most digits */
+        **p_numeral = '_';
+        (*p_numeral)++;
         /* Part after underscores without "M" char, start with "CM" */
-        roman_numeral =
-                cleaned_value_to_basic_numeral(int_part, roman_numeral, 1);
+        cleaned_value_to_basic_numeral(integer_part, *p_numeral, DICTIONARY_INDEX_FOR_CM);
     }
     else
     {
         /* No underscores needed, so starting with "M" char */
-        roman_numeral =
-                cleaned_value_to_basic_numeral(int_part, roman_numeral, 0);
+        cleaned_value_to_basic_numeral(integer_part, *p_numeral, DICTIONARY_INDEX_FOR_M);
     }
     /* Decimal part, starting with "S" char */
-    roman_numeral =
-            cleaned_value_to_basic_numeral(twelfths, roman_numeral, 13);
-    *(roman_numeral++) = '\0';
-
-    /* Copy out of the buffer and return it on the heap */
-    char* returnable_roman_string =
-            malloc(roman_numeral - building_buffer);
-    if (returnable_roman_string == NULL)
-    {
-        numerus_error_code = NUMERUS_ERROR_MALLOC_FAIL;
-        *errcode = NUMERUS_ERROR_MALLOC_FAIL;
-        return NULL;
-    }
-    strcpy(returnable_roman_string, building_buffer);
-    numerus_error_code = NUMERUS_OK;
-    *errcode = NUMERUS_OK;
-    return returnable_roman_string;
+    cleaned_value_to_basic_numeral(twelfths, *p_numeral, DICTIONARY_INDEX_FOR_S);
+    **p_numeral = '\0';
+    (*p_numeral)++;
+    return NUMERUS_OK;
 }
 
 
@@ -225,8 +207,7 @@ numerus_status_t numerus_int_to_extended_numeral(
  *
  * @param *source the string of 1-2 characters to copy
  * @param *destination the string, already allocated, to copy the *source into
- * @returns the new position of the destination pointer after the characters
- * have been copied
+ * @returns amount of characters that were copied
  */
 static uint8_t copy_char_from_dictionary(
         const dictionary_char_t* source,

@@ -395,7 +395,7 @@ numerus_status_t numerus_int_to_basic_numeral(
  *        extended roman numeral. Can be negative.
  * @param[in] twelfths the fractional part to sum to the \p integer_part.
  *        Can be negative.
- * @param[in, out] numeral pointer to the generated numeral string. Check its
+ * @param[in, out] p_numeral pointer to the generated numeral string. Check its
  *        **remarks**, as it can be either allocated by the user or by
  *        this function. It's up to the user to free this string.
  * @return status code, indicating operation success or failure.
@@ -403,7 +403,7 @@ numerus_status_t numerus_int_to_basic_numeral(
  * @see numerus_double_to_extended_roman
  */
 numerus_status_t numerus_int_to_extended_numeral(
-        int32_t integer_part, int8_t twelfths, char** numeral);
+        int32_t integer_part, int8_t twelfths, char** p_numeral);
 
 /**
  * Converts a double-precision floating point value to an extended
@@ -419,7 +419,7 @@ numerus_status_t numerus_int_to_extended_numeral(
  *
  * @param[in] double_value the value of the numeral. Can be negative.
  *        Must be finite.
- * @param[in, out] numeral pointer to the generated numeral string. Check its
+ * @param[in, out] p_numeral pointer to the generated numeral string. Check its
  *        **remarks**, as it can be either allocated by the user or by
  *        this function. It's up to the user to free this string.
  * @return status code, indicating operation success or failure.
@@ -427,7 +427,7 @@ numerus_status_t numerus_int_to_extended_numeral(
  * @see numerus_int_to_extended_roman
  */
 numerus_status_t numerus_double_to_extended_numeral(
-        double double_value, char** numeral);
+        double double_value, char** p_numeral);
 
 
 /* Conversion function from roman numeral to value */

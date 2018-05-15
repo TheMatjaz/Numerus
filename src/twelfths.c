@@ -10,10 +10,6 @@
 #include "math.h"
 
 
-numerus_status_t numerus_int_parts_to_double(
-        int32_t int_part, uint8_t twelfths, double* result);
-numerus_status_t numerus_double_to_int_parts(
-        double value, int32_t* int_part, int8_t* twelfths);
 
 /**
  * Shortens the twelfths by adding the remainder to the int part so that they
@@ -118,7 +114,7 @@ numerus_status_t numerus_double_to_int_parts(
         value -= *int_part;
         value = round(value * 12) / 12; /* Round fractional to nearest 12th */
         value = round(value * 12); /* Get numerator of that 12th */
-        *twelfths = (uint8_t) value;
+        *twelfths = (int8_t) value;
         status = NUMERUS_OK;
     }
     return status;

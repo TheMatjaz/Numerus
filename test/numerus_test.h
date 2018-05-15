@@ -13,7 +13,7 @@
 #ifndef NUMERUS_TEST_H
 #define NUMERUS_TEST_H
 
-#include "../src/numerus_internal.h"
+#include "../src/internal.h"
 
 #define PRINT_STATUS_DIVIDER 400000
 
