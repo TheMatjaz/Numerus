@@ -29,16 +29,22 @@ extern "C"
 
 /**
  * Heap memory allocation function.
+ *
+ * Replace it with any preferred allocator.
  */
 #define numerus_malloc malloc
 
 /**
  * Heap memory allocation function with zeroing-out.
+ *
+ * Replace it with any preferred allocator that clear the allocated space.
  */
 #define numerus_calloc calloc
 
 /**
  * Heap memory freeing function.
+ *
+ * Replace it with any preferred allocation release function.
  */
 #define numerus_free free
 
@@ -257,7 +263,7 @@ typedef enum
      * Decimal characters `S.` are allowed only at the end of the numeral.
      */
             NUMERUS_ERROR_FRACTIONAL_CHARS_NOT_AT_END,
-            NUMERUS_ERROR_FRACTIONAL_CHARS_BETWEEN_UNDERSCORES,
+    NUMERUS_ERROR_FRACTIONAL_CHARS_BETWEEN_UNDERSCORES,
 
 
     /**
@@ -317,9 +323,10 @@ typedef enum
  *
  * @anchor numeral_allocation
  * @remark **Important!**
- *         The \p numeral parameter will contain the generated numeral
- *         at execution and, but also allows the user to decide who allocates
- *         the buffer for the numeral to be written in.
+ * The \p numeral parameter will contain the generated numeral at execution
+ * end, but also allows the user to decide who allocates the buffer for the
+ * numeral to be written in. Either way it's up to the user to deallocate
+ * that memory.
  *
  * - if \p numeral is a NULL pointer, the function returns an error;
  *
@@ -335,7 +342,7 @@ typedef enum
  *   heap memory using #numerus_malloc and returned through the same parameter.
  *   It's **up to the user to free it!** It stays unchanged in case of errors.
  *   The memory allocation procedure will allocate exactly the space required
- *   to fit the numeral.
+ *   to fit the numeral, including its null terminator '\0'.
  *
  *   \code{C}
  *   char* numeral = NULL;
@@ -350,7 +357,7 @@ typedef enum
  *   // numeral still points to "XLII\0".
  *
  *   numerus_free(numeral);
- *   // The "XLII\0" string is freed.
+ *   // The memory location of the "XLII\0" string is released.
  *   \endcode
  *
  *
@@ -374,10 +381,10 @@ typedef enum
  *   // numeral_buffer contains "\0".
  *   \endcode
  *
- * @param[in] value the integer value of the numeral. Can be negative.
+ * @param[in] value the integer value to be converted. Can be negative.
  * @param[in, out] p_numeral pointer to the generated numeral string. Check its
  *        **remarks**, as it can be either allocated by the user or by
- *        this function. It's up to the user to free this string.
+ *        this function.
  * @return status code, indicating operation success or failure.
  * @see numerus_int_to_extended_roman
  * @see numerus_double_to_extended_roman
@@ -401,7 +408,7 @@ numerus_status_t numerus_int_to_basic_numeral(
  * parameter.
  *
  * @param[in] integer_part the integer part of the value of the
- *        extended roman numeral. Can be negative.
+ *        to-be extended roman numeral. Can be negative.
  * @param[in] twelfths the fractional part to sum to the \p integer_part.
  *        Can be negative.
  * @param[in, out] p_numeral pointer to the generated numeral string. Check its
