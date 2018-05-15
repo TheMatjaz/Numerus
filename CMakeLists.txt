@@ -7,8 +7,9 @@
 # -----------------------------------------------------------------------------
 
 cmake_minimum_required(VERSION 3.3)
-project(Numerus)
+project(Numerus C)
 
+set(CMAKE_C_STANDARD 11)
 set(OUTPUT_FILE_NAME_NOEXTENSION numerus)
 set(COMPILER_FLAGS_WARNINGS
         "-Wall \
@@ -23,8 +24,17 @@ set(COMPILER_FLAGS_WARNINGS
         -Wdouble-promotion
         -Werror \
         -pedantic-errors \
-        --std=c11 \
     ")
+set(COMPILER_FLAGS_DEBUG "${COMPILER_FLAGS_WARNINGS} -O0 -g3 -gdwarf-2")
+set(COMPILER_FLAGS_RELEASE "${COMPILER_FLAGS_WARNINGS} -O3 -DNDEBUG")
+set(COMPILER_FLAGS_SMALL "${COMPILER_FLAGS_WARNINGS} -Os -DNDEBUG")
+
+# Set a default build type for single-configuration
+# CMake generators if no build type is set.
+IF(NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
+    SET(CMAKE_BUILD_TYPE Release)
+ENDIF(NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
+
 set(LIBRARY_SOURCE_FILES
     src/allocation.c
     src/analysis.c
@@ -37,8 +47,6 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 
 # Debug targets
-set(COMPILER_FLAGS_DEBUG "${COMPILER_FLAGS_WARNINGS} -O0 -g3 -gdwarf-2")
-
 set(DEBUG_SOURCE_FILES
     test/main.c
     test/numerus_test.c
@@ -48,9 +56,6 @@ add_executable(${OUTPUT_FILE_NAME_NOEXTENSION}_debug ${DEBUG_SOURCE_FILES})
 
 
 # Release targets
-set(COMPILER_FLAGS_RELEASE "${COMPILER_FLAGS_WARNINGS} -O3 -DNDEBUG")
-set(CMAKE_C_FLAGS ${COMPILER_FLAGS_RELEASE})
-
 add_library(lib${OUTPUT_FILE_NAME_NOEXTENSION}.dll SHARED ${LIBRARY_SOURCE_FILES})
 
 add_library(lib${OUTPUT_FILE_NAME_NOEXTENSION}.a STATIC ${LIBRARY_SOURCE_FILES})
