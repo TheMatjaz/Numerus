@@ -1,6 +1,6 @@
 /**
  * @file formatting.c
- * @brief
+ * @brief Implementations of numeral formatting functions.
  * @copyright Copyright © 2015-2018, Matjaž Guštin <dev@matjaz.it>
  * <https://matjaz.it>. All rights reserved.
  * @license BSD 3-clause license.
@@ -9,52 +9,20 @@
 #include "internal.h"
 
 
-/**
- * Analyzes how many chars are necessary to allocate the first line of the
- * pretty-printing version of a long roman numeral without security checks.
- *
- * It has to be used after the roman numeral has been already checked with
- * numerus_count_roman_chars() to prevent any errors.
- */
-static size_t expected_length_of_overlined(const char* numeral)
-{
-    uint8_t index;
-    int8_t first_underscore_index = -1;
-    int8_t second_underscore_index = -1;
-    size_t overlined_length = 0;
-
-    for (index = 0; index < NUMERUS_MAX_EXTENDED_LENGTH; index++)
-    {
-        if (numeral[index] == '\0')
-        {
-            break;
-        }
-        if (numeral[index] == '_')
-        {
-            if (first_underscore_index == -1)
-            {
-                first_underscore_index = index;
-            }
-            else
-            {
-                // TODO Does not check if the second underscore actually exists!
-                second_underscore_index = index;
-            }
-        }
-        else
-        {
-            overlined_length++;
-        }
-    }
-    /* The following line also includes a space for the line feed '\n'. */
-    overlined_length += second_underscore_index - first_underscore_index;
-    return overlined_length;
-}
+static numerus_status_t expected_length_of_overlined(
+        const char* numeral,
+        uint8_t* numeral_length,
+        uint8_t* additional_size);
 
 
 /**
  * Allocates a string with a prettier representation of a long roman numeral
  * with actual overlining.
+ *
+ * Ignores any heading whitespace.
+ *
+ * In case of no overlining, it provides a copy of the original numeral,
+ * with the same parameter usage as in value-to-numeral conversion functions.
  *
  * Generates a two lined string (newline character is '\n') by overlining the
  * part between underscores. The string is just copied if the roman numeral is
@@ -88,72 +56,151 @@ numerus_status_t numerus_overline(
         const char* numeral, char** const p_formatted)
 {
     numerus_status_t status;
+    uint8_t numeral_length;
+    uint8_t additional_size;
 
     status = prepare_for_analysis(&numeral);
     if (status != NUMERUS_OK)
     {
         return status;
     }
-    size_t
-            numeral_length =
-            strnlen(numeral, NUMERUS_MAX_EXTENDED_LENGTH + 1) + 1;
-    if (numeral_length > NUMERUS_MAX_EXTENDED_LENGTH)
+    status = expected_length_of_overlined(
+            numeral, &numeral_length, &additional_size);
+    if (status != NUMERUS_OK)
     {
-        status = NUMERUS_ERROR_TOO_LONG_EXTENDED_NUMERAL;
         return status;
     }
-    if (contains_extended_characters(numeral))
-    { // TODO should check that there are actually two underscores?
+    if (additional_size > 0)
+    {
+        /* Needs to be overlined. */
         status = obtain_numeral_buffer(p_formatted,
-                // TODO check this cast
-                                       (uint8_t) expected_length_of_overlined(
-                                               numeral));
-        char* unformatted_start = numeral;
-        char* formatted = *p_formatted;;
+                                       numeral_length + additional_size);
+        if (status != NUMERUS_OK)
+        {
+            return status;
+        }
+        uint8_t formatted_index = 0;
+        uint8_t numeral_index = 0;
 
         /* Skip minus sign */
-        if (*numeral == '-')
+        if (numeral[numeral_index] == '-')
         {
-            *(formatted++) = ' ';
-            numeral++;
+            (*p_formatted)[formatted_index++] = ' ';
+            numeral_index++;
         }
 
         /* Write the overline */
-        numeral++; /* Skip first underscore */
-        while (*numeral != '_')
+        numeral_index++; /* Skip first underscore */
+        while (numeral[numeral_index] != '_')
         {
-            *(formatted++) = '_';
-            numeral++;
+            (*p_formatted)[formatted_index++] = '_';
+            numeral_index++;
         }
-        *(formatted++) = '\n';
+        (*p_formatted)[formatted_index++] = '\n';
 
         /* Copy the numeral in the second line without underscores. */
-        numeral = unformatted_start;
-        while (*numeral != '\0')
+        numeral_index = 0;
+        while (numeral[numeral_index] != '\0')
         {
-            if (*numeral == '_')
+            if (numeral[numeral_index] != '_')
             {
-                numeral++;
+                (*p_formatted)[formatted_index++] = numeral[numeral_index];
             }
-            else
-            {
-                *(formatted++) = *numeral;
-                numeral++;
-            }
+            numeral_index++;
         }
-        *formatted = '\0';
-        return status;
+        (*p_formatted)[formatted_index] = '\0';
     }
     else
     {
-        /* Just a basic numeral. */
-        status = obtain_numeral_buffer(p_formatted, NUMERUS_MAX_BASIC_LENGTH);
+        /* Just a basic numeral, no overlining needed */
+        status = obtain_numeral_buffer(p_formatted, numeral_length);
         if (status == NUMERUS_OK)
         {
-            strncpy(*p_formatted, numeral, NUMERUS_MAX_BASIC_LENGTH);
+            strncpy(*p_formatted, numeral, numeral_length);
         }
-        return status;
     }
+    return status;
+}
+
+
+/**
+ * @internal
+ * Analyzes how much additional space would the numeral need after conversion
+ * to overlined
+ *
+ * Including the newline character '\n', the null terminator '\0' and
+ * an initial space for an optional minus '-'.
+ *
+ * If the numeral does not have exactly two underscores (includes the case
+ * if it's just a basic numeral), it returns the same size of the passed
+ * numeral.
+ *
+ * @param[in] numeral the numeral to analyze
+ * @param[out] numeral_length size of the unchanged \p numeral, including
+ *             its null terminator '\0'.
+ * @param[out] additional_size additional size that the overlined form would
+ *             need. Sum it up with \p numeral_length to obtain the total
+ *             allocation size. It's 0 in case no overlining is required
+ *             or possible.
+ * @returns status code, indicating operation success or any numeral format
+ *          errors that prevent the overlining.
+ */
+static numerus_status_t expected_length_of_overlined(
+        const char* const numeral,
+        uint8_t* const numeral_length,
+        uint8_t* const additional_size)
+{
+    uint8_t overlined_length = 0;
+    uint8_t first_underscore_index = NUMERUS_MAX_EXTENDED_LENGTH;
+    uint8_t index = 0;
+    numerus_status_t status = NUMERUS_ERROR_MISSING_SECOND_UNDERSCORE;
+
+    while (numeral[index] != '\0' && index < NUMERUS_MAX_EXTENDED_LENGTH)
+    {
+        if (numeral[index] == '_')
+        {
+            if (first_underscore_index == NUMERUS_MAX_EXTENDED_LENGTH)
+            {
+                first_underscore_index = index;
+            }
+            else
+            {
+                /* The following line also includes a byte for the line
+                 * feed '\n'. */
+                overlined_length += index - first_underscore_index;
+                status = NUMERUS_OK;
+                break;
+            }
+        }
+        else
+        {
+            overlined_length++;
+        }
+        index++;
+    };
+    while (numeral[index] != '\0' && index < NUMERUS_MAX_EXTENDED_LENGTH)
+    {
+        if (numeral[index] == '_')
+        {
+            status = NUMERUS_ERROR_TOO_MANY_UNDERSCORES;
+            break;
+        }
+        index++;
+    };
+    if (index >= NUMERUS_MAX_EXTENDED_LENGTH)
+    {
+        status = NUMERUS_ERROR_TOO_LONG_EXTENDED_NUMERAL;
+    }
+    *numeral_length = ++index;
+    if (status == NUMERUS_OK)
+    {
+        *additional_size = overlined_length;
+    }
+    else
+    {
+        *additional_size = 0;
+    }
+    return status;
 }
 
 
