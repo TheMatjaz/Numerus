@@ -311,6 +311,7 @@ typedef enum
 } numerus_status_t;
 
 
+/* CONVERSIONS FROM VALUE TO NUMERAL */
 /**
  * Converts an integer to a basic roman numeral.
  *
@@ -445,8 +446,7 @@ numerus_status_t numerus_int_to_extended_numeral(
 numerus_status_t numerus_double_to_extended_numeral(
         double double_value, char** p_numeral);
 
-
-/* Conversion function from roman numeral to value */
+/* CONVERSIONS FROM NUMERAL TO VALUE */
 numerus_status_t numerus_basic_numeral_to_int(
         const char* numeral, int16_t* value);
 numerus_status_t numerus_extended_numeral_to_int(
@@ -455,16 +455,76 @@ numerus_status_t numerus_extended_numeral_to_double(
         const char* numeral, double* value);
 
 
-/* Functions to manage twelfths */
+/* FRACTIONAL FORMAT MANAGEMENT */
+/**
+ * Converts a value expressed as integer part and twelfths to a double.
+ *
+ * Returns an error if the summed value \p integer_part + \p twelfths
+ * is not in the range
+ * [#NUMERUS_MIN_EXTENDED_VALUE, #NUMERUS_MAX_EXTENDED_VALUE].
+ *
+ * @param *integer_part long integer part of the value.
+ * @param *twelfths fractional part of the value in twelfths.
+ * @returns status code, indicating operation success or failure.
+ */
 numerus_status_t numerus_int_parts_to_double(
-        int32_t int_part, uint8_t twelfths, double* result);
+        int32_t integer_part, uint8_t twelfths, double* result);
+
+/**
+ * Splits a double value to its integer part and a number of twelfths.
+ *
+ * The twelfths are obtained by rounding the double value to the nearest
+ * twelfth multiple.
+ *
+ * Accepts any finite double within
+ * [#NUMERUS_MIN_EXTENDED_VALUE -1.0/24, #NUMERUS_MAX_EXTENDED_VALUE +1.0/24].
+ * The range is extended by half a twelfth on each side as the values
+ * get rounded.
+ *
+ * @examples
+ * - `10.0` becomes `10 and 0/12 = 10.0`
+ * - `-2.8` becomes `-2 and -10/12 = -2.8333`
+ * - `11.1` becomes `11 and 1/12 = 11.08333`
+ * - `7.9` becomes `7 and 11/12 = 7.91666`
+ *
+ * @param value to convert to integer part and twelfths. Must be finite.
+ * @param *integer_part long integer part of the value.
+ * @param *twelfths fractional part of the value in twelfths.
+ * @returns status code, indicating operation success or failure.
+ */
 numerus_status_t numerus_double_to_int_parts(
-        double value, int32_t* int_part, int8_t* twelfths);
+        double value, int32_t* integer_part, int8_t* twelfths);
+
+/**
+ * Enforce twelfths to be in [-11, 11] and to match sign of the integer part.
+ *
+ * It's useful when the twelfths are more than 11 (or less than -11 if
+ * negative). The transformation is performed so that the parts will carry the
+ * same sign at the end.
+ *
+ * Returns an error if the summed value \p integer_part + \p twelfths
+ * is not in the range
+ * [#NUMERUS_MIN_EXTENDED_VALUE, #NUMERUS_MAX_EXTENDED_VALUE].
+ *
+ * In any case, the summed value \p integer_part + \p twelfths will be the
+ * same before and after the computation, just simplified mathematically.
+ *
+ * @examples
+ * - `-3 and 2/12` becomes `-2 and -10/12`
+ * - `10 and 13/12` becomes `11 and 1/12`
+ * - `10 and -25/12` becomes `7 and 11/12`
+ * - `28 and 1/12` stays unaltered
+ * - `0 and -3/12` stays unaltered
+ *
+ * @param *integer_part long integer part of the value.
+ * @param *twelfths fractional part of the value in twelfths.
+ * @returns status code, indicating operation success or failure.
+ */
 numerus_status_t numerus_simplify_twelfths(
-        int32_t* int_part, int8_t* twelfths);
+        int32_t* integer_part, int8_t* twelfths);
 
 
-/* Numeral analysis functions */
+/* ANALYSIS OF NUMERAL STRINGS */
 numerus_status_t numerus_is_zero(
         const char* numeral, bool* p_result);
 numerus_status_t numerus_sign(
@@ -475,7 +535,7 @@ numerus_status_t numerus_count_roman_chars(
         const char* numeral, uint8_t* p_result);
 
 
-/* Output formatting functions */
+/* NUMERAL FORMATTING */
 // Pass the string two times to overwrite it??
 // Max result size #NUMERUS_MAX_EXTENDED_OVERLINED_LENGTH
 numerus_status_t numerus_overline(

@@ -1,6 +1,6 @@
 /**
  * @file twelfths.c
- * @brief
+ * @brief Implementation of fractional format handling functions.
  * @copyright Copyright © 2015-2018, Matjaž Guštin <dev@matjaz.it>
  * <https://matjaz.it>. All rights reserved.
  * @license BSD 3-clause license.
@@ -10,49 +10,31 @@
 #include "math.h"
 
 
-/**
- * Shortens the twelfths by adding the remainder to the int part so that they
- * have the same sign.
- *
- * It's useful when the twelfths are more than 11 (or -11 if negative). The
- * transformation is performed so that the parts will carry the same sign for
- * better readability.
- *
- * Example: `-3, 2` (= -3 + 2/12) becomes `-2, -10` (= -2 -10/12).
- *
- * Modifies the passed parameters themselves. The sign of the twelfth will be
- * the same of the int part (the int part leads) which is necessary also for a
- * correct conversion to of the parts to roman numeral.
- * *
- * @param *int_part long integer part of a value.
- * @param *twelfths twelfth of the value.
- * @returns void since modifies the passed values.
- */
 numerus_status_t numerus_simplify_twelfths(
-        int32_t* const int_part, int8_t* const twelfths)
+        int32_t* const integer_part, int8_t* const twelfths)
 {
     numerus_status_t status;
 
-    if (int_part == NULL || twelfths == NULL)
+    if (integer_part == NULL || twelfths == NULL)
     {
         status = NUMERUS_ERROR_NULL_NUMBER;
     }
     else
     {
-        *int_part += *twelfths / 12;
+        *integer_part += *twelfths / 12;
         *twelfths %= 12;
-        if (*int_part > 0 && *twelfths < 0)
+        if (*integer_part > 0 && *twelfths < 0)
         {
-            *int_part -= 1;
+            *integer_part -= 1;
             *twelfths += 12;
         }
-        else if (*int_part < 0 && *twelfths > 0)
+        else if (*integer_part < 0 && *twelfths > 0)
         {
-            *int_part += 1;
+            *integer_part += 1;
             *twelfths -= 12;
         }
-        if (*int_part < NUMERUS_MIN_EXTENDED_VALUE_INT_PART
-            || *int_part > NUMERUS_MAX_EXTENDED_VALUE_INT_PART)
+        if (*integer_part < NUMERUS_MIN_EXTENDED_VALUE_INT_PART
+            || *integer_part > NUMERUS_MAX_EXTENDED_VALUE_INT_PART)
         {
             status = NUMERUS_ERROR_EXTENDED_VALUE_OUT_OF_RANGE;
         }
@@ -64,23 +46,15 @@ numerus_status_t numerus_simplify_twelfths(
     return status;
 }
 
-/**
- * Converts a value expressed as sum of an integer part and a number of twelfths
- * to a double.
- *
- * @param int_part long integer part of a value to be added to the twelfths
- * and converted to double.
- * @param twelfths short integer as number of twelfths (1/12) to be added to the
- * integer part and converted to double.
- * @returns double value as the sum of the integer part and the twelfths.
- */
+
 numerus_status_t numerus_int_parts_to_double(
-        const int32_t int_part, const uint8_t twelfths, double* const result)
+        const int32_t integer_part, const uint8_t twelfths,
+        double* const result)
 {
     double value;
     numerus_status_t status;
 
-    value = int_part + (twelfths / 12.0);
+    value = integer_part + (twelfths / 12.0);
     if (value < NUMERUS_MIN_EXTENDED_VALUE
         || value > NUMERUS_MAX_EXTENDED_VALUE)
     {
@@ -95,23 +69,16 @@ numerus_status_t numerus_int_parts_to_double(
 }
 
 
-/**
- * Splits a double value to a pair of its integer part and a number of twelfths.
- *
- * The twelfths are obtained by rounding the double value to the nearest
- * twelfths. The number of twelfths is stored in the passed parameter, while the
- * integer part is returned directly.
- * *
- * @param value double to be split into integer part and number of twelfths.
- * @param *twelfths number of twelfths.
- * @returns long as the integer part of the value of the roman numeral.
- */
 numerus_status_t numerus_double_to_int_parts(
-        double value, int32_t* const int_part, int8_t* twelfths)
+        double value, int32_t* const integer_part, int8_t* twelfths)
 {
     numerus_status_t status;
 
-    if (int_part == NULL || twelfths == NULL)
+    if (!isfinite(value))
+    {
+        status = NUMERUS_ERROR_DOUBLE_VALUE_IS_NOT_FINITE;
+    }
+    else if (integer_part == NULL || twelfths == NULL)
     {
         status = NUMERUS_ERROR_NULL_NUMBER;
     }
@@ -122,11 +89,17 @@ numerus_status_t numerus_double_to_int_parts(
     }
     else
     {
-        *int_part = (int32_t) value;
-        value -= *int_part;
+        *integer_part = (int32_t) value;
+        value -= *integer_part;
         value = round(value * 12) / 12; /* Round fractional to nearest 12th */
         value = round(value * 12); /* Get numerator of that 12th */
         *twelfths = (int8_t) value;
+        if (*twelfths == 12 || *twelfths == -12)
+        {
+            /* Rounding of +/- 0.99 gives +/- 12/12, we want 0/12 instead. */
+            *integer_part += value / 12;
+            *twelfths = 0;
+        }
         status = NUMERUS_OK;
     }
     return status;
