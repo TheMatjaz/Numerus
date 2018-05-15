@@ -12,9 +12,10 @@
 #include "internal.h"
 
 
-void cleaned_value_to_basic_numeral(
-        int32_t value, char* numeral_part,
-        uint8_t dictionary_start_char);
+static uint8_t cleaned_value_to_basic_numeral(
+        int32_t value, char* numeral_part, uint8_t dictionary_start_char);
+static uint8_t copy_char_from_dictionary(
+        const dictionary_char_t* source, char* destination);
 
 /**
  * Converts an int32_t integer value to a roman numeral with its value.
@@ -241,20 +242,31 @@ static uint8_t copy_char_from_dictionary(
  * starting dictionary entry to compare the characters with
  * @returns position after the inserted string
  */
-void cleaned_value_to_basic_numeral(
-        int32_t value, char* numeral_part,
+static uint8_t cleaned_value_to_basic_numeral(
+        int32_t value, char* const numeral_part,
         uint8_t dictionary_start_char)
 {
     const dictionary_char_t* current_dictionary_char
             = &DICTIONARY[dictionary_start_char];
+    uint8_t written_characters;
+
+    written_characters = 0;
     while (value > 0)
     {
         while (value >= current_dictionary_char->value)
         {
-            numeral_part += copy_char_from_dictionary(
-                    current_dictionary_char, numeral_part);
+            numeral_part[written_characters] =
+                    current_dictionary_char->character_1;
+            written_characters++;
+            if (current_dictionary_char->character_2 != '\0')
+            {
+                numeral_part[written_characters] =
+                        current_dictionary_char->character_2;
+                written_characters++;
+            }
             value -= current_dictionary_char->value;
         }
         current_dictionary_char++;
     }
+    return written_characters;
 }
