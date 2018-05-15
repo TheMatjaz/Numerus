@@ -10,12 +10,22 @@
  */
 
 #include "internal.h"
+#include "dictionary.h"
 
 
+static bool handle_basic_corner_cases(
+        int32_t value,
+        char** p_numeral,
+        numerus_status_t* p_status);
+static bool handle_extended_corner_case(
+        int32_t integer_part, int8_t twelfths, char** p_numeral,
+        numerus_status_t* p_status);
+static uint8_t convert_integer_part(
+        char* numeral_in_progress, int32_t integer_part);
 static uint8_t cleaned_value_to_basic_numeral(
-        int32_t value, char* numeral_part, uint8_t dictionary_start_char);
-static uint8_t copy_char_from_dictionary(
-        const dictionary_char_t* source, char* destination);
+        int32_t value,
+        char* numeral,
+        uint8_t current_dict_char_index);
 
 /**
  * Converts an int32_t integer value to a roman numeral with its value.
@@ -41,55 +51,65 @@ numerus_status_t numerus_int_to_basic_numeral(
         int16_t value, char** p_numeral)
 {
     numerus_status_t status;
-    char* numeral;
-    char build_buffer[NUMERUS_MAX_BASIC_LENGTH];
-    uint8_t numeral_length;
+    bool was_corner_case;
 
-    do
+    was_corner_case = handle_basic_corner_cases(value, p_numeral, &status);
+    if (!was_corner_case)
     {
-        if (p_numeral == NULL)
-        {
-            status = NUMERUS_ERROR_NULL_NUMERAL;
-            break;
-        }
-        if (value < NUMERUS_MIN_BASIC_VALUE || value > NUMERUS_MAX_BASIC_VALUE)
-        {
-            status = NUMERUS_ERROR_BASIC_VALUE_OUT_OF_RANGE;
-            break;
-        }
-        if (value == 0)
-        {
-            status = obtain_numeral_buffer(p_numeral, ZERO_NUMERAL_SIZE);
-            if (status != NUMERUS_OK)
-            {
-                break;
-            }
-            strncpy(*p_numeral, NUMERUS_ZERO_NUMERAL, ZERO_NUMERAL_SIZE);
-            status = NUMERUS_OK;
-            break;
-        }
-        numeral_length = 0;
+        char numeral_in_progress[NUMERUS_MAX_BASIC_LENGTH];
+        uint8_t numeral_length = 0;
+
         if (value < 0)
         {
-            build_buffer[numeral_length++] = '-';
+            numeral_in_progress[numeral_length++] = '-';
             value = ABS(value);
         }
         numeral_length += cleaned_value_to_basic_numeral(
-                value, &build_buffer[numeral_length], DICTIONARY_INDEX_FOR_M);
-        build_buffer[numeral_length++] = '\0';
+                value, &numeral_in_progress[numeral_length],
+                DICTIONARY_INDEX_FOR_M);
+        numeral_in_progress[numeral_length++] = '\0';
         status = obtain_numeral_buffer(p_numeral, numeral_length);
-        if (status != NUMERUS_OK)
+        if (status == NUMERUS_OK)
         {
-            break;
+            strncpy(*p_numeral, numeral_in_progress, numeral_length);
+            status = NUMERUS_OK;
         }
-        strncpy(*p_numeral, build_buffer, numeral_length);
-        status = NUMERUS_OK;
-        break;
     }
-    while (0);
     return status;
 }
 
+// Returns true if it was a corner case
+static bool handle_basic_corner_cases(
+        const int32_t value,
+        char** const p_numeral,
+        numerus_status_t* const p_status)
+{
+    bool is_corner_case = true;
+
+    if (p_numeral == NULL)
+    {
+        *p_status = NUMERUS_ERROR_NULL_NUMERAL;
+    }
+    else if (value < NUMERUS_MIN_BASIC_VALUE
+             || value > NUMERUS_MAX_BASIC_VALUE)
+    {
+        *p_status = NUMERUS_ERROR_BASIC_VALUE_OUT_OF_RANGE;
+    }
+    else if (value == 0)
+    {
+        *p_status = obtain_numeral_buffer(p_numeral, ZERO_NUMERAL_SIZE);
+        if (*p_status == NUMERUS_OK)
+        {
+            strncpy(*p_numeral, NUMERUS_ZERO_NUMERAL, ZERO_NUMERAL_SIZE);
+        }
+    }
+    else
+    {
+        *p_status = NUMERUS_OK;
+        is_corner_case = false;
+    }
+    return is_corner_case;
+}
 
 /**
  * Converts a double value to a roman numeral with its value.
@@ -156,95 +176,101 @@ numerus_status_t numerus_double_to_extended_numeral(
 numerus_status_t numerus_int_to_extended_numeral(
         int32_t integer_part, int8_t twelfths, char** p_numeral)
 {
-    /* ALGORITHM
-    sing
-    + ('_' + value_to_basic(integer_part/1000) + '_') if ABS(value) > NUMERUS_MAX_BASIC_VALUE
-    + value_to_basic(integer_part - integer_part/1000)
-    + decimal_part(twelfths)
-     */
     numerus_status_t status;
+    bool was_corner_case;
 
-    status = obtain_numeral_buffer(p_numeral, NUMERUS_MAX_EXTENDED_LENGTH);
-    if (status != NUMERUS_OK)
+    was_corner_case = handle_extended_corner_case(
+            integer_part, twelfths, p_numeral, &status);
+    if (!was_corner_case)
     {
-        return status;
-    }
-    status = numerus_simplify_twelfths(&integer_part, &twelfths);
-    if (status != NUMERUS_OK)
-    {
-        return status;
-    }
-    if (integer_part < NUMERUS_MIN_EXTENDED_VALUE_INT_PART
-        || integer_part > NUMERUS_MAX_EXTENDED_VALUE_INT_PART)
-    {
-        return NUMERUS_ERROR_EXTENDED_VALUE_OUT_OF_RANGE;
-    }
+        char numeral_in_progress[NUMERUS_MAX_EXTENDED_LENGTH];
+        uint8_t numeral_length = 0;
 
-    if (integer_part == 0 && twelfths == 0)
-    {
-        /* Return writable copy of NUMERUS_ZERO on the heap */
-        strncpy(*p_numeral, NUMERUS_ZERO_NUMERAL, ZERO_NUMERAL_SIZE);
-        return NUMERUS_OK;
+        if (integer_part < 0 || (integer_part == 0 && twelfths < 0))
+        {
+            numeral_in_progress[numeral_length++] = '-';
+            integer_part = ABS(integer_part);
+            twelfths = ABS(twelfths);
+        }
+        numeral_length += convert_integer_part(
+                &numeral_in_progress[numeral_length], integer_part);
+        /* Decimal part, starting with "S" char */
+        numeral_length += cleaned_value_to_basic_numeral(
+                twelfths,
+                &numeral_in_progress[numeral_length],
+                DICTIONARY_INDEX_FOR_S);
+        numeral_in_progress[numeral_length++] = '\0';
+        status = obtain_numeral_buffer(p_numeral, numeral_length);
+        if (status == NUMERUS_OK)
+        {
+            strncpy(*p_numeral, numeral_in_progress, numeral_length);
+        }
     }
-    else if (integer_part < 0 || (integer_part == 0 && twelfths < 0))
-    {
-        **p_numeral = '-';
-        (*p_numeral)++;
-        integer_part = ABS(integer_part);
-        twelfths = ABS(twelfths);
-    }
+    return status;
+}
 
-    /* Create part between underscores */
+static bool handle_extended_corner_case(
+        int32_t integer_part, int8_t twelfths, char** p_numeral,
+        numerus_status_t* p_status)
+{
+    bool is_corner_case = true;
+
+    *p_status = numerus_simplify_twelfths(&integer_part, &twelfths);
+    if (*p_status == NUMERUS_OK)
+    {
+        if (integer_part < NUMERUS_MIN_EXTENDED_VALUE_INT_PART
+            || integer_part > NUMERUS_MAX_EXTENDED_VALUE_INT_PART)
+        {
+            *p_status = NUMERUS_ERROR_EXTENDED_VALUE_OUT_OF_RANGE;
+        }
+        else if (integer_part == 0 && twelfths == 0)
+        {
+            *p_status = obtain_numeral_buffer(p_numeral, ZERO_NUMERAL_SIZE);
+            if (*p_status == NUMERUS_OK)
+            {
+                strncpy(*p_numeral, NUMERUS_ZERO_NUMERAL, ZERO_NUMERAL_SIZE);
+            }
+        }
+        else
+        {
+            is_corner_case = false;
+        }
+    }
+    return is_corner_case;
+}
+
+
+static uint8_t convert_integer_part(
+        char* numeral_in_progress, int32_t integer_part)
+{
+    uint8_t numeral_length = 0;
+
     if (integer_part > NUMERUS_MAX_BASIC_VALUE)
     {
-        /* Underscores are needed */
-        **p_numeral = '_';
-        (*p_numeral)++;
-        cleaned_value_to_basic_numeral(integer_part / 1000, *p_numeral, DICTIONARY_INDEX_FOR_M);
-        integer_part -= (integer_part / 1000) * 1000; /* Remove 3 left-most digits */
-        **p_numeral = '_';
-        (*p_numeral)++;
+        /* Part between underscores */
+        numeral_in_progress[numeral_length++] = '_';
+        numeral_length += cleaned_value_to_basic_numeral(
+                integer_part / VINCULUMN_VALUE_MULTIPLER,
+                &numeral_in_progress[numeral_length],
+                DICTIONARY_INDEX_FOR_M);
+        integer_part -= (integer_part / VINCULUMN_VALUE_MULTIPLER)
+                        * VINCULUMN_VALUE_MULTIPLER; /* Remove 3 left-most digits */
+        numeral_in_progress[numeral_length++] = '_';
         /* Part after underscores without "M" char, start with "CM" */
-        cleaned_value_to_basic_numeral(integer_part, *p_numeral, DICTIONARY_INDEX_FOR_CM);
+        numeral_length += cleaned_value_to_basic_numeral(
+                integer_part,
+                &numeral_in_progress[numeral_length],
+                DICTIONARY_INDEX_FOR_CM);
     }
     else
     {
         /* No underscores needed, so starting with "M" char */
-        cleaned_value_to_basic_numeral(integer_part, *p_numeral, DICTIONARY_INDEX_FOR_M);
+        numeral_length += cleaned_value_to_basic_numeral(
+                integer_part,
+                &numeral_in_progress[numeral_length],
+                DICTIONARY_INDEX_FOR_M);
     }
-    /* Decimal part, starting with "S" char */
-    cleaned_value_to_basic_numeral(twelfths, *p_numeral, DICTIONARY_INDEX_FOR_S);
-    **p_numeral = '\0';
-    (*p_numeral)++;
-    return NUMERUS_OK;
-}
-
-
-/**
- * Copies a string of 1 or 2 characters.
- *
- * Copies a character from the source to the destination. If there is another
- * character after that in the source, copies that as well.
- *
- * @param *source the string of 1-2 characters to copy
- * @param *destination the string, already allocated, to copy the *source into
- * @returns amount of characters that were copied
- */
-static uint8_t copy_char_from_dictionary(
-        const dictionary_char_t* source,
-        char* destination)
-{
-    *destination = source->character_1;
-    if (source->character_2 != '\0')
-    {
-        destination++;
-        *destination = source->character_2;
-        return 2;
-    }
-    else
-    {
-        return 1;
-    }
+    return numeral_length;
 }
 
 
@@ -263,30 +289,28 @@ static uint8_t copy_char_from_dictionary(
  * @returns position after the inserted string
  */
 static uint8_t cleaned_value_to_basic_numeral(
-        int32_t value, char* const numeral_part,
-        uint8_t dictionary_start_char)
+        int32_t value,
+        char* const numeral,
+        uint8_t current_dict_char_index)
 {
-    const dictionary_char_t* current_dictionary_char
-            = &DICTIONARY[dictionary_start_char];
-    uint8_t written_characters;
+    uint8_t written_characters = 0;
 
-    written_characters = 0;
     while (value > 0)
     {
-        while (value >= current_dictionary_char->value)
+        while (value >= DICTIONARY[current_dict_char_index].value)
         {
-            numeral_part[written_characters] =
-                    current_dictionary_char->character_1;
+            numeral[written_characters] =
+                    DICTIONARY[current_dict_char_index].character_1;
             written_characters++;
-            if (current_dictionary_char->character_2 != '\0')
+            if (DICTIONARY[current_dict_char_index].character_2 != '\0')
             {
-                numeral_part[written_characters] =
-                        current_dictionary_char->character_2;
+                numeral[written_characters] =
+                        DICTIONARY[current_dict_char_index].character_2;
                 written_characters++;
             }
-            value -= current_dictionary_char->value;
+            value -= DICTIONARY[current_dict_char_index].value;
         }
-        current_dictionary_char++;
+        current_dict_char_index++;
     }
     return written_characters;
 }

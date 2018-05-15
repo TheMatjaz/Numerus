@@ -21,6 +21,9 @@ extern "C"
 #include "../include/numerus.h"
 #include "dictionary.h"
 
+
+#define VINCULUMN_VALUE_MULTIPLER 1000
+
 /**
  * @internal
  * Checks if the string is empty i.e. contains no characters i.e. length 0.
