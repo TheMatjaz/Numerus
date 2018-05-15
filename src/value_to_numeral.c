@@ -41,33 +41,53 @@ numerus_status_t numerus_int_to_basic_numeral(
         int16_t value, char** p_numeral)
 {
     numerus_status_t status;
+    char* numeral;
+    char build_buffer[NUMERUS_MAX_BASIC_LENGTH];
+    uint8_t numeral_length;
 
-    status = obtain_numeral_buffer(p_numeral, NUMERUS_MAX_BASIC_LENGTH);
-    if (status != NUMERUS_OK)
+    do
     {
-        return status;
+        if (p_numeral == NULL)
+        {
+            status = NUMERUS_ERROR_NULL_NUMERAL;
+            break;
+        }
+        if (value < NUMERUS_MIN_BASIC_VALUE || value > NUMERUS_MAX_BASIC_VALUE)
+        {
+            status = NUMERUS_ERROR_BASIC_VALUE_OUT_OF_RANGE;
+            break;
+        }
+        if (value == 0)
+        {
+            status = obtain_numeral_buffer(p_numeral, ZERO_NUMERAL_SIZE);
+            if (status != NUMERUS_OK)
+            {
+                break;
+            }
+            strncpy(*p_numeral, NUMERUS_ZERO_NUMERAL, ZERO_NUMERAL_SIZE);
+            status = NUMERUS_OK;
+            break;
+        }
+        numeral_length = 0;
+        if (value < 0)
+        {
+            build_buffer[numeral_length++] = '-';
+            value = ABS(value);
+        }
+        numeral_length += cleaned_value_to_basic_numeral(
+                value, &build_buffer[numeral_length], DICTIONARY_INDEX_FOR_M);
+        build_buffer[numeral_length++] = '\0';
+        status = obtain_numeral_buffer(p_numeral, numeral_length);
+        if (status != NUMERUS_OK)
+        {
+            break;
+        }
+        strncpy(*p_numeral, build_buffer, numeral_length);
+        status = NUMERUS_OK;
+        break;
     }
-    if (value < NUMERUS_MIN_BASIC_VALUE || value > NUMERUS_MAX_BASIC_VALUE)
-    {
-        return NUMERUS_ERROR_BASIC_VALUE_OUT_OF_RANGE;
-    }
-
-    if (value == 0)
-    {
-        /* Return writable copy of NUMERUS_ZERO on the heap */
-        strncpy(*p_numeral, NUMERUS_ZERO_NUMERAL, ZERO_NUMERAL_SIZE);
-        return NUMERUS_OK;
-    }
-    else if (value < 0)
-    {
-        **p_numeral = '-';
-        (*p_numeral)++;
-        value = ABS(value);
-    }
-    cleaned_value_to_basic_numeral(value, *p_numeral, DICTIONARY_INDEX_FOR_M);
-    (*p_numeral)++;
-    **p_numeral = '\0';
-    return NUMERUS_OK;
+    while (0);
+    return status;
 }
 
 

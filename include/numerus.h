@@ -313,7 +313,7 @@ typedef enum
  * a basic numeral without any Numerus extensions representing the same value.
  *
  * The function can either allocate the string dynamically or fill a provided
- * buffer, based on the \p numeral parameter:
+ * buffer, based on the \p numeral parameter.
  *
  * @anchor numeral_allocation
  * @remark **Important!**
@@ -322,15 +322,21 @@ typedef enum
  *         the buffer for the numeral to be written in.
  *
  * - if \p numeral is a NULL pointer, the function returns an error;
+ *
  *   \code{C}
  *   numerus_status_t status;
  *
  *   status = numerus_int_to_basic_roman(42, NULL);
  *   // status == NUMERUS_ERROR_NULL_NUMERAL
  *   \endcode
+ *
+ *
  * - if \p numeral points to a NULL pointer, a string will be allocated on the
  *   heap memory using #numerus_malloc and returned through the same parameter.
- *   It's **up to the user to free it!** It stays unchanged in case of errors;
+ *   It's **up to the user to free it!** It stays unchanged in case of errors.
+ *   The memory allocation procedure will allocate exactly the space required
+ *   to fit the numeral.
+ *
  *   \code{C}
  *   char* numeral = NULL;
  *   numerus_status_t status;
@@ -346,12 +352,15 @@ typedef enum
  *   numerus_free(numeral);
  *   // The "XLII\0" string is freed.
  *   \endcode
+ *
+ *
  * - if \p numeral points to a non-NULL location, that will be considered as
  *   the buffer to fill with the numeral. The buffer will be **ASSUMED** to
  *   have #NUMERUS_MAX_BASIC_LENGTH size for basic numerals an
  *   #NUMERAL_MAX_EXTENDED_LENGTH for extended numerals. The buffer will be
  *   set to an empty string in case of error. In both cases (error or not)
  *   the bytes after the null terminator `\0` are unchanged.
+ *
  *   \code{C}
  *   char numeral_buffer[NUMERUS_MAX_BASIC_LENGTH];
  *   numerus_status_t status;
