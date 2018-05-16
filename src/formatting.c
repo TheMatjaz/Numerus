@@ -6,6 +6,7 @@
  * @license BSD 3-clause license.
  */
 
+#include <stdio.h>
 #include "internal.h"
 
 
@@ -13,6 +14,10 @@ static numerus_status_t expected_length_of_overlined(
         const char* numeral,
         uint8_t* numeral_length,
         uint8_t* additional_size);
+static uint8_t digits_of_integer_part(int32_t value);
+static uint8_t digits_of_twelfths(uint8_t value);
+static void shorten_fraction(int8_t* numerator, int8_t* denominator);
+static int8_t greatest_common_divisor(int8_t a, int8_t b);
 
 
 /**
@@ -204,13 +209,20 @@ static numerus_status_t expected_length_of_overlined(
 }
 
 
-char* numerus_create_pretty_value_as_double(double double_value)
+numerus_status_t numerus_double_as_int_parts_string(
+        const double value, char** const p_formatted)
 {
-    uint8_t twelfths;
-    int32_t int_part = numerus_double_to_parts(double_value, &twelfths);
-    return numerus_create_pretty_value_as_parts(int_part, twelfths);
-}
+    int32_t int_part;
+    int8_t twelfths;
+    numerus_status_t status;
 
+    status = numerus_double_to_int_parts(value, &int_part, &twelfths);
+    if (status == NUMERUS_OK)
+    {
+        status = numerus_int_parts_to_string(int_part, twelfths, p_formatted);
+    }
+    return status;
+}
 
 /**
  * Allocates a string with a prettier representation of a value as an integer
@@ -227,37 +239,98 @@ char* numerus_create_pretty_value_as_double(double double_value)
  * integer part and converted to a pretty string.
  * @returns char* allocated string with the prettier version of the value or
  * NULL if malloc() fails.
+ *
+ * p_formatted assumed to have NUMERUS_MAX_FORMATTED_PARTS_LENGTH or NULL.
  */
-char* numerus_create_pretty_value_as_parts(int32_t int_part, uint8_t twelfths)
+numerus_status_t numerus_int_parts_to_string(
+        int32_t int_part, int8_t twelfths, char** const p_formatted)
 {
-    char* pretty_value;
+    numerus_status_t status;
+
+    status = numerus_simplify_twelfths(&int_part, &twelfths);
+    if (status != NUMERUS_OK)
+    {
+        return status;
+    }
+    char build_buffer[NUMERUS_MAX_FORMATTED_PARTS_LENGTH];
+    uint8_t written_in_buffer;
     if (twelfths == 0)
     {
-        size_t needed_space = snprintf(NULL, 0, "%d", int_part);
-        pretty_value = malloc(needed_space + 1); /* +1 for '\0' */
-        if (pretty_value == NULL)
-        {
-            numerus_error_code = NUMERUS_ERROR_MALLOC_FAIL;
-            return NULL;
-        }
-        sprintf(pretty_value, "%d", int_part);
+        written_in_buffer = sprintf(build_buffer, "%d", int_part);
     }
     else
     {
-        numerus_shorten_and_same_sign_to_parts(&int_part, &twelfths);
-        /* Shorten twelfth fraction */
-        int8_t gcd = _num_greatest_common_divisor(twelfths, 12);
-        size_t
-                needed_space =
-                snprintf(NULL, 0, "%d, %d/%d", int_part, twelfths / gcd,
-                         12 / gcd);
-        pretty_value = malloc(needed_space + 1); /* +1 for '\0' */
-        if (pretty_value == NULL)
-        {
-            numerus_error_code = NUMERUS_ERROR_MALLOC_FAIL;
-            return NULL;
-        }
-        sprintf(pretty_value, "%d, %d/%d", int_part, twelfths / gcd, 12 / gcd);
+        int8_t denominator = 12;
+        shorten_fraction(&twelfths, &denominator);
+        written_in_buffer = sprintf(
+                build_buffer, "%d, %d/%d", int_part, twelfths, denominator);
     }
-    return pretty_value;
+    written_in_buffer++;  /* sprintf return value does not count '\0'. */
+    status = obtain_numeral_buffer(p_formatted, written_in_buffer);
+    if (status == NUMERUS_OK)
+    {
+        strncpy(*p_formatted, build_buffer, written_in_buffer);
+    }
+    return status;
+}
+
+
+static uint8_t digits_of_integer_part(int32_t value)
+{
+    // Inspired by https://stackoverflow.com/a/6655759
+    uint8_t digits = 1;
+
+    if (value < 0)
+    {
+        digits++; /* Minus sign. */
+        value = -value;
+    }
+    if (value >= 10000)
+    {
+        digits += 4;
+        value /= 10000;
+    }
+    if (value >= 100)
+    {
+        digits += 2;
+        value /= 100;
+    }
+    if (value >= 10)
+    {
+        digits += 1;
+    }
+    return digits;
+}
+
+static uint8_t digits_of_twelfths(uint8_t value)
+{
+    // Inspired by https://stackoverflow.com/a/6655759
+    uint8_t digits = 1;
+
+    if (value >= 10)
+    {
+        digits += 1;
+    }
+    return digits;
+}
+
+static void shorten_fraction(int8_t* numerator, int8_t* denominator)
+{
+    int8_t gcd = greatest_common_divisor(*numerator, *denominator);
+
+    *numerator /= gcd;
+    *denominator /= gcd;
+}
+
+static int8_t greatest_common_divisor(int8_t a, int8_t b)
+{
+    int8_t temp;
+
+    while (b != 0)
+    {
+        temp = b;
+        b = a % b;
+        a = temp;
+    }
+    return a;
 }

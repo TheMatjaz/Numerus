@@ -540,7 +540,10 @@ numerus_status_t numerus_count_roman_chars(
 // Max result size #NUMERUS_MAX_EXTENDED_OVERLINED_LENGTH
 numerus_status_t numerus_overline(
         const char* numeral, char** p_formatted);
-
+numerus_status_t numerus_int_parts_to_string(
+        int32_t int_part, int8_t twelfths, char** p_formatted);
+numerus_status_t numerus_double_as_int_parts_string(
+        double value, char** p_formatted);
 
 #ifdef __cplusplus
 }
