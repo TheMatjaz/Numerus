@@ -6,7 +6,6 @@
  * @license BSD 3-clause license.
  */
 
-#include "numerus.h"
 #include "internal.h"
 
 
@@ -16,6 +15,7 @@ const int16_t NUMERUS_MIN_BASIC_VALUE = -NUMERUS_MAX_BASIC_VALUE;
 const int32_t NUMERUS_MAX_EXTENDED_VALUE_INT_PART = 3999999;
 const int32_t NUMERUS_MIN_EXTENDED_VALUE_INT_PART =
         -NUMERUS_MAX_EXTENDED_VALUE_INT_PART;
+
 
 // TODO evaluate using 11.5/12.0 because it would be de facto the maximum
 // representable number as the conversion function would round it down to

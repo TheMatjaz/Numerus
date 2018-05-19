@@ -48,6 +48,9 @@ extern "C"
  */
 #define numerus_free free
 
+#define NUMERUS_UNIX_EOL 0U
+#define NUMERUS_WINDOWS_EOL 1U
+
 /**
  * Smallest negative value of a basic roman numeral, without Numerus
  * extensions.
@@ -538,8 +541,46 @@ numerus_status_t numerus_count_roman_chars(
 /* NUMERAL FORMATTING */
 // Pass the string two times to overwrite it??
 // Max result size #NUMERUS_MAX_EXTENDED_OVERLINED_LENGTH
+
+/**
+ * Converts the numeral to a printable representation with actual overlining.
+ *
+ * Generates a two lined string by overlining the part between underscores.
+ * The end-of-line character is defined by \p windows_end_of_line as boolean.
+ * In case of no overlining, it provides a copy of the original numeral.
+ * Ignores any heading whitespace.
+ *
+ * It's up to the user to free the overlined string.
+ *
+ * @examples
+ * - `-_CXX_VIII` becomes ` ___\n-CXXVIII` or ` ___\r\n-CXXVIII`
+ * - `VIII` becomes `VIII`
+ *
+ * The printed strings look like this:
+ *
+ * @verbatim
+ *                  ___
+ * -_CXX_VIII  =>  -CXXVIII
+ * VIII        =>   VIII
+ * @endverbatim
+ *
+ * @remark Same **important** remarks apply as for the
+ * numerus_int_to_basic_roman() function regarding the usage of the
+ * \p p_formatted parameter.
+ *
+ * @param[in] numeral string to convert to an overlined version.
+ *            The original is unchanged.
+ * @param[in, out] pointer to the generated numeral string. Check its
+ *        **remarks**, as it can be either allocated by the user or by
+ *        this function. It's up to the user to free this string.
+ * @param windows_end_of_line true sets the EOL characters to "\r\n"
+ *        (Windows/DOS style), false to "\n" (Unix style).
+ * @return status code, indicating operation success or failure.
+ * @see numerus_int_to_basic_roman
+ */
 numerus_status_t numerus_overline(
-        const char* numeral, char** p_formatted);
+        const char* numeral, char** p_formatted, bool windows_end_of_line);
+
 numerus_status_t numerus_int_parts_to_string(
         int32_t int_part, int8_t twelfths, char** p_formatted);
 numerus_status_t numerus_double_as_int_parts_string(

@@ -20,45 +20,9 @@ static void shorten_fraction(int8_t* numerator, int8_t* denominator);
 static int8_t greatest_common_divisor(int8_t a, int8_t b);
 
 
-/**
- * Allocates a string with a prettier representation of a long roman numeral
- * with actual overlining.
- *
- * Ignores any heading whitespace.
- *
- * In case of no overlining, it provides a copy of the original numeral,
- * with the same parameter usage as in value-to-numeral conversion functions.
- *
- * Generates a two lined string (newline character is '\n') by overlining the
- * part between underscores. The string is just copied if the roman numeral is
- * not long.
- *
- * Remember to free() the pretty-printed roman numeral when it's not useful
- * anymore and (depending on your necessity) also the roman numeral itself.
- *
- * Example:
- *
- * <pre>
- *                  ___
- * -_CXX_VIII  =>  -CXXVIII
- * VIII        =>   VIII
- * </pre>
- *
- * The prettifying process status is stored in the errcode passed as parameter,
- * which can be NULL to ignore the error, although it's not recommended. If the
- * error code is different than NUMERUS_OK, an error occurred during the
- * prettifying process and the returned string is NULL. The error code may help
- * find the specific error.
- *
- * @param *roman string containing the roman numeral.
- * @param status int where to store the comparison status: NUMERUS_OK or any
- * other error. Can be NULL to ignore the error (NOT recommended).
- * @returns char* allocated string with the prettier version of the roman
- * numeral or NULL if malloc() fails.
- */
-
 numerus_status_t numerus_overline(
-        const char* numeral, char** const p_formatted)
+        const char* numeral, char** const p_formatted,
+        const bool windows_end_of_line)
 {
     numerus_status_t status;
     uint8_t numeral_length;
@@ -100,6 +64,10 @@ numerus_status_t numerus_overline(
         {
             (*p_formatted)[formatted_index++] = '_';
             numeral_index++;
+        }
+        if (windows_end_of_line)
+        {
+            (*p_formatted)[formatted_index++] = '\r';
         }
         (*p_formatted)[formatted_index++] = '\n';
 
@@ -224,24 +192,6 @@ numerus_status_t numerus_double_as_int_parts_string(
     return status;
 }
 
-/**
- * Allocates a string with a prettier representation of a value as an integer
- * and a number of twelfths, with the twelfths shortened.
- *
- * Remember to free() the pretty-printed value when it's not useful anymore.
- * If a malloc() error occurs during the operation, the returned value is NULL.
- *
- * Example: `-3, 2` (= -3 + 2/12) becomes "-2, -5/6" (= -2 -10/12).
- *
- * @param int_part long integer part of a value to be added to the twelfths
- * and converted to a pretty string.
- * @param twelfths short integer as number of twelfths (1/12) to be added to the
- * integer part and converted to a pretty string.
- * @returns char* allocated string with the prettier version of the value or
- * NULL if malloc() fails.
- *
- * p_formatted assumed to have NUMERUS_MAX_FORMATTED_PARTS_LENGTH or NULL.
- */
 numerus_status_t numerus_int_parts_to_string(
         int32_t int_part, int8_t twelfths, char** const p_formatted)
 {
