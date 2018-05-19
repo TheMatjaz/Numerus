@@ -1,5 +1,5 @@
 # -----------------------------------------------------------------------------
-# Numerus doxygen configuration file for the public API
+# Numerus doxygen configuration file for the internal components
 # Copyright © 2015-2018, Matjaž Guštin <dev@matjaz.it> http://matjaz.it
 # All rights reserved.
 # Released under the BSD 3-clause license.
@@ -66,7 +66,7 @@ PROJECT_LOGO           = design/Numerus_icon.png
 # entered, it will be relative to the location where doxygen was started. If
 # left blank the current directory will be used.
 
-OUTPUT_DIRECTORY       = docs/public/
+OUTPUT_DIRECTORY       = docs/internal/
 
 # If the CREATE_SUBDIRS tag is set to YES then doxygen will create 4096 sub-
 # directories (in 2 levels) under the output directory of each output format and
@@ -425,7 +425,7 @@ LOOKUP_CACHE_SIZE      = 0
 # normally produced when WARNINGS is set to YES.
 # The default value is: NO.
 
-EXTRACT_ALL            = NO
+EXTRACT_ALL            = YES
 
 # If the EXTRACT_PRIVATE tag is set to YES, all private members of a class will
 # be included in the documentation.
@@ -505,7 +505,7 @@ HIDE_IN_BODY_DOCS      = NO
 # will be excluded. Set it to YES to include the internal documentation.
 # The default value is: NO.
 
-INTERNAL_DOCS          = NO
+INTERNAL_DOCS          = YES
 
 # If the CASE_SENSE_NAMES tag is set to NO then doxygen will only generate file
 # names in lower-case letters. If set to YES, upper-case letters are also
@@ -774,13 +774,9 @@ WARN_LOGFILE           = docs/doxygen_warnings.log
 # spaces. See also FILE_PATTERNS and EXTENSION_MAPPING
 # Note: If this tag is empty the current directory is searched.
 
-INPUT  = LICENSE.md
-INPUT += README.md
-INPUT += SYNTAX.md
-INPUT += USAGE_EXAMPLE.md
-INPUT += CHANGELOG.md
-INPUT += include/numerus.h
-
+INPUT  = ./
+INPUT += include/
+INPUT += src/
 
 # Include the README.md file and make it the source for the main page of the
 # documentation website. See the variable USE_MDFILE_AS_MAINPAGE
@@ -809,13 +805,15 @@ INPUT_ENCODING         = UTF-8
 # *.m, *.markdown, *.md, *.mm, *.dox, *.py, *.f90, *.f, *.for, *.tcl, *.vhd,
 # *.vhdl, *.ucf, *.qsf, *.as and *.js.
 
-FILE_PATTERNS  =
+FILE_PATTERNS  = *.c
+FILE_PATTERNS += *.h
+FILE_PATTERNS += *.md
 
 # The RECURSIVE tag can be used to specify whether or not subdirectories should
 # be searched for input files as well.
 # The default value is: NO.
 
-RECURSIVE              = NO
+RECURSIVE              = YES
 
 # The EXCLUDE tag can be used to specify files and/or directories that should be
 # excluded from the INPUT source files. This way you can easily exclude a
@@ -839,6 +837,14 @@ EXCLUDE_SYMLINKS       = NO
 #
 # Note that the wildcards are matched against the file with absolute path, so to
 # exclude all test directories for example use the pattern */test/*
+
+EXCLUDE_PATTERNS  = builds
+EXCLUDE_PATTERNS += cmake
+EXCLUDE_PATTERNS += test
+EXCLUDE_PATTERNS += wrapper
+EXCLUDE_PATTERNS += design
+EXCLUDE_PATTERNS += docs
+EXCLUDE_PATTERNS += venv
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names
 # (namespaces, classes, functions, etc.) that should be excluded from the
