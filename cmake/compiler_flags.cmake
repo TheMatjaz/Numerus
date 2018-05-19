@@ -16,6 +16,12 @@ include(CheckCCompilerFlag)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
+option(WARNINGS_TO_ERRORS "Compiling warnings are converted to errors" ON)
+if (WARNINGS_TO_ERRORS)
+    list(APPEND
+         COMPILER_FLAGS_WARNINGS
+         "-Werror")
+endif ()
 list(APPEND
      COMPILER_FLAGS_WARNINGS
      "-Wall"
@@ -27,8 +33,7 @@ list(APPEND
      "-Wuninitialized"
      "-Wshadow"
      "-Wpacked"
-     "-Wdouble-promotion"
-     "-Werror")  # Turn all warnings into errors
+     "-Wdouble-promotion")
 list(APPEND
      COMPILER_FLAGS_DEBUG
      "-O0"
@@ -40,25 +45,37 @@ list(APPEND
      "-DNDEBUG")
 
 foreach (FLAG IN LISTS COMPILER_FLAGS_WARNINGS)
-    check_c_compiler_flag(${FLAG} COMPILER_SUPPORTS_${FLAG})
-    if (NOT COMPILER_SUPPORTS_${FLAG})
+    string(REPLACE "-" "" FLAG_NO_HYPHEN ${FLAG})
+    check_c_compiler_flag(${FLAG} COMPILER_SUPPORTS_${FLAG_NO_HYPHEN})
+    if (COMPILER_SUPPORTS_${FLAG_NO_HYPHEN})
+        string(APPEND CMAKE_C_FLAGS " ${FLAG}")
+    else ()
         string(APPEND UNSUPPORTED_COMPILER_FLAGS " ${FLAG}")
     endif ()
-    string(APPEND CMAKE_C_FLAGS " ${FLAG}")
 endforeach (FLAG)
 
 foreach (FLAG IN LISTS COMPILER_FLAGS_DEBUG)
-    check_c_compiler_flag(${FLAG} COMPILER_SUPPORTS_${FLAG})
-    if (NOT COMPILER_SUPPORTS_${FLAG})
+    string(REPLACE "-" "" FLAG_NO_HYPHEN ${FLAG})
+    check_c_compiler_flag(${FLAG} COMPILER_SUPPORTS_${FLAG_NO_HYPHEN})
+    if (COMPILER_SUPPORTS_${FLAG_NO_HYPHEN})
+        string(APPEND CMAKE_C_FLAGS_DEBUG " ${FLAG}")
+    else ()
         string(APPEND UNSUPPORTED_COMPILER_FLAGS " ${FLAG}")
     endif ()
-    string(APPEND CMAKE_C_FLAGS_DEBUG " ${FLAG}")
 endforeach (FLAG)
 
 foreach (FLAG IN LISTS COMPILER_FLAGS_RELEASE)
-    check_c_compiler_flag(${FLAG} COMPILER_SUPPORTS_${FLAG})
-    if (NOT COMPILER_SUPPORTS_${FLAG})
+    string(REPLACE "-" "" FLAG_NO_HYPHEN ${FLAG})
+    check_c_compiler_flag(${FLAG} COMPILER_SUPPORTS_${FLAG_NO_HYPHEN})
+    if (COMPILER_SUPPORTS_${FLAG_NO_HYPHEN})
+        string(APPEND CMAKE_C_FLAGS_RELEASE " ${FLAG}")
+    else ()
         string(APPEND UNSUPPORTED_COMPILER_FLAGS " ${FLAG}")
     endif ()
-    string(APPEND CMAKE_C_FLAGS_RELEASE " ${FLAG}")
 endforeach (FLAG)
+
+if (UNSUPPORTED_COMPILER_FLAGS)
+    message(WARNING
+            "The following compiler flags are not supported: "
+            "${UNSUPPORTED_COMPILER_FLAGS}")
+endif ()
