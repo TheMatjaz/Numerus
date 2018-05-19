@@ -1,5 +1,5 @@
 /**
- * @file numerus_cli.c
+ * @file
  * @brief Numerus command line interface for user-friendly conversions.
  * @copyright Copyright © 2015-2018, Matjaž Guštin <dev@matjaz.it>
  * <https://matjaz.it>. All rights reserved.

@@ -1,5 +1,5 @@
 /**
- * @file value_to_numeral.c
+ * @file
  * @brief Implementation of conversion functions from value
  * to roman numeral.
  * @copyright Copyright © 2015-2018, Matjaž Guštin <dev@matjaz.it>

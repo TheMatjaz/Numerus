@@ -1,5 +1,5 @@
 /**
- * @file internal.h
+ * @file
  * @brief Numerus roman numerals library internal/private definitions
  * @copyright Copyright © 2015-2018, Matjaž Guštin <dev@matjaz.it>
  * <https://matjaz.it>. All rights reserved.

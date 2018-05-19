@@ -1,5 +1,5 @@
 /**
- * @file numeral_to_value.c
+ * @file
  * @brief
  * @copyright Copyright © 2015-2018, Matjaž Guštin <dev@matjaz.it>
  * <https://matjaz.it>. All rights reserved.

@@ -1,5 +1,5 @@
 /**
- * @file numerus_test.c
+ * @file
  * @brief Numerus test functions to verify the correctness of the library.
  * @copyright Copyright © 2015-2018, Matjaž Guštin <dev@matjaz.it>
  * <https://matjaz.it>. All rights reserved.

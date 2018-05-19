@@ -1,5 +1,5 @@
 /**
- * @file twelfths.c
+ * @file
  * @brief Implementation of fractional format handling functions.
  * @copyright Copyright © 2015-2018, Matjaž Guštin <dev@matjaz.it>
  * <https://matjaz.it>. All rights reserved.
