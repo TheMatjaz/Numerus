@@ -1,3 +1,1 @@
-#!/usr/bin/env cython
-# -*- coding: utf8 -*-
-
+#parse("Cython shebang.pyx")
