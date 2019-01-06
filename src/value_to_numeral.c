@@ -2,7 +2,7 @@
  * @file
  * @brief Implementation of conversion functions from value
  * to roman numeral.
- * @copyright Copyright © 2015-2018, Matjaž Guštin <dev@matjaz.it>
+ * @copyright Copyright © 2015-2019, Matjaž Guštin <dev@matjaz.it>
  * <https://matjaz.it>. All rights reserved.
  * @license BSD 3-clause license.
  */

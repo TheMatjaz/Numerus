@@ -1,13 +1,13 @@
 /**
  * @file
  * @brief Numerus roman numerals library API.
- * @copyright Copyright © 2015-2018, Matjaž Guštin <dev@matjaz.it>
+ * @copyright Copyright © 2015-2019, Matjaž Guštin <dev@matjaz.it>
  * <https://matjaz.it>. All rights reserved.
  * @license BSD 3-clause license.
  */
 
-#ifndef NUMERUS_NUMERUS3_H_
-#define NUMERUS_NUMERUS3_H_
+#ifndef NUMERUS_H_
+#define NUMERUS_H_
 
 #ifdef __cplusplus
 extern "C"
@@ -590,4 +590,4 @@ numerus_status_t numerus_double_as_int_parts_string(
 }
 #endif
 
-#endif  /* NUMERUS_NUMERUS3_H_ */
+#endif  /* NUMERUS_H_ */

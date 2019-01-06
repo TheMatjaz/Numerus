@@ -1,12 +1,10 @@
 /**
  * @file
- * @brief
- * @copyright Copyright © 2015-2018, Matjaž Guštin <dev@matjaz.it>
+ * @brief Implementation of conversion functions from roman numeral
+ * to value.
+ * @copyright Copyright © 2015-2019, Matjaž Guštin <dev@matjaz.it>
  * <https://matjaz.it>. All rights reserved.
  * @license BSD 3-clause license.
- *
- * This file contains implementations of the conversion functions from
- * roman numeral to value only.
  */
 
 #include "internal.h"
