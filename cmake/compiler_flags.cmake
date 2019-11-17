@@ -79,3 +79,12 @@ if (UNSUPPORTED_COMPILER_FLAGS)
             "The following compiler flags are not supported: "
             "${UNSUPPORTED_COMPILER_FLAGS}")
 endif ()
+
+
+#Debug mode
+#
+#-c -fmessage-length=0 -lm -Wdouble-promotion -Wswitch-default -Wswitch-enum -Wuninitialized -Wshadow -Wpacked -Wno-unused-variable -Wformat-security -Wjump-misses-init -Wlogical-not-parentheses -pedantic -Wall -Wextra -Wconversion -std=c11 -Wpadded -Waggregate-return -Wmissing-declarations -fPIC
+#
+#Release mode
+#
+#-c -fmessage-length=0 -lm -Wdouble-promotion -Wswitch-default -Wswitch-enum -Wuninitialized -Wshadow -Wpacked -Wno-unused-variable -Wformat-security -Wjump-misses-init -Wlogical-not-parentheses -pedantic -Wall -Wextra -Wconversion -std=c11 -Wpadded -Waggregate-return -Wmissing-declarations -fPIC -pedantic-errors -Werror -flto
