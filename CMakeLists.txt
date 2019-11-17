@@ -13,9 +13,13 @@ file(MAKE_DIRECTORY "builds")
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 #include(doxygen)
-include(build_type)
-include(compiler_flags)
+#include(build_type)
+#include(compiler_flags)
 
-add_subdirectory(include)
 add_subdirectory(src)
 add_subdirectory(test)
+
+add_library(numerusstatic STATIC $<TARGET_OBJECTS:library>)
+add_library(numerusshared SHARED $<TARGET_OBJECTS:library>)
+add_executable(test_numerus $<TARGET_OBJECTS:library> $<TARGET_OBJECTS:test>)
+add_executable(numerus $<TARGET_OBJECTS:library> $<TARGET_OBJECTS:cli>)
