@@ -48,13 +48,14 @@ extern "C"
 
 /**
  * @internal
- * Minimalistic computation of the absolute value of an integer.
+ * Minimalistic computation of the absolute value of an integer or float.
  *
- * @param x an integer, also unsigned.
+ * @param x an (signed/unsigned) integer or float.
  */
 #define ABS(x) (((x) < 0) ? (-(x)) : (x))
 
-/** @internal
+/**
+ * @internal
  * Size of the NMRS_ZERO_STRING including null terminator.
  */
 extern const uint8_t ZERO_NUMERAL_SIZE;

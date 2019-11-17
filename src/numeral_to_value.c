@@ -55,7 +55,7 @@ nmrs_err_t nmrs_basic_numeral_to_int(
     }
     while (numeral[parser_data.current_numeral_index] != '\0'
            && parser_data.current_dictionary_char_index
-              <= NMRS_DICTIONARY_SIZE);
+              <= NMRS_DICTIONARY_ENTRIES);
 
 
     termination:
@@ -161,7 +161,7 @@ static nmrs_err_t numeral_section_to_value(
         skip_to_next_non_unique_dictionary_char(p_parser_data);
     }
     if (p_parser_data->current_dictionary_char_index
-        >= NMRS_DICTIONARY_SIZE)
+        >= NMRS_DICTIONARY_ENTRIES)
     {
         status = NMRS_ERROR_ILLEGAL_CHAR_SEQUENCE;
         goto termination;
