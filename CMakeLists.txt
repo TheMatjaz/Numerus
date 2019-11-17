@@ -6,10 +6,10 @@
 # -----------------------------------------------------------------------------
 
 cmake_minimum_required(VERSION 3.10 FATAL_ERROR)
-
 project(Numerus C)
-
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+file(MAKE_DIRECTORY "builds")
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 #include(doxygen)
