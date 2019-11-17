@@ -14,7 +14,7 @@ void test_constants(void)
     atto_eq(NMRS_OK, 0);
     atto_eq(NMRS_MIN_BASIC_VALUE, -3999);
     atto_eq(NMRS_MAX_BASIC_VALUE, +3999);
-    atto_eq(NMRS_MAX_BASIC_LENGTH, strlen("-MMMCMXCIX") + NULL_TERM_LEN);
+    atto_eq(NMRS_MAX_BASIC_LENGTH, strlen("-MMMDCCCLXXXVIII") + NULL_TERM_LEN);
     atto_eq(NMRS_MIN_EXTENDED_VALUE_INT_PART, -3999999);
     atto_eq(NMRS_MAX_EXTENDED_VALUE_INT_PART, +3999999);
     atto_eq(NMRS_MIN_EXTENDED_VALUE, -3999999.9166666667f);
