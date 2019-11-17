@@ -4,8 +4,7 @@
 # All rights reserved.
 # Released under the BSD 3-clause license.
 # -----------------------------------------------------------------------------
-set(PUBLIC_API_HEADER_FILE
-    "numerus.h")
+
+set(PUBLIC_API_HEADER_FILE "numerus.h")
 include_directories(".")
 install(FILES PUBLIC_API_HEADER_FILE DESTINATION CMAKE_BINARY_DIR)
-

@@ -6,7 +6,6 @@
 # -----------------------------------------------------------------------------
 # Taken from https://blog.kitware.com/cmake-and-the-default-build-type/
 
-# Set a default build type if none was specified
 set(DEFAULT_BUILD_TYPE "Release")
 if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     message(STATUS

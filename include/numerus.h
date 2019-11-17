@@ -101,7 +101,7 @@ extern const uint8_t NMRS_MAX_EXTENDED_LENGTH;
  *
  * Specifically it is the length of the roman numeral
  * @verbatim
- *  _______________\n
+ *  _______________\r\n
  * -MMMDCCCLXXXVIIIDCCCLXXXVIIIS.....\0
  * @endverbatim
  * with value (-3888888 and -11/12) = -3888888.9166666665.

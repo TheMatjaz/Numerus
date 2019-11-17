@@ -18,9 +18,4 @@ include(compiler_flags)
 
 add_subdirectory(include)
 add_subdirectory(src)
-
-option(ENABLE_TESTING "Enable testing and building the tests." ON)
-if (ENABLE_TESTING)
-    enable_testing()
-    add_subdirectory(test)
-endif ()
+add_subdirectory(test)
