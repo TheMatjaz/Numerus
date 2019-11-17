@@ -1,0 +1,17 @@
+# Doxygen-generated files
+docs/
+
+# Compiled binaries
+bin/
+build/
+builds/
+cmake-build-*/
+
+# The Numerus logo
+design/
+
+# The Python virtual environment
+venv/
+
+# A list of ideas
+TODO.md
