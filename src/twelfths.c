@@ -10,14 +10,14 @@
 #include "math.h"
 
 
-numerus_status_t numerus_simplify_twelfths(
-        int32_t* const integer_part, int8_t* const twelfths)
+nmrs_err_t nmrs_simplify_twelfths(
+        int32_t* integer_part, int8_t* twelfths)
 {
-    numerus_status_t status;
+    nmrs_err_t status;
 
     if (integer_part == NULL || twelfths == NULL)
     {
-        status = NUMERUS_ERROR_NULL_NUMBER;
+        status = NMRS_ERROR_NULL_NUMBER;
     }
     else
     {
@@ -33,59 +33,59 @@ numerus_status_t numerus_simplify_twelfths(
             *integer_part += 1;
             *twelfths -= 12;
         }
-        if (*integer_part < NUMERUS_MIN_EXTENDED_VALUE_INT_PART
-            || *integer_part > NUMERUS_MAX_EXTENDED_VALUE_INT_PART)
+        if (*integer_part < NMRS_MIN_EXTENDED_VALUE_INT_PART
+            || *integer_part > NMRS_MAX_EXTENDED_VALUE_INT_PART)
         {
-            status = NUMERUS_ERROR_EXTENDED_VALUE_OUT_OF_RANGE;
+            status = NMRS_ERROR_EXTENDED_VALUE_OUT_OF_RANGE;
         }
         else
         {
-            status = NUMERUS_OK;
+            status = NMRS_OK;
         }
     }
     return status;
 }
 
 
-numerus_status_t numerus_int_parts_to_double(
+nmrs_err_t numerus_int_parts_to_double(
         const int32_t integer_part, const uint8_t twelfths,
         double* const result)
 {
     double value;
-    numerus_status_t status;
+    nmrs_err_t status;
 
     value = integer_part + (twelfths / 12.0);
-    if (value < NUMERUS_MIN_EXTENDED_VALUE
-        || value > NUMERUS_MAX_EXTENDED_VALUE)
+    if (value < NMRS_MIN_EXTENDED_VALUE
+        || value > NMRS_MAX_EXTENDED_VALUE)
     {
-        status = NUMERUS_ERROR_EXTENDED_VALUE_OUT_OF_RANGE;
+        status = NMRS_ERROR_EXTENDED_VALUE_OUT_OF_RANGE;
     }
     else
     {
         *result = value;
-        status = NUMERUS_OK;
+        status = NMRS_OK;
     }
     return status;
 }
 
 
-numerus_status_t numerus_double_to_int_parts(
+nmrs_err_t numerus_double_to_int_parts(
         double value, int32_t* const integer_part, int8_t* twelfths)
 {
-    numerus_status_t status;
+    nmrs_err_t status;
 
     if (!isfinite(value))
     {
-        status = NUMERUS_ERROR_DOUBLE_VALUE_IS_NOT_FINITE;
+        status = NMRS_ERROR_DOUBLE_VALUE_IS_NOT_FINITE;
     }
     else if (integer_part == NULL || twelfths == NULL)
     {
-        status = NUMERUS_ERROR_NULL_NUMBER;
+        status = NMRS_ERROR_NULL_NUMBER;
     }
-    else if (value < NUMERUS_MIN_EXTENDED_VALUE
-             || value > NUMERUS_MAX_EXTENDED_VALUE)
+    else if (value < NMRS_MIN_EXTENDED_VALUE
+             || value > NMRS_MAX_EXTENDED_VALUE)
     {
-        status = NUMERUS_ERROR_EXTENDED_VALUE_OUT_OF_RANGE;
+        status = NMRS_ERROR_EXTENDED_VALUE_OUT_OF_RANGE;
     }
     else
     {
@@ -100,7 +100,7 @@ numerus_status_t numerus_double_to_int_parts(
             *integer_part += value / 12;
             *twelfths = 0;
         }
-        status = NUMERUS_OK;
+        status = NMRS_OK;
     }
     return status;
 }

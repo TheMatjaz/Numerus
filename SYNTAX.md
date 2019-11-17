@@ -117,7 +117,7 @@ Zero
 ----------------------------------------
 
 Numerus uses the string `NULLA` (as stored in the global constant variable 
-`NUMERUS_ZERO`) for the numeral of value 0 (zero). The word _nulla_ means 
+`NMRS_ZERO`) for the numeral of value 0 (zero). The word _nulla_ means 
 _nothing_ in latin.
 
 This allows writing integer values in `[0, 3999]`.

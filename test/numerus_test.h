@@ -10,8 +10,8 @@
  * usage.
  */
 
-#ifndef NUMERUS_TEST_H
-#define NUMERUS_TEST_H
+#ifndef NMRS_TEST_H
+#define NMRS_TEST_H
 
 #include "../src/internal.h"
 
@@ -28,5 +28,5 @@ void numtest_null_handling_utils();
 int numtest_pretty_print_all_numerals();
 int numtest_pretty_print_all_values();
 
-#endif // NUMERUS_TEST_H
+#endif // NMRS_TEST_H
 

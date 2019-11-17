@@ -10,7 +10,7 @@
 #include "internal.h"
 
 
-static numerus_status_t expected_length_of_overlined(
+static nmrs_err_t expected_length_of_overlined(
         const char* numeral,
         uint8_t* numeral_length,
         uint8_t* additional_size);
@@ -20,22 +20,22 @@ static void shorten_fraction(int8_t* numerator, int8_t* denominator);
 static int8_t greatest_common_divisor(int8_t a, int8_t b);
 
 
-numerus_status_t numerus_overline(
+nmrs_err_t numerus_overline(
         const char* numeral, char** const p_formatted,
         const bool windows_end_of_line)
 {
-    numerus_status_t status;
+    nmrs_err_t status;
     uint8_t numeral_length;
     uint8_t additional_size;
 
     status = prepare_for_analysis(&numeral);
-    if (status != NUMERUS_OK)
+    if (status != NMRS_OK)
     {
         return status;
     }
     status = expected_length_of_overlined(
             numeral, &numeral_length, &additional_size);
-    if (status != NUMERUS_OK)
+    if (status != NMRS_OK)
     {
         return status;
     }
@@ -44,7 +44,7 @@ numerus_status_t numerus_overline(
         /* Needs to be overlined. */
         status = obtain_numeral_buffer(p_formatted,
                                        numeral_length + additional_size);
-        if (status != NUMERUS_OK)
+        if (status != NMRS_OK)
         {
             return status;
         }
@@ -87,7 +87,7 @@ numerus_status_t numerus_overline(
     {
         /* Just a basic numeral, no overlining needed */
         status = obtain_numeral_buffer(p_formatted, numeral_length);
-        if (status == NUMERUS_OK)
+        if (status == NMRS_OK)
         {
             strncpy(*p_formatted, numeral, numeral_length);
         }
@@ -118,21 +118,21 @@ numerus_status_t numerus_overline(
  * @returns status code, indicating operation success or any numeral format
  *          errors that prevent the overlining.
  */
-static numerus_status_t expected_length_of_overlined(
+static nmrs_err_t expected_length_of_overlined(
         const char* const numeral,
         uint8_t* const numeral_length,
         uint8_t* const additional_size)
 {
     uint8_t overlined_length = 0;
-    uint8_t first_underscore_index = NUMERUS_MAX_EXTENDED_LENGTH;
+    uint8_t first_underscore_index = NMRS_MAX_EXTENDED_LENGTH;
     uint8_t index = 0;
-    numerus_status_t status = NUMERUS_ERROR_MISSING_SECOND_UNDERSCORE;
+    nmrs_err_t status = NMRS_ERROR_MISSING_SECOND_UNDERSCORE;
 
-    while (numeral[index] != '\0' && index < NUMERUS_MAX_EXTENDED_LENGTH)
+    while (numeral[index] != '\0' && index < NMRS_MAX_EXTENDED_LENGTH)
     {
         if (numeral[index] == '_')
         {
-            if (first_underscore_index == NUMERUS_MAX_EXTENDED_LENGTH)
+            if (first_underscore_index == NMRS_MAX_EXTENDED_LENGTH)
             {
                 first_underscore_index = index;
             }
@@ -141,7 +141,7 @@ static numerus_status_t expected_length_of_overlined(
                 /* The following line also includes a byte for the line
                  * feed '\n'. */
                 overlined_length += index - first_underscore_index;
-                status = NUMERUS_OK;
+                status = NMRS_OK;
                 break;
             }
         }
@@ -151,21 +151,21 @@ static numerus_status_t expected_length_of_overlined(
         }
         index++;
     };
-    while (numeral[index] != '\0' && index < NUMERUS_MAX_EXTENDED_LENGTH)
+    while (numeral[index] != '\0' && index < NMRS_MAX_EXTENDED_LENGTH)
     {
         if (numeral[index] == '_')
         {
-            status = NUMERUS_ERROR_TOO_MANY_UNDERSCORES;
+            status = NMRS_ERROR_TOO_MANY_UNDERSCORES;
             break;
         }
         index++;
     };
-    if (index >= NUMERUS_MAX_EXTENDED_LENGTH)
+    if (index >= NMRS_MAX_EXTENDED_LENGTH)
     {
-        status = NUMERUS_ERROR_TOO_LONG_EXTENDED_NUMERAL;
+        status = NMRS_ERROR_TOO_LONG_EXTENDED_NUMERAL;
     }
     *numeral_length = ++index;
-    if (status == NUMERUS_OK)
+    if (status == NMRS_OK)
     {
         *additional_size = overlined_length;
     }
@@ -177,32 +177,32 @@ static numerus_status_t expected_length_of_overlined(
 }
 
 
-numerus_status_t numerus_double_as_int_parts_string(
+nmrs_err_t numerus_double_as_int_parts_string(
         const double value, char** const p_formatted)
 {
     int32_t int_part;
     int8_t twelfths;
-    numerus_status_t status;
+    nmrs_err_t status;
 
     status = numerus_double_to_int_parts(value, &int_part, &twelfths);
-    if (status == NUMERUS_OK)
+    if (status == NMRS_OK)
     {
         status = numerus_int_parts_to_string(int_part, twelfths, p_formatted);
     }
     return status;
 }
 
-numerus_status_t numerus_int_parts_to_string(
+nmrs_err_t numerus_int_parts_to_string(
         int32_t int_part, int8_t twelfths, char** const p_formatted)
 {
-    numerus_status_t status;
+    nmrs_err_t status;
 
-    status = numerus_simplify_twelfths(&int_part, &twelfths);
-    if (status != NUMERUS_OK)
+    status = nmrs_simplify_twelfths(&int_part, &twelfths);
+    if (status != NMRS_OK)
     {
         return status;
     }
-    char build_buffer[NUMERUS_MAX_FORMATTED_PARTS_LENGTH];
+    char build_buffer[NMRS_MAX_FORMATTED_PARTS_LENGTH];
     uint8_t written_in_buffer;
     if (twelfths == 0)
     {
@@ -217,7 +217,7 @@ numerus_status_t numerus_int_parts_to_string(
     }
     written_in_buffer++;  /* sprintf return value does not count '\0'. */
     status = obtain_numeral_buffer(p_formatted, written_in_buffer);
-    if (status == NUMERUS_OK)
+    if (status == NMRS_OK)
     {
         strncpy(*p_formatted, build_buffer, written_in_buffer);
     }

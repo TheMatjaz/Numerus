@@ -39,12 +39,12 @@ int numtest_convert_all_floats_with_parts() {
     int8_t errcode;
     printf("Starting conversion of all roman numerals with parts\n");
     clock_t start_clock = clock();
-    for (int_part = NUMERUS_MIN_LONG_NONFLOAT_VALUE; int_part <=
-         NUMERUS_MAX_LONG_NONFLOAT_VALUE; int_part++) {
+    for (int_part = NMRS_MIN_LONG_NONFLOAT_VALUE; int_part <=
+         NMRS_MAX_LONG_NONFLOAT_VALUE; int_part++) {
         for (frac_part = 0; frac_part < 12; frac_part++) {
             frac_part = SIGN(int_part) * ABS(frac_part);
             roman = numerus_int_with_twelfth_to_roman(int_part, frac_part, &errcode);
-            if (errcode != NUMERUS_OK) {
+            if (errcode != NMRS_OK) {
                 fprintf(stderr, "Error converting %d, %d to roman: %s\n",
                         int_part, frac_part, numerus_explain_error(errcode));
                 return 1;
@@ -52,7 +52,7 @@ int numtest_convert_all_floats_with_parts() {
             int_part_converted = numerus_roman_to_int_part_and_twelfths(roman,
                     &frac_part_converted,
                     &errcode);
-            if (errcode != NUMERUS_OK) {
+            if (errcode != NMRS_OK) {
                 fprintf(stderr, "Error converting %s to value: %s.\n",
                         roman, numerus_explain_error(errcode));
                 return 1;
@@ -67,7 +67,7 @@ int numtest_convert_all_floats_with_parts() {
         }
         if (int_part % PRINT_STATUS_DIVIDER == 0) {
             printf("\r> %6.2f%%", 100.0 * (int_part +
-                                         NUMERUS_MAX_LONG_NONFLOAT_VALUE) / 7999999.0);
+                                         NMRS_MAX_LONG_NONFLOAT_VALUE) / 7999999.0);
             fflush(stdout);
         }
     }
@@ -90,19 +90,19 @@ int numtest_convert_all_floats_with_doubles() {
     int8_t errcode;
     printf("Starting conversion of all roman numerals with doubles \n");
     clock_t start_clock = clock();
-    for (int_part = NUMERUS_MIN_LONG_NONFLOAT_VALUE; int_part <=
-         NUMERUS_MAX_LONG_NONFLOAT_VALUE; int_part++) {
+    for (int_part = NMRS_MIN_LONG_NONFLOAT_VALUE; int_part <=
+         NMRS_MAX_LONG_NONFLOAT_VALUE; int_part++) {
         for (frac_part = 0; frac_part < 12; frac_part++) {
             frac_part = SIGN(int_part) * ABS(frac_part);
             to_convert = numerus_parts_to_double(int_part, frac_part);
             roman = numerus_double_to_roman(to_convert, &errcode);
-            if (errcode != NUMERUS_OK) {
+            if (errcode != NMRS_OK) {
                 fprintf(stderr, "Error converting %d, %d (%f) to roman: %s.\n",
                         int_part, frac_part, to_convert, numerus_explain_error(errcode));
                 return 1;
             }
             converted = numerus_roman_to_double(roman, &errcode);
-            if (errcode != NUMERUS_OK) {
+            if (errcode != NMRS_OK) {
                 fprintf(stderr, "Error converting %s to value: %s.\n",
                         roman, numerus_explain_error(errcode));
                 return 1;
@@ -117,7 +117,7 @@ int numtest_convert_all_floats_with_doubles() {
         }
         if (int_part % PRINT_STATUS_DIVIDER == 0) {
             printf("\r> %6.2f%%", 100.0 * (int_part +
-                                         NUMERUS_MAX_LONG_NONFLOAT_VALUE) / 7999999.0);
+                                         NMRS_MAX_LONG_NONFLOAT_VALUE) / 7999999.0);
             fflush(stdout);
         }
     }
@@ -138,16 +138,16 @@ int numtest_convert_all_integers_with_parts() {
     int8_t errcode;
     printf("Starting conversion of all integer roman numerals with parts \n");
     clock_t start_clock = clock();
-    for (int_part = NUMERUS_MIN_LONG_NONFLOAT_VALUE; int_part <=
-         NUMERUS_MAX_LONG_NONFLOAT_VALUE; int_part++) {
+    for (int_part = NMRS_MIN_LONG_NONFLOAT_VALUE; int_part <=
+         NMRS_MAX_LONG_NONFLOAT_VALUE; int_part++) {
         roman = numerus_int_to_roman(int_part, &errcode);
-        if (errcode != NUMERUS_OK) {
+        if (errcode != NMRS_OK) {
             fprintf(stderr, "Error converting %d to roman: %s\n",
                     int_part, numerus_explain_error(errcode));
             return 1;
         }
         converted = numerus_roman_to_int(roman, &errcode);
-        if (errcode != NUMERUS_OK) {
+        if (errcode != NMRS_OK) {
             fprintf(stderr, "Error converting %s to value: %s\n",
                     roman, numerus_explain_error(errcode));
             return 1;
@@ -160,7 +160,7 @@ int numtest_convert_all_integers_with_parts() {
         free(roman);
         if (int_part % PRINT_STATUS_DIVIDER == 0) {
             printf("\r> %6.2f%%", 100.0 * (int_part +
-                                         NUMERUS_MAX_LONG_NONFLOAT_VALUE) / 7999999.0);
+                                         NMRS_MAX_LONG_NONFLOAT_VALUE) / 7999999.0);
             fflush(stdout);
         }
     }
@@ -182,17 +182,17 @@ int numtest_convert_all_integers_with_doubles() {
     int8_t errcode;
     printf("Starting conversion of all integer roman numerals with doubles \n");
     clock_t start_clock = clock();
-    for (int_part = NUMERUS_MIN_LONG_NONFLOAT_VALUE; int_part <=
-         NUMERUS_MAX_LONG_NONFLOAT_VALUE; int_part++) {
+    for (int_part = NMRS_MIN_LONG_NONFLOAT_VALUE; int_part <=
+         NMRS_MAX_LONG_NONFLOAT_VALUE; int_part++) {
         to_convert = numerus_parts_to_double(int_part, 0);
         roman = numerus_double_to_roman(to_convert, &errcode);
-        if (errcode != NUMERUS_OK) {
+        if (errcode != NMRS_OK) {
             fprintf(stderr, "Error converting %f to roman: %s\n",
                     to_convert, numerus_explain_error(errcode));
             return 1;
         }
         converted = numerus_roman_to_double(roman, &errcode);
-        if (errcode != NUMERUS_OK) {
+        if (errcode != NMRS_OK) {
             fprintf(stderr, "Error converting %s to value: %s\n",
                     roman, numerus_explain_error(errcode));
             return 1;
@@ -205,7 +205,7 @@ int numtest_convert_all_integers_with_doubles() {
         free(roman);
         if (int_part % PRINT_STATUS_DIVIDER == 0) {
             printf("\r> %6.2f%%", 100.0 * (int_part +
-                                         NUMERUS_MAX_LONG_NONFLOAT_VALUE) / 7999999.0);
+                                         NMRS_MAX_LONG_NONFLOAT_VALUE) / 7999999.0);
             fflush(stdout);
         }
     }
@@ -246,43 +246,43 @@ static void _num_test_for_error(char *roman, int error_code) {
  * @see _num_test_for_error(char *roman, int error_code)
  */
 void numtest_roman_syntax_errors() {
-    _num_test_for_error("-_MCM_XX_I", NUMERUS_ERROR_TOO_MANY_UNDERSCORES);
-    _num_test_for_error("-_MCM__I", NUMERUS_ERROR_TOO_MANY_UNDERSCORES);
+    _num_test_for_error("-_MCM_XX_I", NMRS_ERROR_TOO_MANY_UNDERSCORES);
+    _num_test_for_error("-_MCM__I", NMRS_ERROR_TOO_MANY_UNDERSCORES);
 
-    _num_test_for_error("-MMCM-LI", NUMERUS_ERROR_ILLEGAL_MINUS_POSITION);
-    _num_test_for_error("--_MCM_LI", NUMERUS_ERROR_ILLEGAL_MINUS_POSITION);
+    _num_test_for_error("-MMCM-LI", NMRS_ERROR_ILLEGAL_MINUS_POSITION);
+    _num_test_for_error("--_MCM_LI", NMRS_ERROR_ILLEGAL_MINUS_POSITION);
 
-    _num_test_for_error("MMMCMLCI", NUMERUS_ERROR_ILLEGAL_CHAR_SEQUENCE);
-    _num_test_for_error("MMMCMLIIIX", NUMERUS_ERROR_ILLEGAL_CHAR_SEQUENCE);
-    _num_test_for_error("MMMCMLIII.S", NUMERUS_ERROR_ILLEGAL_CHAR_SEQUENCE);
+    _num_test_for_error("MMMCMLCI", NMRS_ERROR_ILLEGAL_CHAR_SEQUENCE);
+    _num_test_for_error("MMMCMLIIIX", NMRS_ERROR_ILLEGAL_CHAR_SEQUENCE);
+    _num_test_for_error("MMMCMLIII.S", NMRS_ERROR_ILLEGAL_CHAR_SEQUENCE);
 
-    _num_test_for_error("-XVIFI", NUMERUS_ERROR_ILLEGAL_CHARACTER);
-    _num_test_for_error("-XVI.FI", NUMERUS_ERROR_ILLEGAL_CHARACTER);
-    _num_test_for_error("-XVI,.", NUMERUS_ERROR_ILLEGAL_CHARACTER);
+    _num_test_for_error("-XVIFI", NMRS_ERROR_ILLEGAL_CHARACTER);
+    _num_test_for_error("-XVI.FI", NMRS_ERROR_ILLEGAL_CHARACTER);
+    _num_test_for_error("-XVI,.", NMRS_ERROR_ILLEGAL_CHARACTER);
 
-    _num_test_for_error("MMMM", NUMERUS_ERROR_TOO_MANY_REPEATED_CHARS);
-    _num_test_for_error("MMCCCC", NUMERUS_ERROR_TOO_MANY_REPEATED_CHARS);
-    _num_test_for_error("MMDD", NUMERUS_ERROR_ILLEGAL_CHAR_SEQUENCE);
-    _num_test_for_error("MMCMCM", NUMERUS_ERROR_ILLEGAL_CHAR_SEQUENCE);
-    _num_test_for_error("MMCMD", NUMERUS_ERROR_ILLEGAL_CHAR_SEQUENCE);
-    _num_test_for_error("MMDCD", NUMERUS_ERROR_ILLEGAL_CHAR_SEQUENCE);
-    _num_test_for_error("MMCMCD", NUMERUS_ERROR_ILLEGAL_CHAR_SEQUENCE);
-    _num_test_for_error("MMSS", NUMERUS_ERROR_ILLEGAL_CHAR_SEQUENCE);
-    _num_test_for_error("MM......", NUMERUS_ERROR_TOO_MANY_REPEATED_CHARS);
+    _num_test_for_error("MMMM", NMRS_ERROR_TOO_MANY_REPEATED_CHARS);
+    _num_test_for_error("MMCCCC", NMRS_ERROR_TOO_MANY_REPEATED_CHARS);
+    _num_test_for_error("MMDD", NMRS_ERROR_ILLEGAL_CHAR_SEQUENCE);
+    _num_test_for_error("MMCMCM", NMRS_ERROR_ILLEGAL_CHAR_SEQUENCE);
+    _num_test_for_error("MMCMD", NMRS_ERROR_ILLEGAL_CHAR_SEQUENCE);
+    _num_test_for_error("MMDCD", NMRS_ERROR_ILLEGAL_CHAR_SEQUENCE);
+    _num_test_for_error("MMCMCD", NMRS_ERROR_ILLEGAL_CHAR_SEQUENCE);
+    _num_test_for_error("MMSS", NMRS_ERROR_ILLEGAL_CHAR_SEQUENCE);
+    _num_test_for_error("MM......", NMRS_ERROR_TOO_MANY_REPEATED_CHARS);
 
-    _num_test_for_error("-_MCMLI", NUMERUS_ERROR_MISSING_SECOND_UNDERSCORE);
-    _num_test_for_error("_MCMLI", NUMERUS_ERROR_MISSING_SECOND_UNDERSCORE);
+    _num_test_for_error("-_MCMLI", NMRS_ERROR_MISSING_SECOND_UNDERSCORE);
+    _num_test_for_error("_MCMLI", NMRS_ERROR_MISSING_SECOND_UNDERSCORE);
 
-    _num_test_for_error("_MCMS_LI", NUMERUS_ERROR_DECIMALS_IN_LONG_PART);
-    _num_test_for_error("_MCM.._LI", NUMERUS_ERROR_DECIMALS_IN_LONG_PART);
-    _num_test_for_error("_MCMs.._LI", NUMERUS_ERROR_DECIMALS_IN_LONG_PART);
+    _num_test_for_error("_MCMS_LI", NMRS_ERROR_DECIMALS_IN_LONG_PART);
+    _num_test_for_error("_MCM.._LI", NMRS_ERROR_DECIMALS_IN_LONG_PART);
+    _num_test_for_error("_MCMs.._LI", NMRS_ERROR_DECIMALS_IN_LONG_PART);
 
-    _num_test_for_error("_MCM_MLI", NUMERUS_ERROR_M_IN_SHORT_PART);
+    _num_test_for_error("_MCM_MLI", NMRS_ERROR_M_IN_SHORT_PART);
 
-    _num_test_for_error("CCX_II", NUMERUS_ERROR_ILLEGAL_FIRST_UNDERSCORE_POSITION);
-    _num_test_for_error("-CCX_II", NUMERUS_ERROR_ILLEGAL_FIRST_UNDERSCORE_POSITION);
+    _num_test_for_error("CCX_II", NMRS_ERROR_ILLEGAL_FIRST_UNDERSCORE_POSITION);
+    _num_test_for_error("-CCX_II", NMRS_ERROR_ILLEGAL_FIRST_UNDERSCORE_POSITION);
 
-    _num_test_for_error("IVI", NUMERUS_ERROR_ILLEGAL_CHAR_SEQUENCE);
+    _num_test_for_error("IVI", NMRS_ERROR_ILLEGAL_CHAR_SEQUENCE);
 }
 
 
@@ -402,18 +402,18 @@ int numtest_pretty_print_all_numerals() {
     int8_t errcode;
     printf("Starting pretty printing of all roman numerals with parts\n");
     clock_t start_clock = clock();
-    for (int_part = NUMERUS_MIN_LONG_NONFLOAT_VALUE;
-         int_part <= NUMERUS_MAX_LONG_NONFLOAT_VALUE; int_part++) {
+    for (int_part = NMRS_MIN_LONG_NONFLOAT_VALUE;
+         int_part <= NMRS_MAX_LONG_NONFLOAT_VALUE; int_part++) {
         for (frac_part = 0; frac_part < 12; frac_part++) {
             frac_part = SIGN(int_part) * ABS(frac_part);
             roman = numerus_int_with_twelfth_to_roman(int_part, frac_part, &errcode);
-            if (errcode != NUMERUS_OK) {
+            if (errcode != NMRS_OK) {
                 fprintf(stderr, "Error converting %d, %d to roman (%s): %s\n",
                         int_part, frac_part, roman, numerus_explain_error(errcode));
                 return 1;
             }
             pretty_roman = numerus_overline_long_numerals(roman, NULL);
-            if (errcode != NUMERUS_OK) {
+            if (errcode != NMRS_OK) {
                 fprintf(stderr, "Error pretty printing %s (%d, %d) to value: %s.\n",
                         roman, int_part, frac_part, numerus_explain_error(errcode));
                 return 1;
@@ -424,7 +424,7 @@ int numtest_pretty_print_all_numerals() {
         }
         if (int_part % PRINT_STATUS_DIVIDER == 0) {
             printf("\r> %6.2f%%", 100.0 * (int_part +
-                                         NUMERUS_MAX_LONG_NONFLOAT_VALUE) / 7999999.0);
+                                         NMRS_MAX_LONG_NONFLOAT_VALUE) / 7999999.0);
             fflush(stdout);
         }
     }
@@ -444,8 +444,8 @@ int numtest_pretty_print_all_values() {
     char *pretty_roman;
     printf("Starting pretty printing of all values with parts\n");
     clock_t start_clock = clock();
-    for (int_part = NUMERUS_MIN_LONG_NONFLOAT_VALUE;
-         int_part <= NUMERUS_MAX_LONG_NONFLOAT_VALUE; int_part++) {
+    for (int_part = NMRS_MIN_LONG_NONFLOAT_VALUE;
+         int_part <= NMRS_MAX_LONG_NONFLOAT_VALUE; int_part++) {
         for (frac_part = 0; frac_part < 12; frac_part++) {
             frac_part = SIGN(int_part) * ABS(frac_part);
             pretty_roman = numerus_create_pretty_value_as_parts(int_part, frac_part);
@@ -459,7 +459,7 @@ int numtest_pretty_print_all_values() {
         }
         if (int_part % PRINT_STATUS_DIVIDER == 0) {
             printf("\r> %6.2f%%", 100.0 * (int_part +
-                                         NUMERUS_MAX_LONG_NONFLOAT_VALUE) / 7999999.0);
+                                         NMRS_MAX_LONG_NONFLOAT_VALUE) / 7999999.0);
             fflush(stdout);
         }
     }

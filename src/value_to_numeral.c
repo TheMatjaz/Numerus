@@ -13,28 +13,28 @@
 static bool handle_basic_corner_cases(
         int32_t value,
         char** p_numeral,
-        numerus_status_t* p_status);
+        nmrs_err_t* p_status);
 static bool handle_extended_corner_case(
         int32_t* p_integer_part, int8_t* p_twelfths, char** p_numeral,
-        numerus_status_t* p_status);
+        nmrs_err_t* p_status);
 static uint8_t convert_integer_part(
-        int32_t integer_part, char* const numeral_in_progress);
+        int32_t integer_part, char* numeral_in_progress);
 static uint8_t value_to_numeral_section(
         int32_t value,
-        char* const numeral,
+        char* numeral,
         uint8_t current_dict_char_index);
 
 
-numerus_status_t numerus_int_to_basic_numeral(
+nmrs_err_t numerus_int_to_basic_numeral(
         int16_t value, char** p_numeral)
 {
-    numerus_status_t status;
+    nmrs_err_t status;
     bool was_corner_case;
 
     was_corner_case = handle_basic_corner_cases(value, p_numeral, &status);
     if (!was_corner_case)
     {
-        char numeral_in_progress[NUMERUS_MAX_BASIC_LENGTH];
+        char numeral_in_progress[NMRS_MAX_BASIC_LENGTH];
         uint8_t numeral_length = 0;
 
         if (value < 0)
@@ -47,10 +47,10 @@ numerus_status_t numerus_int_to_basic_numeral(
                 DICTIONARY_INDEX_FOR_M);
         numeral_in_progress[numeral_length++] = '\0';
         status = obtain_numeral_buffer(p_numeral, numeral_length);
-        if (status == NUMERUS_OK)
+        if (status == NMRS_OK)
         {
             strncpy(*p_numeral, numeral_in_progress, numeral_length);
-            status = NUMERUS_OK;
+            status = NMRS_OK;
         }
     }
     return status;
@@ -65,7 +65,7 @@ numerus_status_t numerus_int_to_basic_numeral(
  * This includes handling of the cases:
  * - NULL pointers
  * - value out of range
- * - value==0, which sets the status to NUMERUS_OK and generates the numeral
+ * - value==0, which sets the status to NMRS_OK and generates the numeral
  *
  * @param value to be converted
  * @param p_numeral pointer to pointer to the numeral-to-be memory location
@@ -77,45 +77,45 @@ numerus_status_t numerus_int_to_basic_numeral(
 static bool handle_basic_corner_cases(
         const int32_t value,
         char** const p_numeral,
-        numerus_status_t* const p_status)
+        nmrs_err_t* const p_status)
 {
     bool is_corner_case = true;
 
     if (p_numeral == NULL)
     {
-        *p_status = NUMERUS_ERROR_NULL_NUMERAL;
+        *p_status = NMRS_ERROR_NULL_NUMERAL;
     }
-    else if (value < NUMERUS_MIN_BASIC_VALUE
-             || value > NUMERUS_MAX_BASIC_VALUE)
+    else if (value < NMRS_MIN_BASIC_VALUE
+             || value > NMRS_MAX_BASIC_VALUE)
     {
-        *p_status = NUMERUS_ERROR_BASIC_VALUE_OUT_OF_RANGE;
+        *p_status = NMRS_ERROR_BASIC_VALUE_OUT_OF_RANGE;
     }
     else if (value == 0)
     {
         *p_status = obtain_numeral_buffer(p_numeral, ZERO_NUMERAL_SIZE);
-        if (*p_status == NUMERUS_OK)
+        if (*p_status == NMRS_OK)
         {
-            strncpy(*p_numeral, NUMERUS_ZERO_NUMERAL, ZERO_NUMERAL_SIZE);
+            strncpy(*p_numeral, NMRS_ZERO_NUMERAL, ZERO_NUMERAL_SIZE);
         }
     }
     else
     {
-        *p_status = NUMERUS_OK;
+        *p_status = NMRS_OK;
         is_corner_case = false;
     }
     return is_corner_case;
 }
 
 
-numerus_status_t numerus_double_to_extended_numeral(
+nmrs_err_t numerus_double_to_extended_numeral(
         const double double_value, char** p_numeral)
 {
     int32_t int_part;
     int8_t twelfths;
-    numerus_status_t status;
+    nmrs_err_t status;
 
     status = numerus_double_to_int_parts(double_value, &int_part, &twelfths);
-    if (status == NUMERUS_OK)
+    if (status == NMRS_OK)
     {
         status = numerus_int_to_extended_numeral(
                 int_part, twelfths, p_numeral);
@@ -124,17 +124,17 @@ numerus_status_t numerus_double_to_extended_numeral(
 }
 
 
-numerus_status_t numerus_int_to_extended_numeral(
+nmrs_err_t numerus_int_to_extended_numeral(
         int32_t integer_part, int8_t twelfths, char** p_numeral)
 {
-    numerus_status_t status;
+    nmrs_err_t status;
     bool was_corner_case;
 
     was_corner_case = handle_extended_corner_case(
             &integer_part, &twelfths, p_numeral, &status);
     if (!was_corner_case)
     {
-        char numeral_in_progress[NUMERUS_MAX_EXTENDED_LENGTH];
+        char numeral_in_progress[NMRS_MAX_EXTENDED_LENGTH];
         uint8_t numeral_length = 0;
 
         if (integer_part < 0 || (integer_part == 0 && twelfths < 0))
@@ -152,7 +152,7 @@ numerus_status_t numerus_int_to_extended_numeral(
                 DICTIONARY_INDEX_FOR_S);
         numeral_in_progress[numeral_length++] = '\0';
         status = obtain_numeral_buffer(p_numeral, numeral_length);
-        if (status == NUMERUS_OK)
+        if (status == NMRS_OK)
         {
             strncpy(*p_numeral, numeral_in_progress, numeral_length);
         }
@@ -168,7 +168,7 @@ numerus_status_t numerus_int_to_extended_numeral(
  * - simplification of integer part and twelfths
  * - NULL pointers
  * - value out of range
- * - value==0, which sets the status to NUMERUS_OK and generates the numeral
+ * - value==0, which sets the status to NMRS_OK and generates the numeral
  *
  * @param p_integer_part value to be converted
  * @param p_twelfths to be added to the \p integer_part
@@ -180,24 +180,24 @@ numerus_status_t numerus_int_to_extended_numeral(
  */
 static bool handle_extended_corner_case(
         int32_t* const p_integer_part, int8_t* const p_twelfths,
-        char** p_numeral, numerus_status_t* p_status)
+        char** p_numeral, nmrs_err_t* p_status)
 {
     bool is_corner_case = true;
 
-    *p_status = numerus_simplify_twelfths(p_integer_part, p_twelfths);
-    if (*p_status == NUMERUS_OK)
+    *p_status = nmrs_simplify_twelfths(p_integer_part, p_twelfths);
+    if (*p_status == NMRS_OK)
     {
-        if (*p_integer_part < NUMERUS_MIN_EXTENDED_VALUE_INT_PART
-            || *p_integer_part > NUMERUS_MAX_EXTENDED_VALUE_INT_PART)
+        if (*p_integer_part < NMRS_MIN_EXTENDED_VALUE_INT_PART
+            || *p_integer_part > NMRS_MAX_EXTENDED_VALUE_INT_PART)
         {
-            *p_status = NUMERUS_ERROR_EXTENDED_VALUE_OUT_OF_RANGE;
+            *p_status = NMRS_ERROR_EXTENDED_VALUE_OUT_OF_RANGE;
         }
         else if (*p_integer_part == 0 && *p_twelfths == 0)
         {
             *p_status = obtain_numeral_buffer(p_numeral, ZERO_NUMERAL_SIZE);
-            if (*p_status == NUMERUS_OK)
+            if (*p_status == NMRS_OK)
             {
-                strncpy(*p_numeral, NUMERUS_ZERO_NUMERAL, ZERO_NUMERAL_SIZE);
+                strncpy(*p_numeral, NMRS_ZERO_NUMERAL, ZERO_NUMERAL_SIZE);
             }
         }
         else
@@ -225,7 +225,7 @@ static uint8_t convert_integer_part(
 {
     uint8_t numeral_length = 0;
 
-    if (integer_part > NUMERUS_MAX_BASIC_VALUE)
+    if (integer_part > NMRS_MAX_BASIC_VALUE)
     {
         /* Part between underscores */
         numeral_in_progress[numeral_length++] = '_';

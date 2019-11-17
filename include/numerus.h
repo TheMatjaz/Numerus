@@ -6,8 +6,8 @@
  * @license BSD 3-clause license.
  */
 
-#ifndef NUMERUS_H_
-#define NUMERUS_H_
+#ifndef NMRS_H_
+#define NMRS_H_
 
 #ifdef __cplusplus
 extern "C"
@@ -21,75 +21,54 @@ extern "C"
 #include <stdlib.h>
 
 /**
- * Version of this header file using semantic versioning.
+ * Version of the Numerus library using semantic versioning.
  *
  * <https://semver.org/spec/v2.0.0.html>
  */
-#define NUMERUS_API_VERSION "v3.0.0"
+#define NMRS_VERSION "v3.0.0"
 
-/**
- * Heap memory allocation function.
- *
- * Replace it with any preferred allocator.
- */
-#define numerus_malloc malloc
-
-/**
- * Heap memory allocation function with zeroing-out.
- *
- * Replace it with any preferred allocator that clear the allocated space.
- */
-#define numerus_calloc calloc
-
-/**
- * Heap memory freeing function.
- *
- * Replace it with any preferred allocation release function.
- */
-#define numerus_free free
-
-#define NUMERUS_UNIX_EOL 0U
-#define NUMERUS_WINDOWS_EOL 1U
+#define NMRS_UNIX_EOL 0U
+#define NMRS_WINDOWS_EOL 1U
 
 /**
  * Smallest negative value of a basic roman numeral, without Numerus
  * extensions.
  */
-extern const int16_t NUMERUS_MIN_BASIC_VALUE;
+extern const int16_t NMRS_MIN_BASIC_VALUE;
 
 /**
  * Biggest positive value of a basic roman numeral, without Numerus
  * extensions.
  */
-extern const int16_t NUMERUS_MAX_BASIC_VALUE;
+extern const int16_t NMRS_MAX_BASIC_VALUE;
 
 /**
  * Smallest negative value of an extended roman numeral.
  *
  * That is the smallest number with a vinculum and the fractional part.
  */
-extern const double NUMERUS_MIN_EXTENDED_VALUE;
+extern const float NMRS_MIN_EXTENDED_VALUE;
 
 /**
  * Biggest positive value of an extended roman numeral.
  *
  * That is the biggest number with a vinculum and the fractional part.
  */
-extern const double NUMERUS_MAX_EXTENDED_VALUE;
+extern const float NMRS_MAX_EXTENDED_VALUE;
 
 /**
  * Smallest negative value the integer part of an extended roman numeral.
  *
  * That is the smallest number with a vinculum but without the fractional part.
  */
-extern const int32_t NUMERUS_MIN_EXTENDED_VALUE_INT_PART;
+extern const int32_t NMRS_MIN_EXTENDED_VALUE_INT_PART;
 
 /**
  * Biggest positive value the integer part of an extended roman numeral.
  *
  * That is the biggest number with a vinculum but without the fractional part.
  */
-extern const int32_t NUMERUS_MAX_EXTENDED_VALUE_INT_PART;
+extern const int32_t NMRS_MAX_EXTENDED_VALUE_INT_PART;
 
 /**
  * The maximum length a basic roman numeral string may hav.
@@ -99,7 +78,7 @@ extern const int32_t NUMERUS_MAX_EXTENDED_VALUE_INT_PART;
  * That is the length of the roman numeral `-MMMDCCCLXXXVIII\0`
  * with value 3888.
  */
-extern const uint8_t NUMERUS_MAX_BASIC_LENGTH;
+extern const uint8_t NMRS_MAX_BASIC_LENGTH;
 
 /**
  * The maximum length an extended roman numeral string may have
@@ -110,7 +89,7 @@ extern const uint8_t NUMERUS_MAX_BASIC_LENGTH;
  * `-_MMMDCCCLXXXVIII_DCCCLXXXVIIIS.....\0`
  * with value (-3888888 and -11/12) = -3888888.9166666665.
  */
-extern const uint8_t NUMERUS_MAX_EXTENDED_LENGTH;
+extern const uint8_t NMRS_MAX_EXTENDED_LENGTH;
 
 /**
  * The maximum length an overlined extended roman numeral string may have.
@@ -127,18 +106,17 @@ extern const uint8_t NUMERUS_MAX_EXTENDED_LENGTH;
  * @endverbatim
  * with value (-3888888 and -11/12) = -3888888.9166666665.
  */
-extern const uint8_t NUMERUS_MAX_EXTENDED_OVERLINED_LENGTH;
+extern const uint8_t NMRS_MAX_EXTENDED_OVERLINED_LENGTH;
 
 /**
  * The roman numeral of value 0 (zero).
  *
  * Both for positive and negative zero.
  */
-extern const char* const NUMERUS_ZERO_NUMERAL;
-
+extern const char* const NMRS_ZERO_NUMERAL;
 
 /**
- * The status code returned by any Numerus function.
+ * The error code returned by any Numerus function.
  *
  * As common practice, the value of 0 (false) indicates no error.
  * The values fit within a `uint8_t`.
@@ -148,7 +126,7 @@ typedef enum
     /**
      * Successful operation.
      */
-            NUMERUS_OK = 0U,
+    NMRS_OK = 0U,
 
     /**
      * An unknown or unspecified error happened.
@@ -156,7 +134,7 @@ typedef enum
      * The error did not match any other error scenario Numerus is prepared to
      * handle.
      */
-            NUMERUS_ERROR_GENERIC,
+    NMRS_ERROR_GENERIC,
 
     /**
      * The roman numeral contains mispositioned characters.
@@ -166,64 +144,64 @@ typedef enum
      * non-consecutively (like `MCIM`) or that a non-repeatable roman
      * character has been repeated (like `DD`).
      */
-            NUMERUS_ERROR_ILLEGAL_CHAR_SEQUENCE,
+    NMRS_ERROR_ILLEGAL_CHAR_SEQUENCE,
 
     /**
      * The value to be converted to basic roman numeral is out of range.
      *
      * The value should be within
-     * [#NUMERUS_MIN_BASIC_VALUE, #NUMERUS_MAX_BASIC_VALUE].
+     * [#NMRS_MIN_BASIC_VALUE, #NMRS_MAX_BASIC_VALUE].
      */
-            NUMERUS_ERROR_BASIC_VALUE_OUT_OF_RANGE,
+    NMRS_ERROR_BASIC_VALUE_OUT_OF_RANGE,
 
     /**
      * The value to be converted to extended roman numeral is out of range.
      *
      * The value should be within
-     * [#NUMERUS_MIN_EXTENDED_VALUE, #NUMERUS_MAX_EXTENDED_VALUE].
+     * [#NMRS_MIN_EXTENDED_VALUE, #NMRS_MAX_EXTENDED_VALUE].
      */
-            NUMERUS_ERROR_EXTENDED_VALUE_OUT_OF_RANGE,
+    NMRS_ERROR_EXTENDED_VALUE_OUT_OF_RANGE,
 
     /**
      * The value to be converted to extended roman numeral must not be
      * +/- Infinity or NaN.
      *
      * At the same time, the value should be within
-     * [#NUMERUS_MIN_EXTENDED_VALUE, #NUMERUS_MAX_EXTENDED_VALUE].
+     * [#NMRS_MIN_EXTENDED_VALUE, #NMRS_MAX_EXTENDED_VALUE].
      */
-            NUMERUS_ERROR_DOUBLE_VALUE_IS_NOT_FINITE,
+    NMRS_ERROR_DOUBLE_VALUE_IS_NOT_FINITE,
 
     /**
      * The basic roman numeral contains a character that is not accepted.
      *
      * The only allowed characters are: `MDCLXVI-` both lowercase and
-     * uppercase. The only exception is the #NUMERUS_ZERO_STRING string.
+     * uppercase. The only exception is the #NMRS_ZERO_STRING string.
      */
-            NUMERUS_ERROR_ILLEGAL_BASIC_CHARACTER,
+    NMRS_ERROR_ILLEGAL_BASIC_CHARACTER,
 
     /**
      * The extended roman numeral contains a character that is not accepted.
      *
      * The only allowed characters are: `MDCLXVIS_.-` both lowercase and
-     * uppercase. The only exception is the #NUMERUS_ZERO_STRING string.
+     * uppercase. The only exception is the #NMRS_ZERO_STRING string.
      */
-            NUMERUS_ERROR_ILLEGAL_EXTENDED_CHARACTER,
+    NMRS_ERROR_ILLEGAL_EXTENDED_CHARACTER,
 
     /**
      * The basic roman numeral is too long to be syntactically correct.
      *
      * The max allowed length of a basic roman numeral is
-     * #NUMERUS_MAX_BASIC_LENGTH.
+     * #NMRS_MAX_BASIC_LENGTH.
      */
-            NUMERUS_ERROR_TOO_LONG_BASIC_NUMERAL,
+    NMRS_ERROR_TOO_LONG_BASIC_NUMERAL,
 
     /**
      * The extended roman numeral is too long to be syntactically correct.
      *
      * The max allowed length of an extended roman numeral is
-     * #NUMERUS_MAX_BASIC_LENGTH.
+     * #NMRS_MAX_BASIC_LENGTH.
      */
-            NUMERUS_ERROR_TOO_LONG_EXTENDED_NUMERAL,
+    NMRS_ERROR_TOO_LONG_EXTENDED_NUMERAL,
 
     /**
      * The roman numeral contains too many consecutive repetitions of a
@@ -232,7 +210,7 @@ typedef enum
      * Characters that are allowed to be repeated multiple times are `MCXI.`.
      * They have 3 maximum consecutive repetitions each, the dot `.` has 5.
      */
-            NUMERUS_ERROR_TOO_MANY_REPEATED_CHARS,
+    NMRS_ERROR_TOO_MANY_REPEATED_CHARS,
 
     /**
      * The extended roman numeral contains only one underscore.
@@ -240,7 +218,7 @@ typedef enum
      * A roman numeral may contain exactly 0 or 2 underscores, the
      * latter case being an extended numeral.
      */
-            NUMERUS_ERROR_MISSING_SECOND_UNDERSCORE,
+    NMRS_ERROR_MISSING_SECOND_UNDERSCORE,
 
     /**
      * The extended roman numeral contains more than two underscores.
@@ -248,7 +226,7 @@ typedef enum
      * A roman numeral may contain exactly 0 or 2 underscores, the
      * latter case being an extended numeral.
      */
-            NUMERUS_ERROR_TOO_MANY_UNDERSCORES,
+    NMRS_ERROR_TOO_MANY_UNDERSCORES,
 
     /**
      * The extended roman numeral contains the first underscore not at the
@@ -257,7 +235,7 @@ typedef enum
      * The first underscore has to be placed at the first position of the
      * extended numeral, after the minus in case there is one.
      */
-            NUMERUS_ERROR_ILLEGAL_FIRST_UNDERSCORE_POSITION,
+    NMRS_ERROR_ILLEGAL_FIRST_UNDERSCORE_POSITION,
 
     /**
      * The extended roman numeral contains decimal characters not
@@ -265,8 +243,8 @@ typedef enum
      *
      * Decimal characters `S.` are allowed only at the end of the numeral.
      */
-            NUMERUS_ERROR_FRACTIONAL_CHARS_NOT_AT_END,
-    NUMERUS_ERROR_FRACTIONAL_CHARS_BETWEEN_UNDERSCORES,
+    NMRS_ERROR_FRACTIONAL_CHARS_NOT_AT_END,
+    NMRS_ERROR_FRACTIONAL_CHARS_BETWEEN_UNDERSCORES,
 
 
     /**
@@ -275,7 +253,7 @@ typedef enum
      * A roman numeral must contain exactly 0 or 1 minus symbol. If existing,
      * it must be at the very first position of the numeral.
      */
-            NUMERUS_ERROR_ILLEGAL_MINUS_POSITION,
+            NMRS_ERROR_ILLEGAL_MINUS_POSITION,
 
     /**
      * The extended roman numeral contains an `M` not between underscores.
@@ -285,7 +263,7 @@ typedef enum
      * represented between underscores, making an `M` character after the
      * underscores illogical.
      */
-            NUMERUS_ERROR_M_AFTER_UNDERSCORES,
+            NMRS_ERROR_M_AFTER_UNDERSCORES,
 
     /**
      * Heap memory allocation failure.
@@ -293,25 +271,25 @@ typedef enum
      * The #numerus_malloc function failed to allocate memory.
      * The operation could not be completed.
      */
-            NUMERUS_ERROR_ALLOC_FAIL,
+            NMRS_ERROR_ALLOC_FAIL,
 
     /**
      * The pointer to the roman numeral string is NULL.
      */
-            NUMERUS_ERROR_NULL_NUMERAL,
+            NMRS_ERROR_NULL_NUMERAL,
 
     /**
      * The pointer to a number is NULL.
      */
-            NUMERUS_ERROR_NULL_NUMBER,
+            NMRS_ERROR_NULL_NUMBER,
 
     /**
      * The roman numeral string is empty or filled with only whitespace.
      *
      * Insert some non-whitespace characters in the string.
      */
-            NUMERUS_ERROR_EMPTY_NUMERAL,
-} numerus_status_t;
+            NMRS_ERROR_EMPTY_NUMERAL,
+} nmrs_err_t;
 
 
 /* CONVERSIONS FROM VALUE TO NUMERAL */
@@ -319,7 +297,7 @@ typedef enum
  * Converts an integer to a basic roman numeral.
  *
  * Accepts any integer within
- * [#NUMERUS_MIN_BASIC_VALUE, #NUMERUS_MAX_BASIC_VALUE] and generates
+ * [#NMRS_MIN_BASIC_VALUE, #NMRS_MAX_BASIC_VALUE] and generates
  * a basic numeral without any Numerus extensions representing the same value.
  *
  * The function can either allocate the string dynamically or fill a provided
@@ -338,7 +316,7 @@ typedef enum
  *   numerus_status_t status;
  *
  *   status = numerus_int_to_basic_roman(42, NULL);
- *   // status == NUMERUS_ERROR_NULL_NUMERAL
+ *   // status == NMRS_ERROR_NULL_NUMERAL
  *   \endcode
  *
  *
@@ -353,11 +331,11 @@ typedef enum
  *   numerus_status_t status;
  *
  *   status = numerus_int_to_basic_roman(42, &numeral);
- *   // status == NUMERUS_OK
+ *   // status == NMRS_OK
  *   // numeral points to "XLII\0", which was allocated in the function.
  *
  *   status = numerus_int_to_basic_roman(983492875, &numeral);
- *   // status == NUMERUS_ERROR_BASIC_VALUE_OUT_OF_RANGE
+ *   // status == NMRS_ERROR_BASIC_VALUE_OUT_OF_RANGE
  *   // numeral still points to "XLII\0".
  *
  *   numerus_free(numeral);
@@ -367,21 +345,21 @@ typedef enum
  *
  * - if \p numeral points to a non-NULL location, that will be considered as
  *   the buffer to fill with the numeral. The buffer will be **ASSUMED** to
- *   have #NUMERUS_MAX_BASIC_LENGTH size for basic numerals an
+ *   have #NMRS_MAX_BASIC_LENGTH size for basic numerals an
  *   #NUMERAL_MAX_EXTENDED_LENGTH for extended numerals. The buffer will be
  *   set to an empty string in case of error. In both cases (error or not)
  *   the bytes after the null terminator `\0` are unchanged.
  *
  *   \code{C}
- *   char numeral_buffer[NUMERUS_MAX_BASIC_LENGTH];
+ *   char numeral_buffer[NMRS_MAX_BASIC_LENGTH];
  *   numerus_status_t status;
  *
  *   status = numerus_int_to_basic_roman(42, &numeral_buffer);
- *   // status == NUMERUS_OK
+ *   // status == NMRS_OK
  *   // numeral_buffer contains "XLII\0".
  *
  *   status = numerus_int_to_basic_roman(983492875, &numeral_buffer);
- *   // status == NUMERUS_ERROR_BASIC_VALUE_OUT_OF_RANGE
+ *   // status == NMRS_ERROR_BASIC_VALUE_OUT_OF_RANGE
  *   // numeral_buffer contains "\0".
  *   \endcode
  *
@@ -393,17 +371,16 @@ typedef enum
  * @see numerus_int_to_extended_roman
  * @see numerus_double_to_extended_roman
  */
-numerus_status_t numerus_int_to_basic_numeral(
-        int16_t value, char** p_numeral);
+nmrs_err_t nmrs_int_to_basic_numeral(int16_t value, void* numeral);
 
 /**
  * Converts an integer and a fractional part (in twelfths) to an extended
  * roman numeral.
  *
  * Accepts any integer part within
- * [#NUMERUS_MIN_EXTENDED_VALUE_INT_PART, #NUMERUS_MAX_EXTENDED_VALUE_INT_PART]
+ * [#NMRS_MIN_EXTENDED_VALUE_INT_PART, #NMRS_MAX_EXTENDED_VALUE_INT_PART]
  * and any fractional part as long as the combined value is within
- * [#NUMERUS_MIN_EXTENDED_VALUE, #NUMERUS_MAX_EXTENDED_VALUE]. Generates
+ * [#NMRS_MIN_EXTENDED_VALUE, #NMRS_MAX_EXTENDED_VALUE]. Generates
  * an extended numeral with the Numerus extensions representing the same
  * combined value.
  *
@@ -422,15 +399,15 @@ numerus_status_t numerus_int_to_basic_numeral(
  * @see numerus_int_to_basic_roman
  * @see numerus_double_to_extended_roman
  */
-numerus_status_t numerus_int_to_extended_numeral(
-        int32_t integer_part, int8_t twelfths, char** p_numeral);
+nmrs_err_t nmrs_int_to_extended_numeral(
+        int32_t integer_part, int8_t twelfths, char* p_numeral);
 
 /**
  * Converts a double-precision floating point value to an extended
  * roman numeral.
  *
  * Accepts any double within
- * [#NUMERUS_MIN_EXTENDED_VALUE, #NUMERUS_MAX_EXTENDED_VALUE] and generates
+ * [#NMRS_MIN_EXTENDED_VALUE, #NMRS_MAX_EXTENDED_VALUE] and generates
  * an extended numeral with the Numerus extensions representing the same value.
  *
  * @remark Same **important** remarks apply as for the
@@ -446,16 +423,49 @@ numerus_status_t numerus_int_to_extended_numeral(
  * @see numerus_int_to_basic_roman
  * @see numerus_int_to_extended_roman
  */
-numerus_status_t numerus_double_to_extended_numeral(
-        double double_value, char** p_numeral);
+nmrs_err_t nmrs_float_to_extended_numeral(
+        float double_value, char* p_numeral);
 
 /* CONVERSIONS FROM NUMERAL TO VALUE */
-numerus_status_t numerus_basic_numeral_to_int(
-        const char* numeral, int16_t* value);
-numerus_status_t numerus_extended_numeral_to_int(
+nmrs_err_t nmrs_basic_numeral_to_int(
+        const char* numeral, int16_t* p_value);
+
+/**
+ * Converts a roman numeral to its value expressed as pair of its integer part
+ * and number of twelfths.
+ *
+ * Accepts many variations of roman numerals:
+ *
+ * - it's case INsensitive
+ * - accepts negative roman numerals (with leading minus '-')
+ * - accepts long roman numerals (with character between underscores to denote
+ *   the part that has a value multiplied by 1000)
+ * - accepts decimal value of the roman numerals, those are twelfths (with
+ *   the characters 'S' and dot '.')
+ * - all combinations of the above
+ *
+ * The parsing status of the roman numeral (any kind of wrong syntax)
+ * is stored in the errcode passed as parameter, which can be NULL to ignore
+ * the error, although it's not recommended. If the the error code is different
+ * than NMRS_OK, an error occurred during the conversion and the returned
+ * value is outside the possible range of values of roman numerals.
+ * The error code may help find the specific error.
+ *
+ * The number of twelfths is stored in the passed parameter, while the integer
+ * part is returned directly.
+ *
+ * @param *roman string with a roman numeral
+ * @param *errcode int where to store the conversion status: NMRS_OK or any
+ * other error. Can be NULL to ignore the error (NOT recommended).
+ * @param *twelfths number of twelfths from 0 to 11. NULL is interpreted as 0
+ * twelfths.
+ * @returns int32_t as the integer part of the value of the roman numeral or a
+ * value outside the the possible range of values when an error occurs.
+ */
+nmrs_err_t nmrs_extended_numeral_to_int(
         const char* numeral, int32_t* integer_part, int8_t* twelfths);
-numerus_status_t numerus_extended_numeral_to_double(
-        const char* numeral, double* value);
+nmrs_err_t nmrs_extended_numeral_to_double(
+        const char* numeral, float* value);
 
 
 /* FRACTIONAL FORMAT MANAGEMENT */
@@ -464,14 +474,14 @@ numerus_status_t numerus_extended_numeral_to_double(
  *
  * Returns an error if the summed value \p integer_part + \p twelfths
  * is not in the range
- * [#NUMERUS_MIN_EXTENDED_VALUE, #NUMERUS_MAX_EXTENDED_VALUE].
+ * [#NMRS_MIN_EXTENDED_VALUE, #NMRS_MAX_EXTENDED_VALUE].
  *
  * @param *integer_part long integer part of the value.
  * @param *twelfths fractional part of the value in twelfths.
  * @returns status code, indicating operation success or failure.
  */
-numerus_status_t numerus_int_parts_to_double(
-        int32_t integer_part, uint8_t twelfths, double* result);
+nmrs_err_t nmrs_int_parts_to_float(
+        int32_t integer_part, uint8_t twelfths, float* result);
 
 /**
  * Splits a double value to its integer part and a number of twelfths.
@@ -480,7 +490,7 @@ numerus_status_t numerus_int_parts_to_double(
  * twelfth multiple.
  *
  * Accepts any finite double within
- * [#NUMERUS_MIN_EXTENDED_VALUE -1.0/24, #NUMERUS_MAX_EXTENDED_VALUE +1.0/24].
+ * [#NMRS_MIN_EXTENDED_VALUE -1.0/24, #NMRS_MAX_EXTENDED_VALUE +1.0/24].
  * The range is extended by half a twelfth on each side as the values
  * get rounded.
  *
@@ -495,8 +505,8 @@ numerus_status_t numerus_int_parts_to_double(
  * @param *twelfths fractional part of the value in twelfths.
  * @returns status code, indicating operation success or failure.
  */
-numerus_status_t numerus_double_to_int_parts(
-        double value, int32_t* integer_part, int8_t* twelfths);
+nmrs_err_t nmrs_float_to_int_parts(
+        float value, int32_t* integer_part, int8_t* twelfths);
 
 /**
  * Enforce twelfths to be in [-11, 11] and to match sign of the integer part.
@@ -507,7 +517,7 @@ numerus_status_t numerus_double_to_int_parts(
  *
  * Returns an error if the summed value \p integer_part + \p twelfths
  * is not in the range
- * [#NUMERUS_MIN_EXTENDED_VALUE, #NUMERUS_MAX_EXTENDED_VALUE].
+ * [#NMRS_MIN_EXTENDED_VALUE, #NMRS_MAX_EXTENDED_VALUE].
  *
  * In any case, the summed value \p integer_part + \p twelfths will be the
  * same before and after the computation, just simplified mathematically.
@@ -523,24 +533,24 @@ numerus_status_t numerus_double_to_int_parts(
  * @param *twelfths fractional part of the value in twelfths.
  * @returns status code, indicating operation success or failure.
  */
-numerus_status_t numerus_simplify_twelfths(
+nmrs_err_t nmrs_simplify_twelfths(
         int32_t* integer_part, int8_t* twelfths);
 
 
 /* ANALYSIS OF NUMERAL STRINGS */
-numerus_status_t numerus_is_zero(
+nmrs_err_t nmrs_is_zero(
         const char* numeral, bool* p_result);
-numerus_status_t numerus_sign(
+nmrs_err_t nmrs_sign(
         const char* numeral, int8_t* p_result);
-numerus_status_t numerus_is_basic_numeral(
+nmrs_err_t nmrs_is_basic_numeral(
         const char* numeral, bool* p_result);
-numerus_status_t numerus_count_roman_chars(
+nmrs_err_t nmrs_count_roman_chars(
         const char* numeral, uint8_t* p_result);
 
 
 /* NUMERAL FORMATTING */
 // Pass the string two times to overwrite it??
-// Max result size #NUMERUS_MAX_EXTENDED_OVERLINED_LENGTH
+// Max result size #NMRS_MAX_EXTENDED_OVERLINED_LENGTH
 
 /**
  * Converts the numeral to a printable representation with actual overlining.
@@ -578,16 +588,40 @@ numerus_status_t numerus_count_roman_chars(
  * @return status code, indicating operation success or failure.
  * @see numerus_int_to_basic_roman
  */
-numerus_status_t numerus_overline(
-        const char* numeral, char** p_formatted, bool windows_end_of_line);
+nmrs_err_t nmrs_overline(
+        const char* numeral, char* p_formatted, bool windows_end_of_line);
 
-numerus_status_t numerus_int_parts_to_string(
-        int32_t int_part, int8_t twelfths, char** p_formatted);
-numerus_status_t numerus_double_as_int_parts_string(
-        double value, char** p_formatted);
+nmrs_err_t nmrs_int_parts_to_string(
+        int32_t int_part, int8_t twelfths, char* p_formatted);
+nmrs_err_t nmrs_double_as_int_parts_string(
+        float value, char* p_formatted);
+
+#define NMRS_HAS_MALLOC
+#ifdef NMRS_HAS_MALLOC
+/**
+ * Heap memory allocation function.
+ *
+ * Replace it with any preferred allocator.
+ */
+#define nmrs_malloc malloc
+
+/**
+ * Heap memory allocation function with zeroing-out.
+ *
+ * Replace it with any preferred allocator that clear the allocated space.
+ */
+#define nmrs_calloc calloc
+
+/**
+ * Heap memory freeing function.
+ *
+ * Replace it with any preferred allocation release function.
+ */
+#define nmrs_free free
+#endif  /* NMRS_HAS_MALLOC */
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif  /* NUMERUS_H_ */
+#endif  /* NMRS_H_ */

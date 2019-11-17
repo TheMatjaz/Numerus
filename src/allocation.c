@@ -9,22 +9,22 @@
 #include "internal.h"
 
 
-numerus_status_t obtain_numeral_buffer(
+nmrs_err_t obtain_numeral_buffer(
         char** const p_result_numeral, const uint8_t size)
 {
-    numerus_status_t status;
+    nmrs_err_t status;
 
-    status = NUMERUS_OK;
+    status = NMRS_OK;
     if (p_result_numeral == NULL)
     {
-        status = NUMERUS_ERROR_NULL_NUMERAL;
+        status = NMRS_ERROR_NULL_NUMERAL;
     }
     else if (*p_result_numeral == NULL)
     {
-        *p_result_numeral = numerus_malloc(size);
+        *p_result_numeral = nmrs_malloc(size);
         if (*p_result_numeral == NULL)
         {
-            status = NUMERUS_ERROR_ALLOC_FAIL;
+            status = NMRS_ERROR_ALLOC_FAIL;
         }
     }
     else

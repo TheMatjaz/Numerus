@@ -8,14 +8,299 @@
  */
 
 #include "internal.h"
+#include "dictionary.h"
 
 
-numerus_status_t numerus_basic_numeral_to_int(
-        const char* numeral, int16_t* value);
-numerus_status_t numerus_extended_numeral_to_int(
-        const char* numeral, int32_t* integer_part, int8_t* twelfths);
-numerus_status_t numerus_extended_numeral_to_double(
-        const char* numeral, double* value);
+static nmrs_err_t prepare_for_parsing(
+        const char* numeral,
+        const int16_t* p_value,
+        numeral_parser_data_t* p_parser_data);
+static const char* skip_head_whitespace(const char* p_string);
+static void init_parser_data(numeral_parser_data_t* p_parser_data);
+static nmrs_err_t numeral_section_to_value(
+        const char* numeral,
+        numeral_parser_data_t* p_parser_data);
+static void skip_to_next_non_unique_dictionary_char(
+        numeral_parser_data_t* p_parser_data);
+
+
+nmrs_err_t nmrs_basic_numeral_to_int(
+        const char* numeral, int16_t* p_value)
+{
+    numeral_parser_data_t parser_data;
+    nmrs_err_t status;
+
+    status = prepare_for_parsing(numeral, p_value, &parser_data);
+    if (status != NMRS_OK)
+    {
+        goto termination;
+    }
+    if (numeral_is_zero_minus_ignored(numeral))
+    {
+        *p_value = 0;
+        goto termination;
+    }
+    if (numeral[parser_data.current_numeral_index] == '-')
+    {
+        parser_data.current_numeral_index++;
+        parser_data.numeral_sign = -1;
+    }
+    do
+    {
+        status = numeral_section_to_value(numeral, &parser_data);
+        if (status == NMRS_ERROR_ILLEGAL_CHAR_SEQUENCE) {
+            status = NMRS_ERROR_ILLEGAL_BASIC_CHARACTER;
+            goto termination;
+        }
+    }
+    while (numeral[parser_data.current_numeral_index] != '\0'
+           && parser_data.current_dictionary_char_index
+              <= NMRS_DICTIONARY_SIZE);
+
+
+    termination:
+    {
+        return status;
+    }
+}
+
+static nmrs_err_t prepare_for_parsing(
+        const char* numeral,
+        const int16_t* const p_value,
+        numeral_parser_data_t* const p_parser_data)
+{
+    nmrs_err_t status = NMRS_OK;
+
+    if (numeral == NULL)
+    {
+        status = NMRS_ERROR_NULL_NUMERAL;
+        goto termination;
+    }
+    else if (p_value == NULL)
+    {
+        status = NMRS_ERROR_NULL_NUMBER;
+        goto termination;
+    }
+    numeral = skip_head_whitespace(numeral);
+    if (STRING_IS_EMPTY(numeral))
+    {
+        status = NMRS_ERROR_EMPTY_NUMERAL;
+        goto termination;
+    }
+    init_parser_data(p_parser_data);
+    termination:
+    {
+        return status;
+    };
+}
+
+static const char* skip_head_whitespace(const char* p_string)
+{
+    while (isspace(*p_string))
+    {
+        p_string++;
+    }
+    return p_string;
+}
+
+static void init_parser_data(numeral_parser_data_t* const p_parser_data)
+{
+    p_parser_data->integer_part = 0;
+    p_parser_data->current_numeral_index = 0;
+    p_parser_data->current_dictionary_char_index = DICTIONARY_INDEX_FOR_M;
+    p_parser_data->twelfths = 0;
+    p_parser_data->char_repetitions = 0;
+    p_parser_data->numeral_sign = +1;
+    p_parser_data->numeral_is_extended = false;
+}
+
+static nmrs_err_t numeral_section_to_value(
+        const char* numeral,
+        numeral_parser_data_t* const p_parser_data)
+{
+    nmrs_err_t status = NMRS_OK;
+    dictionary_char_t current_dictionary_entry =
+            DICTIONARY[p_parser_data->current_dictionary_char_index];
+    numeral += p_parser_data->current_numeral_index;
+
+    if (*numeral != current_dictionary_entry.character_1)
+    {
+        p_parser_data->char_repetitions = 0;
+        p_parser_data->current_dictionary_char_index++;
+    }
+    else
+    {
+        if (*(numeral + 1) == current_dictionary_entry.character_2)
+        {
+            /* Two char section. */
+            p_parser_data->integer_part += current_dictionary_entry.value;
+            p_parser_data->current_numeral_index += 2;
+        }
+        else
+        {
+            /* One char section.*/
+            if (current_dictionary_entry.character_1 == 'S'
+                || current_dictionary_entry.character_1 == '.')
+            {
+                p_parser_data->twelfths += current_dictionary_entry.value;
+            }
+            else
+            {
+                p_parser_data->integer_part += current_dictionary_entry.value;
+            }
+            p_parser_data->current_dictionary_char_index++;
+            p_parser_data->current_numeral_index++;
+        }
+        p_parser_data->char_repetitions++;
+        if (p_parser_data->char_repetitions
+            > current_dictionary_entry.max_repetitions)
+        {
+            status = NMRS_ERROR_TOO_MANY_REPEATED_CHARS;
+            goto termination;
+        }
+        skip_to_next_non_unique_dictionary_char(p_parser_data);
+    }
+    if (p_parser_data->current_dictionary_char_index
+        >= NMRS_DICTIONARY_SIZE)
+    {
+        status = NMRS_ERROR_ILLEGAL_CHAR_SEQUENCE;
+        goto termination;
+    }
+    termination:
+    {
+        return status;
+    }
+}
+
+/**
+ * Moves the pointer from the current dictionary character to the next that has
+ * max_repetitions more than 1.
+ *
+ * As an exception to this rule, if the dictionary character at the start of
+ * the skipping is not "V" or "L" or "D", another character is skipped, since
+ * those three are the only ones that can have an "I" or "X" or "C" appended
+ * to them.
+ *
+ * This forces just one of the characters that exclude each other. An example
+ * written as regex: (CM)|(CD)|(D?C{0,3}).
+ *
+ * The computation result is stored in the passed numeral_parser_data.
+ *
+ * @param *parser_data of the numeral that is currently being converted to value
+ */
+static void skip_to_next_non_unique_dictionary_char(
+        numeral_parser_data_t* p_parser_data)
+{
+    bool current_dictionary_entry_is_not_multiple_of_v;
+
+    while (DICTIONARY[p_parser_data->current_dictionary_char_index].max_repetitions
+           == 1)
+    {
+        p_parser_data->current_numeral_index++;
+        p_parser_data->char_repetitions = 0;
+    }
+    current_dictionary_entry_is_not_multiple_of_v =
+            DICTIONARY[p_parser_data->current_numeral_index].character_2
+            != '\0';
+    if (current_dictionary_entry_is_not_multiple_of_v)
+    {
+        p_parser_data->current_numeral_index++;
+    }
+}
+
+
+nmrs_err_t nmrs_extended_numeral_to_int(
+        const char* numeral, int32_t* integer_part, int8_t* twelfths)
+{
+    int32_t local_integer_part;
+    nmrs_err_t status;
+    uint8_t zero_twelfths = 0;
+    bool was_corner_case;
+
+    was_corner_case = handle_basic_corner_cases();
+
+    if (twelfths == NULL)
+    {
+        twelfths = &zero_twelfths;
+    }
+    if (errcode == NULL)
+    {
+        errcode = &numerus_error_code;
+    }
+    struct numeral_parser_data parser_data;
+    init_parser_data(&parser_data, roman);
+
+    /* Check for illegal symbols or length */
+    nmrs_count_roman_chars(roman, &response_code);
+    if (response_code != NMRS_OK)
+    {
+        numerus_error_code = response_code;
+        *errcode = response_code;
+        return NMRS_MAX_LONG_NONFLOAT_VALUE + 10;
+    }
+
+    /* Skip initial whitespace */
+    while (isspace(*roman))
+    {
+        roman++;
+    }
+
+    /* Conversion if NMRS_NULLA */
+    if (is_zero(roman))
+    {
+        local_integer_part = 0;
+        *twelfths = 0;
+        numerus_error_code = NMRS_OK;
+        *errcode = NMRS_OK;
+        return local_integer_part;
+    }
+
+    /* Conversion of other cases */
+    if (*parser_data.current_numeral_position == '-')
+    {
+        parser_data.numeral_sign = -1;
+        parser_data.current_numeral_position++;
+    }
+    if (*parser_data.current_numeral_position == '_')
+    {
+        parser_data.current_numeral_position++;
+        parser_data.numeral_is_long = 1;
+    }
+    if (parser_data.numeral_is_long)
+    {
+        response_code = parse_part_in_underscores(&parser_data);
+        if (response_code != NMRS_OK)
+        {
+            numerus_error_code = response_code;
+            *errcode = response_code;
+            return NMRS_MAX_LONG_NONFLOAT_VALUE + 10;
+        }
+        parser_data.current_numeral_position++; /* Skip second underscore */
+        parser_data.int_part *= 1000;
+        parser_data.current_dictionary_char = &_NUM_DICTIONARY[1];
+        parser_data.char_repetitions = 0;
+    }
+    response_code = parse_part_after_underscores(&parser_data);
+    if (response_code != NMRS_OK)
+    {
+        numerus_error_code = response_code;
+        *errcode = response_code;
+        return NMRS_MAX_LONG_NONFLOAT_VALUE + 10;
+    }
+    response_code = parse_decimal_part(&parser_data);
+    if (response_code != NMRS_OK)
+    {
+        numerus_error_code = response_code;
+        *errcode = response_code;
+        return NMRS_MAX_LONG_NONFLOAT_VALUE + 10;
+    }
+    local_integer_part = parser_data.numeral_sign * parser_data.int_part;
+    *twelfths = parser_data.numeral_sign * parser_data.twelfths;
+    numerus_error_code = NMRS_OK;
+    *errcode = NMRS_OK;
+    return local_integer_part;
+}
+
 
 /**
  * Checks if two strings match in the the next 1 or 2 characters, returning the
@@ -99,40 +384,6 @@ static bool char_is_in_string(char current, char* terminating_chars)
 
 
 /**
- * Moves the pointer from the current dictionary character to the next that has
- * max_repetitions more than 1.
- *
- * As an exception to this rule, if the dictionary character at the start of
- * the skipping is not "V" or "L" or "D", another character is skipped, since
- * those three are the only ones that can have an "I" or "X" or "C" appended
- * to them.
- *
- * This forces just one of the characters that exclude each other. An example
- * written as regex: (CM)|(CD)|(D?C{0,3}).
- *
- * The computation result is stored in the passed numeral_parser_data.
- *
- * @param *parser_data of the numeral that is currently being converted to value
- */
-static void skip_to_next_non_unique_dictionary_char(
-        struct numeral_parser_data* parser_data)
-{
-
-    bool current_char_is_multiple_of_five =
-            strlen(parser_data->current_dictionary_char->characters) == 1;
-    while (parser_data->current_dictionary_char->max_repetitions == 1)
-    {
-        parser_data->current_dictionary_char++;
-        parser_data->char_repetitions = 0;
-    }
-    if (!current_char_is_multiple_of_five)
-    {
-        parser_data->current_dictionary_char++;
-    }
-}
-
-
-/**
  * Parses one single roman character of a roman numeral, comparing it to the
  * dictionary.
  *
@@ -145,7 +396,7 @@ static void skip_to_next_non_unique_dictionary_char(
  * The computation result is stored in the passed numeral_parser_data.
  *
  * @param *parser_data of the numeral that is currently being converted to value
- * @returns result code as an error or NUMERUS_OK.
+ * @returns result code as an error or NMRS_OK.
  */
 static int8_t compare_numeral_position_with_dictionary(
         struct numeral_parser_data* parser_data)
@@ -162,7 +413,7 @@ static int8_t compare_numeral_position_with_dictionary(
         if (parser_data->char_repetitions >
             parser_data->current_dictionary_char->max_repetitions)
         {
-            return NUMERUS_ERROR_TOO_MANY_REPEATED_CHARS;
+            return NMRS_ERROR_TOO_MANY_REPEATED_CHARS;
         }
         parser_data->current_numeral_position += num_of_matching_chars;
         if (*(parser_data->current_dictionary_char->characters) == 'S'
@@ -189,10 +440,10 @@ static int8_t compare_numeral_position_with_dictionary(
         parser_data->current_dictionary_char++;
         if (parser_data->current_dictionary_char->max_repetitions == 0)
         {
-            return NUMERUS_ERROR_ILLEGAL_CHAR_SEQUENCE;
+            return NMRS_ERROR_ILLEGAL_CHAR_SEQUENCE;
         }
     }
-    return NUMERUS_OK;
+    return NMRS_OK;
 }
 
 
@@ -206,7 +457,7 @@ static int8_t compare_numeral_position_with_dictionary(
  * The computation result is stored in the passed numeral_parser_data.
  *
  * @param *parser_data of the numeral that is currently being converted to value
- * @returns result code as an error or NUMERUS_OK.
+ * @returns result code as an error or NMRS_OK.
  */
 static int8_t parse_part_in_underscores(
         struct numeral_parser_data* parser_data)
@@ -217,25 +468,25 @@ static int8_t parse_part_in_underscores(
     {
         int8_t result_code = compare_numeral_position_with_dictionary(
                 parser_data);
-        if (result_code != NUMERUS_OK)
+        if (result_code != NMRS_OK)
         {
             return result_code;
         }
     }
     if (*(parser_data->current_numeral_position) == '\0')
     {
-        return NUMERUS_ERROR_MISSING_SECOND_UNDERSCORE;
+        return NMRS_ERROR_MISSING_SECOND_UNDERSCORE;
     }
     if (char_is_in_string(*(parser_data->current_numeral_position),
                           "sS."))
     {
-        return NUMERUS_ERROR_DECIMALS_IN_LONG_PART;
+        return NMRS_ERROR_DECIMALS_IN_LONG_PART;
     }
     if (*(parser_data->current_numeral_position) == '-')
     {
-        return NUMERUS_ERROR_ILLEGAL_MINUS_POSITION;
+        return NMRS_ERROR_ILLEGAL_MINUS_POSITION;
     }
-    return NUMERUS_OK;
+    return NMRS_OK;
 }
 
 
@@ -251,7 +502,7 @@ static int8_t parse_part_in_underscores(
  * The computation result is stored in the passed numeral_parser_data.
  *
  * @param *parser_data of the numeral that is currently being converted to value
- * @returns result code as an error or NUMERUS_OK.
+ * @returns result code as an error or NMRS_OK.
  */
 static int8_t parse_part_after_underscores(
         struct numeral_parser_data* parser_data)
@@ -271,7 +522,7 @@ static int8_t parse_part_after_underscores(
     {
         int8_t result_code = compare_numeral_position_with_dictionary(
                 parser_data);
-        if (result_code != NUMERUS_OK)
+        if (result_code != NMRS_OK)
         {
             return result_code;
         }
@@ -280,22 +531,22 @@ static int8_t parse_part_after_underscores(
     {
         if (parser_data->numeral_is_long)
         {
-            return NUMERUS_ERROR_TOO_MANY_UNDERSCORES;
+            return NMRS_ERROR_TOO_MANY_UNDERSCORES;
         }
         else
         {
-            return NUMERUS_ERROR_ILLEGAL_FIRST_UNDERSCORE_POSITION;
+            return NMRS_ERROR_ILLEGAL_FIRST_UNDERSCORE_POSITION;
         }
     }
     if (*(parser_data->current_numeral_position) == 'M')
     {
-        return NUMERUS_ERROR_M_IN_SHORT_PART;
+        return NMRS_ERROR_M_IN_SHORT_PART;
     }
     if (*(parser_data->current_numeral_position) == '-')
     {
-        return NUMERUS_ERROR_ILLEGAL_MINUS_POSITION;
+        return NMRS_ERROR_ILLEGAL_MINUS_POSITION;
     }
-    return NUMERUS_OK;
+    return NMRS_OK;
 }
 
 
@@ -309,7 +560,7 @@ static int8_t parse_part_after_underscores(
  * The computation result is stored in the passed numeral_parser_data.
  *
  * @param *parser_data of the numeral that is currently being converted to value
- * @returns result code as an error or NUMERUS_OK.
+ * @returns result code as an error or NMRS_OK.
  */
 static int8_t parse_decimal_part(
         struct numeral_parser_data* parser_data)
@@ -320,7 +571,7 @@ static int8_t parse_decimal_part(
     {
         int8_t result_code = compare_numeral_position_with_dictionary(
                 parser_data);
-        if (result_code != NUMERUS_OK)
+        if (result_code != NMRS_OK)
         {
             return result_code;
         }
@@ -329,18 +580,18 @@ static int8_t parse_decimal_part(
     {
         if (parser_data->numeral_is_long)
         {
-            return NUMERUS_ERROR_TOO_MANY_UNDERSCORES;
+            return NMRS_ERROR_TOO_MANY_UNDERSCORES;
         }
         else
         {
-            return NUMERUS_ERROR_ILLEGAL_FIRST_UNDERSCORE_POSITION;
+            return NMRS_ERROR_ILLEGAL_FIRST_UNDERSCORE_POSITION;
         }
     }
     if (*(parser_data->current_numeral_position) == '-')
     {
-        return NUMERUS_ERROR_ILLEGAL_MINUS_POSITION;
+        return NMRS_ERROR_ILLEGAL_MINUS_POSITION;
     }
-    return NUMERUS_OK;
+    return NMRS_OK;
 }
 
 
@@ -360,12 +611,12 @@ static int8_t parse_decimal_part(
  * The parsing status of the roman numeral (any kind of wrong syntax)
  * is stored in the errcode passed as parameter, which can be NULL to ignore
  * the error, although it's not recommended. If the the error code is different
- * than NUMERUS_OK, an error occurred during the conversion and the returned
+ * than NMRS_OK, an error occurred during the conversion and the returned
  * value is outside the possible range of values of roman numerals.
  * The error code may help find the specific error.
  *
  * @param *roman string with a roman numeral
- * @param *errcode int8_t where to store the conversion status: NUMERUS_OK or any
+ * @param *errcode int8_t where to store the conversion status: NMRS_OK or any
  * other error. Can be NULL to ignore the error (NOT recommended).
  * @returns double value of the roman numeral or a value outside the the
  * possible range of values when an error occurs.
@@ -396,12 +647,12 @@ double numerus_roman_to_double(char* roman, int8_t* errcode)
  * The parsing status of the roman numeral (any kind of wrong syntax)
  * is stored in the errcode passed as parameter, which can be NULL to ignore
  * the error, although it's not recommended. If the the error code is different
- * than NUMERUS_OK, an error occurred during the conversion and the returned
+ * than NMRS_OK, an error occurred during the conversion and the returned
  * value is outside the possible range of values of roman numerals.
  * The error code may help find the specific error.
  *
  * @param *roman string with a roman numeral
- * @param *errcode int8_t where to store the conversion status: NUMERUS_OK or any
+ * @param *errcode int8_t where to store the conversion status: NMRS_OK or any
  * other error. Can be NULL to ignore the error (NOT recommended).
  * @returns long value of the roman numeral or a value outside the the
  * possible range of values when an error occurs.
@@ -412,124 +663,3 @@ int32_t numerus_roman_to_int(char* roman, int8_t* errcode)
 }
 
 
-/**
- * Converts a roman numeral to its value expressed as pair of its integer part
- * and number of twelfths.
- *
- * Accepts many variations of roman numerals:
- *
- * - it's case INsensitive
- * - accepts negative roman numerals (with leading minus '-')
- * - accepts long roman numerals (with character between underscores to denote
- *   the part that has a value multiplied by 1000)
- * - accepts decimal value of the roman numerals, those are twelfths (with
- *   the characters 'S' and dot '.')
- * - all combinations of the above
- *
- * The parsing status of the roman numeral (any kind of wrong syntax)
- * is stored in the errcode passed as parameter, which can be NULL to ignore
- * the error, although it's not recommended. If the the error code is different
- * than NUMERUS_OK, an error occurred during the conversion and the returned
- * value is outside the possible range of values of roman numerals.
- * The error code may help find the specific error.
- *
- * The number of twelfths is stored in the passed parameter, while the integer
- * part is returned directly.
- *
- * @param *roman string with a roman numeral
- * @param *errcode int where to store the conversion status: NUMERUS_OK or any
- * other error. Can be NULL to ignore the error (NOT recommended).
- * @param *twelfths number of twelfths from 0 to 11. NULL is interpreted as 0
- * twelfths.
- * @returns int32_t as the integer part of the value of the roman numeral or a
- * value outside the the possible range of values when an error occurs.
- */
-int32_t numerus_roman_to_int_part_and_twelfths(
-        char* roman, uint8_t* twelfths,
-        int8_t* errcode)
-{
-    /* Prepare variables */
-    int32_t int_part;
-    int8_t response_code;
-    uint8_t zero_twelfths = 0;
-    if (twelfths == NULL)
-    {
-        twelfths = &zero_twelfths;
-    }
-    if (errcode == NULL)
-    {
-        errcode = &numerus_error_code;
-    }
-    struct numeral_parser_data parser_data;
-    init_parser_data(&parser_data, roman);
-
-    /* Check for illegal symbols or length */
-    numerus_count_roman_chars(roman, &response_code);
-    if (response_code != NUMERUS_OK)
-    {
-        numerus_error_code = response_code;
-        *errcode = response_code;
-        return NUMERUS_MAX_LONG_NONFLOAT_VALUE + 10;
-    }
-
-    /* Skip initial whitespace */
-    while (isspace(*roman))
-    {
-        roman++;
-    }
-
-    /* Conversion if NUMERUS_NULLA */
-    if (is_zero(roman))
-    {
-        int_part = 0;
-        *twelfths = 0;
-        numerus_error_code = NUMERUS_OK;
-        *errcode = NUMERUS_OK;
-        return int_part;
-    }
-
-    /* Conversion of other cases */
-    if (*parser_data.current_numeral_position == '-')
-    {
-        parser_data.numeral_sign = -1;
-        parser_data.current_numeral_position++;
-    }
-    if (*parser_data.current_numeral_position == '_')
-    {
-        parser_data.current_numeral_position++;
-        parser_data.numeral_is_long = 1;
-    }
-    if (parser_data.numeral_is_long)
-    {
-        response_code = parse_part_in_underscores(&parser_data);
-        if (response_code != NUMERUS_OK)
-        {
-            numerus_error_code = response_code;
-            *errcode = response_code;
-            return NUMERUS_MAX_LONG_NONFLOAT_VALUE + 10;
-        }
-        parser_data.current_numeral_position++; /* Skip second underscore */
-        parser_data.int_part *= 1000;
-        parser_data.current_dictionary_char = &_NUM_DICTIONARY[1];
-        parser_data.char_repetitions = 0;
-    }
-    response_code = parse_part_after_underscores(&parser_data);
-    if (response_code != NUMERUS_OK)
-    {
-        numerus_error_code = response_code;
-        *errcode = response_code;
-        return NUMERUS_MAX_LONG_NONFLOAT_VALUE + 10;
-    }
-    response_code = parse_decimal_part(&parser_data);
-    if (response_code != NUMERUS_OK)
-    {
-        numerus_error_code = response_code;
-        *errcode = response_code;
-        return NUMERUS_MAX_LONG_NONFLOAT_VALUE + 10;
-    }
-    int_part = parser_data.numeral_sign * parser_data.int_part;
-    *twelfths = parser_data.numeral_sign * parser_data.twelfths;
-    numerus_error_code = NUMERUS_OK;
-    *errcode = NUMERUS_OK;
-    return int_part;
-}

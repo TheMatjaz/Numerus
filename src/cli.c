@@ -25,14 +25,14 @@
  * @internal
  * Macro to indicate that the CLI should continue its execution.
  */
-#define NUMERUS_PROMPT_AGAIN 1
+#define NMRS_PROMPT_AGAIN 1
 
 
 /**
  * @internal
  * Macro to indicate that the CLI should terminate.
  */
-#define NUMERUS_STOP_REPL 0
+#define NMRS_STOP_REPL 0
 
 static const char *PROMPT_TEXT = "numerus> ";
 static const char *WELCOME_TEXT = ""
@@ -176,9 +176,9 @@ void _num_convert_to_other_form_and_print(char *string) {
     if (value != 0) {
         /* The string is a double */
         roman = numerus_double_to_roman(value, &errcode);
-        if (errcode != NUMERUS_OK) {
+        if (errcode != NMRS_OK) {
             printf("%s\n", numerus_explain_error(errcode));
-            if (errcode != NUMERUS_ERROR_MALLOC_FAIL) {
+            if (errcode != NMRS_ERROR_MALLOC_FAIL) {
                 free(roman);
             }
             return;
@@ -187,7 +187,7 @@ void _num_convert_to_other_form_and_print(char *string) {
         if (pretty_printing == 1) {
             /* Enabled pretty printing */
             char *roman_pretty = numerus_overline_long_numerals(roman, &errcode);
-            if (errcode != NUMERUS_OK) {
+            if (errcode != NMRS_OK) {
                 printf("%s\n", numerus_explain_error(errcode));
             } else {
                 /* Successful transformed into pretty format */
@@ -203,13 +203,13 @@ void _num_convert_to_other_form_and_print(char *string) {
     }
     /* The string is not a double, trying as a roman numeral */
     value = numerus_roman_to_double(string, &errcode);
-    if (errcode == NUMERUS_OK) {
+    if (errcode == NMRS_OK) {
         /* The string is a roman numeral */
         if (pretty_printing == 1) {
             /* Pretty printing enabled */
             char *pretty_value = numerus_create_pretty_value_as_double(value);
             if (pretty_value == NULL) {
-                printf("%s\n", numerus_explain_error(NUMERUS_ERROR_MALLOC_FAIL));
+                printf("%s\n", numerus_explain_error(NMRS_ERROR_MALLOC_FAIL));
             } else {
                 /* Successful transformed into pretty format */
                 printf("%s\n", pretty_value);
@@ -234,42 +234,42 @@ void _num_convert_to_other_form_and_print(char *string) {
 static int _num_parse_command(char *command) {
     if (strcmp(command, "?") == 0 || strcmp(command, "help") == 0) {
         printf("%s", HELP_TEXT);
-        return NUMERUS_PROMPT_AGAIN;
+        return NMRS_PROMPT_AGAIN;
     } else if (strcmp(command, "moo") == 0) {
         printf("%s", MOO_TEXT);
-        return NUMERUS_PROMPT_AGAIN;
+        return NMRS_PROMPT_AGAIN;
     } else if (strcmp(command, "ascii") == 0) {
         printf("%s", ASCII_TEXT);
-        return NUMERUS_PROMPT_AGAIN;
+        return NMRS_PROMPT_AGAIN;
     } else if (strcmp(command, "info") == 0 || strcmp(command, "about") == 0) {
         printf("%s", INFO_TEXT);
-        return NUMERUS_PROMPT_AGAIN;
+        return NMRS_PROMPT_AGAIN;
     } else if (strcmp(command, "ave") == 0) {
         printf("%s", AVE_TEXT);
-        return NUMERUS_PROMPT_AGAIN;
+        return NMRS_PROMPT_AGAIN;
     } else if (strcmp(command, "pretty") == 0) {
         /* Toggles pretty printing */
         if (pretty_printing == 1) {
             pretty_printing = 0;
             printf("%s", PRETTY_OFF_TEXT);
-            return NUMERUS_PROMPT_AGAIN;
+            return NMRS_PROMPT_AGAIN;
         } else {
             pretty_printing = 1;
             printf("%s", PRETTY_ON_TEXT);
-            return NUMERUS_PROMPT_AGAIN;
+            return NMRS_PROMPT_AGAIN;
         }
     } else if (strcmp(command, "ping") == 0) {
         printf("%s", PING_TEXT);
-        return NUMERUS_PROMPT_AGAIN;
+        return NMRS_PROMPT_AGAIN;
     } else if (strcmp(command, "exit") == 0 || strcmp(command, "quit") == 0) {
         printf("%s", QUIT_TEXT);
-        return NUMERUS_STOP_REPL;
+        return NMRS_STOP_REPL;
     } else if (*command == '\0') {
         /* No inserted command, just an <enter> */
-        return NUMERUS_PROMPT_AGAIN;
+        return NMRS_PROMPT_AGAIN;
     } else {
         _num_convert_to_other_form_and_print(command);
-        return NUMERUS_PROMPT_AGAIN;
+        return NMRS_PROMPT_AGAIN;
     }
 }
 
@@ -286,7 +286,7 @@ static int _num_parse_command(char *command) {
  * @param argc int number of main arguments. Set to 0 to disable parsing of
  * main arguments.
  * @param args array of main arguments to be parsed as commands.
- * @returns int status code: 0 if everything went OK or a NUMERUS_ERROR_*
+ * @returns int status code: 0 if everything went OK or a NMRS_ERROR_*
  * otherwise.
  */
 int8_t numerus_cli(int argc, char **args) {
@@ -296,8 +296,8 @@ int8_t numerus_cli(int argc, char **args) {
     size_t line_buffer_size = 50;
     char *line = malloc(line_buffer_size);
     if (line == NULL) {
-        numerus_error_code = NUMERUS_ERROR_MALLOC_FAIL;
-        return NUMERUS_ERROR_MALLOC_FAIL;
+        numerus_error_code = NMRS_ERROR_MALLOC_FAIL;
+        return NMRS_ERROR_MALLOC_FAIL;
     }
     if (argc > 1) {
         /* Parse main arguments and exit */
@@ -313,8 +313,8 @@ int8_t numerus_cli(int argc, char **args) {
         /* Enter command line interface */
         pretty_printing = 1;
         printf("%s", WELCOME_TEXT);
-        int command_result = NUMERUS_PROMPT_AGAIN;
-        while (command_result == NUMERUS_PROMPT_AGAIN) {
+        int command_result = NMRS_PROMPT_AGAIN;
+        while (command_result == NMRS_PROMPT_AGAIN) {
             printf("%s", PROMPT_TEXT);
             if (getline(&line, &line_buffer_size, stdin) == -1) {
                 break;

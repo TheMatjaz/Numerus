@@ -6,8 +6,8 @@
  * @license BSD 3-clause license.
  */
 
-#ifndef NUMERUS_DICTIONARY_H_
-#define NUMERUS_DICTIONARY_H_
+#ifndef NMRS_DICTIONARY_H_
+#define NMRS_DICTIONARY_H_
 
 #ifdef __cplusplus
 extern "C"
@@ -19,7 +19,7 @@ extern "C"
  * Size of the dictionary used to convert roman numeral character to values
  * and vice versa.
  */
-#define NUMERUS_DICTIONARY_SIZE 15U
+#define NMRS_DICTIONARY_SIZE 15U
 
 #define DICTIONARY_INDEX_FOR_M 0U
 #define DICTIONARY_INDEX_FOR_CM 1U
@@ -44,10 +44,10 @@ typedef struct
     const char character_2;
 } dictionary_char_t;
 
-extern const dictionary_char_t DICTIONARY[NUMERUS_DICTIONARY_SIZE];
+extern const dictionary_char_t DICTIONARY[NMRS_DICTIONARY_SIZE];
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif  /* NUMERUS_DICTIONARY_H_ */
+#endif  /* NMRS_DICTIONARY_H_ */

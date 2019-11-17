@@ -10,8 +10,8 @@
  * not for public usage.
  */
 
-#ifndef NUMERUS_INTERNAL_H_
-#define NUMERUS_INTERNAL_H_
+#ifndef NMRS_INTERNAL_H_
+#define NMRS_INTERNAL_H_
 
 #ifdef __cplusplus
 extern "C"
@@ -34,7 +34,7 @@ extern "C"
      * - 2 for 12 twelfths (denominator)
      * - 1 for null terminator '\0'
      */
-#define NUMERUS_MAX_FORMATTED_PARTS_LENGTH 16U
+#define NMRS_MAX_FORMATTED_PARTS_LENGTH 16U
 
 #define VINCULUMN_VALUE_MULTIPLER 1000
 
@@ -55,7 +55,7 @@ extern "C"
 #define ABS(x) (((x) < 0) ? (-(x)) : (x))
 
 /** @internal
- * Size of the NUMERUS_ZERO_STRING including null terminator.
+ * Size of the NMRS_ZERO_STRING including null terminator.
  */
 extern const uint8_t ZERO_NUMERAL_SIZE;
 
@@ -73,8 +73,8 @@ extern const uint8_t ZERO_NUMERAL_SIZE;
  */
 typedef struct
 {
-    int32_t int_part;
-    uint8_t current_numeral_position;
+    int32_t integer_part;
+    uint8_t current_numeral_index;
     uint8_t current_dictionary_char_index;
     uint8_t twelfths;
     uint8_t char_repetitions;
@@ -82,13 +82,14 @@ typedef struct
     bool numeral_is_extended;
 } numeral_parser_data_t;
 
-numerus_status_t prepare_for_analysis(const char** p_numeral);
-numerus_status_t obtain_numeral_buffer(
+nmrs_err_t prepare_for_analysis(const char** p_numeral);
+nmrs_err_t obtain_numeral_buffer(
         char** p_result_numeral, uint8_t size);
 bool contains_extended_characters(const char* numeral);
+bool numeral_is_zero_minus_ignored(const char* numeral);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif  /* NUMERUS_INTERNAL_H_ */
+#endif  /* NMRS_INTERNAL_H_ */
