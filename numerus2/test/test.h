@@ -22,6 +22,7 @@ extern "C"
 
 
 void test_constants(void);
+void test_int_to_basic(void);
 
 
 #ifdef __cplusplus

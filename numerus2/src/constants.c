@@ -35,7 +35,7 @@ const uint8_t ZERO_NUMERAL_SIZE = 6U;
  * The last value is a terminator, to be used by conversion functions to
  * understand that the array has been parsed.
  */
-const dictionary_char_t DICTIONARY[NMRS_DICTIONARY_SIZE] = {
+const dictionary_char_t DICTIONARY[NMRS_DICTIONARY_ENTRIES] = {
         {1000, 3, 'M', '\0'}, // index: 0
         {900,  1, 'C', 'M'}, //  index: 1
         {500,  1, 'D', '\0'}, // index: 2

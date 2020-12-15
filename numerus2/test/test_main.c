@@ -11,6 +11,7 @@
 int main(void)
 {
     test_constants();
+    test_int_to_basic();
 
     return atto_at_least_one_fail;
 }

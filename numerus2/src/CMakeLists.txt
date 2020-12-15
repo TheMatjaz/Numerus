@@ -12,6 +12,6 @@ add_library(library OBJECT
             #formatting
             #numeral_to_value
             #twelfths
-            #value_to_numeral
+            value_to_numeral
             )
 add_library(cli OBJECT cli)

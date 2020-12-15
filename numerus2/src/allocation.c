@@ -19,6 +19,7 @@ nmrs_err_t obtain_numeral_buffer(
     {
         status = NMRS_ERROR_NULL_NUMERAL;
     }
+        #ifdef NMRS_HAS_MALLOC
     else if (*p_result_numeral == NULL)
     {
         *p_result_numeral = nmrs_malloc(size);
@@ -27,6 +28,7 @@ nmrs_err_t obtain_numeral_buffer(
             status = NMRS_ERROR_ALLOC_FAIL;
         }
     }
+        #endif
     else
     {
         /* *p_result_numeral it's the location of the buffer. Nothing to do. */

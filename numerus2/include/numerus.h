@@ -290,7 +290,14 @@ typedef enum
      */
             NMRS_ERROR_EMPTY_NUMERAL,
 } nmrs_err_t;
+i
 
+typedef struct
+{
+    int32_t int_part : 22;
+    int32_t twelfths : 4;
+    // This kind of struct fits in 4 bytes and does not require padding.
+} nmrs_value_t;
 
 /* CONVERSIONS FROM VALUE TO NUMERAL */
 /**
@@ -353,7 +360,7 @@ typedef enum
  *   \code{C}
  *   char numeral_buffer[NMRS_MAX_BASIC_LENGTH];
  *   numerus_status_t status;
- *
+ i*
  *   status = numerus_int_to_basic_roman(42, &numeral_buffer);
  *   // status == NMRS_OK
  *   // numeral_buffer contains "XLII\0".
@@ -371,7 +378,9 @@ typedef enum
  * @see numerus_int_to_extended_roman
  * @see numerus_double_to_extended_roman
  */
-nmrs_err_t nmrs_int_to_basic_numeral(int16_t value, void* numeral);
+nmrs_err_t nmrs_int_to_basic_numeral(int16_t value, char** numeral);
+
+nmrs_int_to_basic_numeral_a(int16_t value, void* numeral);
 
 /**
  * Converts an integer and a fractional part (in twelfths) to an extended
@@ -399,8 +408,7 @@ nmrs_err_t nmrs_int_to_basic_numeral(int16_t value, void* numeral);
  * @see numerus_int_to_basic_roman
  * @see numerus_double_to_extended_roman
  */
-nmrs_err_t nmrs_int_to_extended_numeral(
-        int32_t integer_part, int8_t twelfths, char* p_numeral);
+nmrs_err_t nmrs_int_to_extended_numeral(nmrs_value_t valu, char* p_numeral);
 
 /**
  * Converts a double-precision floating point value to an extended
@@ -424,7 +432,7 @@ nmrs_err_t nmrs_int_to_extended_numeral(
  * @see numerus_int_to_extended_roman
  */
 nmrs_err_t nmrs_float_to_extended_numeral(
-        float double_value, char* p_numeral);
+        float value, char* p_numeral);
 
 /* CONVERSIONS FROM NUMERAL TO VALUE */
 nmrs_err_t nmrs_basic_numeral_to_int(
@@ -463,8 +471,8 @@ nmrs_err_t nmrs_basic_numeral_to_int(
  * value outside the the possible range of values when an error occurs.
  */
 nmrs_err_t nmrs_extended_numeral_to_int(
-        const char* numeral, int32_t* integer_part, int8_t* twelfths);
-nmrs_err_t nmrs_extended_numeral_to_double(
+        const char* numeral, nmrs_value_t* value);
+nmrs_err_t nmrs_extended_numeral_to_float(
         const char* numeral, float* value);
 
 
@@ -481,7 +489,7 @@ nmrs_err_t nmrs_extended_numeral_to_double(
  * @returns status code, indicating operation success or failure.
  */
 nmrs_err_t nmrs_int_parts_to_float(
-        int32_t integer_part, uint8_t twelfths, float* result);
+        nrms_value_t value, float* result);
 
 /**
  * Splits a double value to its integer part and a number of twelfths.
@@ -506,7 +514,7 @@ nmrs_err_t nmrs_int_parts_to_float(
  * @returns status code, indicating operation success or failure.
  */
 nmrs_err_t nmrs_float_to_int_parts(
-        float value, int32_t* integer_part, int8_t* twelfths);
+        float value, nmrs_value_t* result);
 
 /**
  * Enforce twelfths to be in [-11, 11] and to match sign of the integer part.
@@ -534,7 +542,7 @@ nmrs_err_t nmrs_float_to_int_parts(
  * @returns status code, indicating operation success or failure.
  */
 nmrs_err_t nmrs_simplify_twelfths(
-        int32_t* integer_part, int8_t* twelfths);
+        nmrs_value_t* value);
 
 
 /* ANALYSIS OF NUMERAL STRINGS */
@@ -592,7 +600,7 @@ nmrs_err_t nmrs_overline(
         const char* numeral, char* p_formatted, bool windows_end_of_line);
 
 nmrs_err_t nmrs_int_parts_to_string(
-        int32_t int_part, int8_t twelfths, char* p_formatted);
+        nmrs_value_t* value, char* p_formatted);
 nmrs_err_t nmrs_double_as_int_parts_string(
         float value, char* p_formatted);
 

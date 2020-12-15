@@ -1,9 +1,3 @@
-# -----------------------------------------------------------------------------
-# Compile flags and warnings CMake configuration file.
-# Copyright © 2015-2019, Matjaž Guštin <dev@matjaz.it> https://matjaz.it
-# All rights reserved.
-# Released under the BSD 3-clause license.
-# -----------------------------------------------------------------------------
 # This file contains settings for the ISO C standard, compilation warnings
 # and errors, for each build type. Compilers FLAGs that are not supported by
 # the used compiler are simply ignored.
@@ -16,12 +10,6 @@ include(CheckCCompilerFlag)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
-option(WARNINGS_TO_ERRORS "Compiling warnings are converted to errors" ON)
-if (WARNINGS_TO_ERRORS)
-    list(APPEND
-         COMPILER_FLAGS_WARNINGS
-         "-Werror")
-endif ()
 list(APPEND
      COMPILER_FLAGS_WARNINGS
      "-Wall"
@@ -33,7 +21,8 @@ list(APPEND
      "-Wuninitialized"
      "-Wshadow"
      "-Wpacked"
-     "-Wdouble-promotion")
+     "-Wdouble-promotion"
+     "-PIC")
 list(APPEND
      COMPILER_FLAGS_DEBUG
      "-O0"
@@ -42,7 +31,8 @@ list(APPEND
 list(APPEND
      COMPILER_FLAGS_RELEASE
      "-O3"
-     "-DNDEBUG")
+     "-DNDEBUG"
+     "-Werror")
 
 foreach (FLAG IN LISTS COMPILER_FLAGS_WARNINGS)
     string(REPLACE "-" "" FLAG_NO_HYPHEN ${FLAG})
