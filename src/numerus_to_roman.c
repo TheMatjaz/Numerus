@@ -13,10 +13,10 @@
 numerus_err_t
 numerus_to_roman(char* numeral, int_fast16_t value)
 {
+    if (numeral == NULL)
+    { return NUMERUS_ERR_NULL_NUMERAL; }
     if (value < NUMERUS_BASIC_MIN || value > NUMERUS_BASIC_MAX)
-    {
-        return NUMERUS_ERR_VALUE_OUT_OF_RANGE;
-    }
+    { return NUMERUS_ERR_VALUE_OUT_OF_RANGE; }
     if (value == 0)
     {
         strcpy(numeral, NUMERUS_ZERO_ROMAN);

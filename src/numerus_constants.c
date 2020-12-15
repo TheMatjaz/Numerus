@@ -10,18 +10,7 @@
 #include "numerus_dictionary.h"
 
 
-const int16_t NUMERUS_BASIC_MAX = 3999;
-const int16_t NUMERUS_BASIC_MIN = -3999;
-
-const double NUMERUS_EXTENDED_MAX = 3999999.0 + 11.5 / 12.0;
-const double NUMERUS_EXTENDED_MIN = -3999999.0 - 11.5 / 12.0;
-
-const uint8_t NUMERUS_BASIC_MAX_LEN = 17U;
-const uint8_t NUMERUS_EXTENDED_MAX_LEN = 37U;
-const uint8_t NUMERUS_EXTENDED_OVERLINED_MAX_LEN = 53U;
-
 const char* const NUMERUS_ZERO_ROMAN = "NULLA";
-const uint8_t NUMERUS_ZERO_ROMAN_LEN = 6U;
 
 const dictionary_entry_t DICTIONARY[] = {
         {1000, 3, 'M', DICTIONARY_UNUSED_CHAR}, // index: 0

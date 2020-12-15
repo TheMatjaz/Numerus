@@ -27,24 +27,23 @@ extern "C"
  */
 #define NUMERUS_VERSION "v3.0.0"
 
+#define NUMERUS_BASIC_MAX 3999
+#define NUMERUS_BASIC_MIN -3999
+#define NUMERUS_EXTENDED_MAX (3999999 + 11.5 / 12.0)
+#define NUMERUS_EXTENDED_MIN (-3999999 - 11.5 / 12.0)
+#define  NUMERUS_BASIC_MAX_LEN 17U
+#define  NUMERUS_EXTENDED_MAX_LEN 37U
+#define  NUMERUS_EXTENDED_OVERLINED_MAX_LEN 53U
+#define  NUMERUS_ZERO_ROMAN_LEN 6U
+
 typedef enum
 {
     NUMERUS_OK = 0,
+    NUMERUS_ERR_NULL_NUMERAL,
     NUMERUS_ERR_VALUE_OUT_OF_RANGE,
 } numerus_err_t;
 
-extern const int16_t NUMERUS_BASIC_MAX;
-extern const int16_t NUMERUS_BASIC_MIN;
-
-extern const double NUMERUS_EXTENDED_MAX;
-extern const double NUMERUS_EXTENDED_MIN;
-
-extern const uint8_t NUMERUS_BASIC_MAX_LEN;
-extern const uint8_t NUMERUS_EXTENDED_MAX_LEN;
-extern const uint8_t NUMERUS_EXTENDED_OVERLINED_MAX_LEN;
-
 extern const char* const NUMERUS_ZERO_ROMAN;
-extern const uint8_t NUMERUS_ZERO_ROMAN_LEN;
 
 numerus_err_t
 numerus_to_roman(char* numeral, int_fast16_t value);
