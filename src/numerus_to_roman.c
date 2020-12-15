@@ -27,20 +27,19 @@ numerus_to_roman(char* numeral, int_fast16_t value)
         *(numeral++) = '-';
         value = -value;
     }
-    uint_fast8_t dict_index = DICTIONARY_INDEX_FOR_M;
+    const dictionary_entry_t* dict_glyph = &DICTIONARY[DICTIONARY_INDEX_FOR_M];
     while (value > 0)
     {
-        while (value >= DICTIONARY[dict_index].value)
+        while (value >= dict_glyph->value)
         {
-            *(numeral++) = DICTIONARY[dict_index].character_1;
-            if (DICTIONARY[dict_index].character_2
-                != DICTIONARY_UNUSED_CHAR)
+            *(numeral++) = dict_glyph->character_1;
+            if (dict_glyph->character_2 != DICTIONARY_UNUSED_CHAR)
             {
-                *(numeral++) = DICTIONARY[dict_index].character_2;
+                *(numeral++) = dict_glyph->character_2;
             }
-            value -= DICTIONARY[dict_index].value;
+            value -= dict_glyph->value;
         }
-        dict_index++;
+        dict_glyph++;
     }
     *numeral = '\0';
     return NUMERUS_OK;

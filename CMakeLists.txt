@@ -16,7 +16,9 @@ set(LIBNUMERUS_SRC
 set(TEST_NUMERUS_SRC
     tst/atto.c
     tst/main.c
-    tst/numerus_test.h)
+    tst/test_constants.c
+    tst/test_to_roman.c
+    )
 set(NUMERUS_DOXYGEN_SRC
     ${LIBNUMERUS_HEADER}
     LICENSE.md

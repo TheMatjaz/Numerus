@@ -46,6 +46,9 @@ extern const uint8_t NUMERUS_EXTENDED_OVERLINED_MAX_LEN;
 extern const char* const NUMERUS_ZERO_ROMAN;
 extern const uint8_t NUMERUS_ZERO_ROMAN_LEN;
 
+numerus_err_t
+numerus_to_roman(char* numeral, int_fast16_t value);
+
 #ifdef __cplusplus
 }
 #endif

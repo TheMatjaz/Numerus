@@ -11,6 +11,7 @@
 
 int main(void)
 {
-    puts("No tests implemented!");
+    test_constants();
+    test_to_roman();
     return atto_at_least_one_fail;
 }
