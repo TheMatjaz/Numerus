@@ -12,12 +12,15 @@ set(LIBNUMERUS_SRC
     ${LIBNUMERUS_HEADER}
     src/numerus_constants.c
     src/numerus_to_roman.c
+    src/numerus_strutils.c
+    src/numerus_twelfths.c
     )
 set(TEST_NUMERUS_SRC
     tst/atto.c
     tst/main.c
     tst/test_constants.c
     tst/test_to_roman.c
+    tst/test_strutils.c
     )
 set(NUMERUS_DOXYGEN_SRC
     ${LIBNUMERUS_HEADER}

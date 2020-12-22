@@ -17,8 +17,10 @@ extern "C"
 #include "atto.h"
 #include "numerus.h"
 
+
 void test_constants(void);
 void test_to_roman(void);
+void test_strutils(void);
 
 #ifdef __cplusplus
 }

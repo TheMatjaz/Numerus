@@ -13,5 +13,6 @@ int main(void)
 {
     test_constants();
     test_to_roman();
+    test_strutils();
     return atto_at_least_one_fail;
 }
