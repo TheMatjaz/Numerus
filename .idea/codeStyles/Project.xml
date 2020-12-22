@@ -9,12 +9,17 @@
     </CMakeCodeStyleSettings>
     <Objective-C>
       <option name="INDENT_DIRECTIVE_AS_CODE" value="true" />
+      <option name="KEEP_CASE_EXPRESSIONS_IN_ONE_LINE" value="true" />
       <option name="NAMESPACE_BRACE_PLACEMENT" value="2" />
       <option name="FUNCTION_BRACE_PLACEMENT" value="2" />
       <option name="BLOCK_BRACE_PLACEMENT" value="2" />
+      <option name="FUNCTION_PARAMETERS_WRAP" value="5" />
       <option name="FUNCTION_PARAMETERS_NEW_LINE_AFTER_LPAR" value="true" />
+      <option name="FUNCTION_PARAMETERS_ALIGN_MULTILINE_PARS" value="true" />
       <option name="LAMBDA_CAPTURE_LIST_WRAP" value="5" />
       <option name="LAMBDA_CAPTURE_LIST_ALIGN_MULTILINE" value="true" />
+      <option name="FUNCTION_CALL_ARGUMENTS_WRAP" value="5" />
+      <option name="FUNCTION_CALL_ARGUMENTS_ALIGN_MULTILINE_PARS" value="true" />
       <option name="SHIFT_OPERATION_WRAP" value="5" />
       <option name="TEMPLATE_PARAMETERS_WRAP" value="5" />
       <option name="TEMPLATE_PARAMETERS_ALIGN_MULTILINE" value="true" />
