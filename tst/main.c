@@ -14,5 +14,6 @@ int main(void)
     test_constants();
     test_to_roman();
     test_strutils();
+    test_fraction();
     return atto_at_least_one_fail;
 }

@@ -21,6 +21,7 @@ extern "C"
 void test_constants(void);
 void test_to_roman(void);
 void test_strutils(void);
+void test_fraction(void);
 
 #ifdef __cplusplus
 }
