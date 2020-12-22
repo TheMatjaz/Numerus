@@ -19,6 +19,7 @@ extern "C"
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h> // toupper()
 
 /**
  * Version of the Numerus library using semantic versioning.

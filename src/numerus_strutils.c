@@ -9,23 +9,25 @@
 #include "numerus.h"
 
 
-inline bool numerus_is_zero(const char* const numeral)
+inline bool numerus_is_zero(const char* numeral)
 {
-    if (numeral == NULL)
-    { return false; }
-    else
-    { return strcmp(numeral, NUMERUS_ZERO_ROMAN) == 0; }
+    // Lightweight case-INsensitive strcmp for a fixed 5-char string
+    if (numeral == NULL) { return false; }
+    if (numeral[0] == '-') { numeral++; }
+    return numeral != NULL
+           && toupper(numeral[0]) == NUMERUS_ZERO_ROMAN[0]
+           && toupper(numeral[1]) == NUMERUS_ZERO_ROMAN[1]
+           && toupper(numeral[2]) == NUMERUS_ZERO_ROMAN[2]
+           && toupper(numeral[3]) == NUMERUS_ZERO_ROMAN[3]
+           && toupper(numeral[4]) == NUMERUS_ZERO_ROMAN[4]
+           && numeral[5] == '\0';
 }
 
 inline int_fast8_t numerus_sign(const char* const numeral)
 {
-    if (numeral == NULL || numerus_is_zero(numeral))
-    { return 0; }
-    else
-    {
-        if (numeral[0] == '-')
-        { return 1; }
-        else
-        { return -1; };
-    }
+    if (numeral == NULL
+        || numerus_is_zero(numeral)
+        || numeral[0] == '\0') { return 0; }
+    else if (numeral[0] == '-') { return -1; }
+    else { return 1; };
 }
