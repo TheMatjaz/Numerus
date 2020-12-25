@@ -48,5 +48,5 @@ numerus_to_roman(char* numeral, int_fast16_t value)
 numerus_err_t
 numerus_to_roman_extended_twelfts(char* numeral, int32_t int_part, int8_t twelfts)
 {
-
+    return -1;
 }

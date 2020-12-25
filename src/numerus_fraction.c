@@ -10,6 +10,7 @@
 
 
 static const int8_t TWELVE = 12;
+
 #define OUT_OF_EXTENDED_INT_RANGE(x) \
     ((x) < NUMERUS_EXTENDED_INT_MIN || (x) > NUMERUS_EXTENDED_INT_MAX)
 #define OUT_OF_EXTENDED_RANGE(x) \
@@ -52,13 +53,13 @@ numerus_err_t numerus_fraction_to_double(
         const numerus_frac_t* const fraction)
 {
     if (result == NULL) { return NUMERUS_ERR_NULL_DOUBLE; }
+    *result = NAN;  // Unusable result in case of errors after this line
     if (fraction == NULL) { return NUMERUS_ERR_NULL_FRACTION; }
     double local_result = fraction->twelfths;
     local_result /= TWELVE;  // True division
     local_result += fraction->int_part;
     if (OUT_OF_EXTENDED_RANGE(local_result))
     {
-        *result = NAN;
         return NUMERUS_ERR_VALUE_OUT_OF_RANGE;
     }
     else
@@ -79,6 +80,7 @@ numerus_err_t numerus_double_to_fraction(
         numerus_frac_t* const fraction,
         const double real)
 {
+    //Todo accept 0.5/12.0 above the limit as its rounded down
     if (fraction == NULL) { return NUMERUS_ERR_NULL_FRACTION; }
     if (!isfinite(real)) { return NUMERUS_ERR_NOT_FINITE_DOUBLE; }
     if (OUT_OF_EXTENDED_RANGE(real))
@@ -86,6 +88,6 @@ numerus_err_t numerus_double_to_fraction(
         return NUMERUS_ERR_VALUE_OUT_OF_RANGE;
     }
     fraction->int_part = (int32_t) real;
-    fraction->twelfths = (real - fraction->int_part) * TWELVE;
+    fraction->twelfths = (int32_t) round((real - fraction->int_part) * TWELVE);
     return numerus_simplify_fraction(fraction);
 }
