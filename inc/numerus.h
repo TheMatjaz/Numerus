@@ -44,13 +44,20 @@ typedef enum
 {
     NUMERUS_OK = 0,
     NUMERUS_ERR_NULL_NUMERAL,
-    NUMERUS_ERR_VALUE_OUT_OF_RANGE,
     NUMERUS_ERR_NULL_FRACTION,
     NUMERUS_ERR_NULL_DOUBLE,
+    NUMERUS_ERR_NULL_INT,
+    NUMERUS_ERR_VALUE_OUT_OF_RANGE,
     NUMERUS_ERR_NOT_FINITE_DOUBLE,
+    NUMERUS_ERR_PARSING_EMPTY_NUMERAL,
+    NUMERUS_ERR_PARSING_TOO_MANY_GLYPH_REPETITIONS,
+    NUMERUS_ERR_PARSING_UNKNOWN_ROMAN_GLYPH,
+    NUMERUS_ERR_PARSING_INVALID_SYNTAX,
+    NUMERUS_ERR_PARSING_NON_TERMINATED_VINCULUM,
+    NUMERUS_ERR_PARSING_M_AFTER_VINCULUM
 } numerus_err_t;
 
-extern const char* const NUMERUS_ZERO_ROMAN;
+extern const char NUMERUS_ZERO_ROMAN[NUMERUS_ZERO_ROMAN_LEN];
 
 typedef char roman_t;
 
@@ -60,23 +67,31 @@ typedef struct
     int32_t twelfths;
 } numerus_frac_t;
 
+
+//  --------------- From roman numeral to int/double/fraction ---------------
+numerus_err_t numerus_roman_to_int(int32_t* value, const char* numeral);
+numerus_err_t numerus_roman_extended_to_fraction(numerus_frac_t* fraction, const char* numeral);
+numerus_err_t numerus_roman_extended_to_double(double* real, const char* numeral);
+
+//  --------------- From int/double/fraction to roman numeral ---------------
 numerus_err_t
 numerus_to_roman(char* numeral, int_fast16_t value);
 
 numerus_err_t
-numerus_to_roman_extended_twelfts(
-        char* numeral, int32_t int_part, int8_t twelfts);
+numerus_to_roman_extended_fraction(
+        char* numeral, const numerus_frac_t* fraction);
 
 numerus_err_t
 numerus_to_roman_extended_double(char* numeral, double value);
 
 
+// --------------- Utilities on roman numerals ---------------
 bool numerus_is_zero(const char* numeral);
 int_fast8_t numerus_sign(const char* numeral);
 bool numerus_is_valid(const char* numeral);
 
 
-// --------------- Fractions ---------------
+// --------------- Utilities on fractions ---------------
 numerus_err_t
 numerus_simplify_fraction(numerus_frac_t* fraction);
 numerus_err_t numerus_fraction_to_double(

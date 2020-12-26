@@ -59,6 +59,8 @@ set(LIBNUMERUS_SRC
     src/numerus_to_roman.c
     src/numerus_strutils.c
     src/numerus_fraction.c
+    src/numerus_parse.c
+    src/numerus_from_roman.c
     )
 set(TEST_NUMERUS_SRC
     tst/atto.c
@@ -66,7 +68,8 @@ set(TEST_NUMERUS_SRC
     tst/test_constants.c
     tst/test_to_roman.c
     tst/test_strutils.c
-    tst/test_fraction.c)
+    tst/test_fraction.c
+    )
 set(NUMERUS_DOXYGEN_SRC
     ${LIBNUMERUS_HEADER}
     LICENSE.md

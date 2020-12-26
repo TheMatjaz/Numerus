@@ -13,10 +13,10 @@
 numerus_err_t
 numerus_to_roman(char* numeral, int_fast16_t value)
 {
-    if (numeral == NULL)
-    { return NUMERUS_ERR_NULL_NUMERAL; }
-    if (value < NUMERUS_BASIC_MIN || value > NUMERUS_BASIC_MAX)
-    { return NUMERUS_ERR_VALUE_OUT_OF_RANGE; }
+    if (numeral == NULL) { return NUMERUS_ERR_NULL_NUMERAL; }
+    if (value < NUMERUS_BASIC_MIN
+        || value
+           > NUMERUS_BASIC_MAX) { return NUMERUS_ERR_VALUE_OUT_OF_RANGE; }
     if (value == 0)
     {
         strcpy(numeral, NUMERUS_ZERO_ROMAN);
@@ -27,15 +27,16 @@ numerus_to_roman(char* numeral, int_fast16_t value)
         *(numeral++) = '-';
         value = -value;
     }
-    const dictionary_entry_t* dict_glyph = &DICTIONARY[DICTIONARY_INDEX_FOR_M];
+    const dictionary_glyph_t* dict_glyph = &DICTIONARY[DICTIONARY_INDEX_FOR_M];
     while (value > 0)
     {
         while (value >= dict_glyph->value)
         {
-            *(numeral++) = dict_glyph->character_1;
-            if (dict_glyph->character_2 != DICTIONARY_UNUSED_CHAR)
+            // strncpy with n==2
+            *(numeral++) = dict_glyph->characters[0];
+            if (dict_glyph->characters[1] != DICTIONARY_UNUSED_CHAR)
             {
-                *(numeral++) = dict_glyph->character_2;
+                *(numeral++) = dict_glyph->characters[1];
             }
             value -= dict_glyph->value;
         }
@@ -45,8 +46,11 @@ numerus_to_roman(char* numeral, int_fast16_t value)
     return NUMERUS_OK;
 }
 
+
 numerus_err_t
-numerus_to_roman_extended_twelfts(char* numeral, int32_t int_part, int8_t twelfts)
+numerus_to_roman_extended_fraction(
+        char* numeral,
+        const numerus_frac_t* const fraction)
 {
     return -1;
 }

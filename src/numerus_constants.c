@@ -10,9 +10,9 @@
 #include "numerus_dictionary.h"
 
 
-const char* const NUMERUS_ZERO_ROMAN = "NULLA";
+const char NUMERUS_ZERO_ROMAN[6] = "NULLA";
 
-const dictionary_entry_t DICTIONARY[] = {
+const dictionary_glyph_t DICTIONARY[] = {
         {1000, 3, 'M', DICTIONARY_UNUSED_CHAR}, // index: 0
         {900,  1, 'C', 'M'}, //  index: 1
         {500,  1, 'D', DICTIONARY_UNUSED_CHAR}, // index: 2
@@ -29,4 +29,3 @@ const dictionary_entry_t DICTIONARY[] = {
         {6,    1, 'S', DICTIONARY_UNUSED_CHAR}, // index: 13
         {1,    5, '.', DICTIONARY_UNUSED_CHAR}, // index: 14
 };
-

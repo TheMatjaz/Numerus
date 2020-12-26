@@ -17,13 +17,16 @@ extern "C"
 #include "numerus.h"
 
 /** Parsing starting point when M is the largest possible roman char. */
-#define DICTIONARY_INDEX_FOR_M 0
+#define DICTIONARY_INDEX_FOR_M 0U
 /** Parsing starting point when CM is the largest possible roman char. */
 #define DICTIONARY_INDEX_FOR_CM 1U
 /** Parsing starting point when S is the largest possible roman char. */
-#define DICTIONARY_INDEX_FOR_S 13
+#define DICTIONARY_INDEX_FOR_S 13U
+#define DICTIONARY_INDEX_FOR_END 15U
 /** Indicator that the roman character has only 1 symbol. */
 #define DICTIONARY_UNUSED_CHAR '\0'
+
+#define DICTIONARY_GLYPH_MAX_LEN 2U
 
 /**
  * @internal
@@ -40,15 +43,14 @@ typedef struct
 {
     uint16_t value: 10;  ///< `1000` fits in 10 bits.
     uint16_t max_repetitions: 6; ///< `5` fits in 3 bits, rounded up to align.
-    char character_1; ///< First (potentially only) roman numeral character.
-    char character_2; ///< #DICTIONARY_UNUSED_CHAR if unused
-} dictionary_entry_t;
+    char characters[DICTIONARY_GLYPH_MAX_LEN]; ///< 1 or 2 characters of the numeral glyph.
+}dictionary_glyph_t;
 
 /**
  * Dictionary of all possible roman chars, their values and repetitions used
  * by conversion functions.
  */
-extern const dictionary_entry_t DICTIONARY[];
+extern const dictionary_glyph_t DICTIONARY[];
 
 #ifdef __cplusplus
 }
