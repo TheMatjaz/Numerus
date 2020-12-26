@@ -75,7 +75,7 @@ numerus_err_t numerus_roman_extended_to_double(double* real, const char* numeral
 
 //  --------------- From int/double/fraction to roman numeral ---------------
 numerus_err_t
-numerus_to_roman(char* numeral, int_fast16_t value);
+numerus_to_roman(char* numeral, int_fast32_t value);
 
 numerus_err_t
 numerus_to_roman_extended_fraction(

@@ -69,7 +69,7 @@ numerus_err_t numerus_fraction_to_double(
     }
 }
 
-double numerus_fraction_to_double_v2(const numerus_frac_t* const fraction)
+double numerus_fraction_to_double_noerr(const numerus_frac_t* const fraction)
 {
     double result = NAN;
     numerus_fraction_to_double(&result, fraction);

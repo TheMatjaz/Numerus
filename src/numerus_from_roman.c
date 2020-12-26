@@ -7,7 +7,27 @@
  */
 
 #include "numerus.h"
-#include "numerus_parse.h"
+
+
+/**
+ * @internal
+ * Advances the char pointer to the first non-ASCII whitespace in the string.
+ */
+#define SKIP_LEADING_WHITESPACE(str) { while(isspace(*(str))) { (str)++; } }
+
+/**
+ * @internal
+ * Maximum value the roman numeral substring can have between the
+ * end of the vinculum and the beginning of the fractional section ("S...")
+ * (if any).
+ *
+ * After the vinculum, the 'M' character is not allowed, as it should be
+ * represented as an 'I' in the vinculum instead.
+ *
+ * 999 = "CMXCIX"
+ */
+#define NUMERUS_POST_VINCULUM_MAX (+999)
+
 
 
 const char* scan_basic(int32_t* const value, const char* numeral)
@@ -225,7 +245,7 @@ numerus_err_t numerus_roman_extended_to_fraction(
         }
     }
     numeral = scan_basic(&int_part, numeral);
-    if (int_part > NUMERUS_POST_VINCULUM_ABSMAX)
+    if (int_part > NUMERUS_POST_VINCULUM_MAX)
     {
         // After the vinculum, the 'M' char is not allowed.
         // If the value received is larger than 999 = "CMXCIX", then

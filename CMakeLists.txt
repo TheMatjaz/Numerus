@@ -55,11 +55,9 @@ set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -DRELEASE \
 set(LIBNUMERUS_HEADER inc/numerus.h)
 set(LIBNUMERUS_SRC
     ${LIBNUMERUS_HEADER}
-    src/numerus_constants.c
     src/numerus_to_roman.c
     src/numerus_strutils.c
     src/numerus_fraction.c
-    src/numerus_parse.c
     src/numerus_from_roman.c
     )
 set(TEST_NUMERUS_SRC

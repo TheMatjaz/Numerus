@@ -7,50 +7,238 @@
  */
 
 #include "numerus.h"
-#include "numerus_dictionary.h"
+
+const char NUMERUS_ZERO_ROMAN[6] = "NULLA";
 
 
 numerus_err_t
-numerus_to_roman(char* numeral, int_fast16_t value)
+numerus_to_roman(char* numeral, int_fast32_t value)
 {
     if (numeral == NULL) { return NUMERUS_ERR_NULL_NUMERAL; }
-    if (value < NUMERUS_BASIC_MIN
-        || value
-           > NUMERUS_BASIC_MAX) { return NUMERUS_ERR_VALUE_OUT_OF_RANGE; }
+    if (value < NUMERUS_BASIC_MIN || value > NUMERUS_BASIC_MAX)
+    {
+        *numeral = '\0';
+        return NUMERUS_ERR_VALUE_OUT_OF_RANGE;
+    }
     if (value == 0)
     {
         strcpy(numeral, NUMERUS_ZERO_ROMAN);
         return NUMERUS_OK;
-    };
+    }
     if (value < 0)
     {
         *(numeral++) = '-';
         value = -value;
     }
-    const dictionary_glyph_t* dict_glyph = &DICTIONARY[DICTIONARY_INDEX_FOR_M];
-    while (value > 0)
+    if (value >= 1000)
     {
-        while (value >= dict_glyph->value)
+        *(numeral++) = 'M';
+        value -= 1000;
+        if (value >= 1000)
         {
-            // strncpy with n==2
-            *(numeral++) = dict_glyph->characters[0];
-            if (dict_glyph->characters[1] != DICTIONARY_UNUSED_CHAR)
+            *(numeral++) = 'M';
+            value -= 1000;
+            if (value >= 1000)
             {
-                *(numeral++) = dict_glyph->characters[1];
+                *(numeral++) = 'M';
+                value -= 1000;
             }
-            value -= dict_glyph->value;
         }
-        dict_glyph++;
+    }
+    if (value >= 900)
+    {
+        *(numeral++) = 'C';
+        *(numeral++) = 'M';
+        value -= 900;
+    }
+    if (value >= 500)
+    {
+        *(numeral++) = 'D';
+        value -= 500;
+    }
+    if (value >= 400)
+    {
+        *(numeral++) = 'C';
+        *(numeral++) = 'D';
+        value -= 400;
+    }
+    if (value >= 100)
+    {
+        *(numeral++) = 'C';
+        value -= 100;
+        if (value >= 100)
+        {
+            *(numeral++) = 'C';
+            value -= 100;
+            if (value >= 100)
+            {
+                *(numeral++) = 'C';
+                value -= 100;
+            }
+        }
+    }
+    if (value >= 90)
+    {
+        *(numeral++) = 'X';
+        *(numeral++) = 'C';
+        value -= 90;
+    }
+    if (value >= 50)
+    {
+        *(numeral++) = 'L';
+        value -= 50;
+    }
+    if (value >= 40)
+    {
+        *(numeral++) = 'X';
+        *(numeral++) = 'L';
+        value -= 40;
+    }
+    if (value >= 10)
+    {
+        *(numeral++) = 'X';
+        value -= 10;
+        if (value >= 10)
+        {
+            *(numeral++) = 'X';
+            value -= 10;
+            if (value >= 10)
+            {
+                *(numeral++) = 'X';
+                value -= 10;
+            }
+        }
+    }
+    if (value >= 9)
+    {
+        *(numeral++) = 'I';
+        *(numeral++) = 'X';
+        value -= 9;
+    }
+    if (value >= 5)
+    {
+        *(numeral++) = 'V';
+        value -= 5;
+    }
+    if (value >= 4)
+    {
+        *(numeral++) = 'I';
+        *(numeral++) = 'V';
+        value -= 4;
+    }
+    if (value >= 1)
+    {
+        *(numeral++) = 'I';
+        value -= 1;
+        if (value >= 1)
+        {
+            *(numeral++) = 'I';
+            value -= 1;
+            if (value >= 1)
+            {
+                *(numeral++) = 'I';
+                value -= 1;
+            }
+        }
     }
     *numeral = '\0';
     return NUMERUS_OK;
 }
 
+numerus_err_t
+numerus_to_roman_extended_double(char* numeral, double value)
+{
+    numerus_frac_t fraction = {0, 0};
+    numerus_err_t err = numerus_double_to_fraction(&fraction, value);
+    if (err != NUMERUS_OK)
+    {
+        *numeral = '\0';
+        return err;
+    }
+    return numerus_to_roman_extended_fraction(numeral, &fraction);
+}
 
 numerus_err_t
 numerus_to_roman_extended_fraction(
         char* numeral,
         const numerus_frac_t* const fraction)
 {
-    return -1;
+    if (numeral == NULL) { return NUMERUS_ERR_NULL_NUMERAL; }
+    if (fraction == NULL)
+    {
+        *numeral = '\0';
+        return NUMERUS_ERR_NULL_FRACTION;
+    }
+    numerus_frac_t simplified = {
+            fraction->int_part,
+            fraction->twelfths
+    };
+    numerus_err_t err = numerus_simplify_fraction(&simplified);
+    if (err != NUMERUS_OK)
+    {
+        *numeral = '\0';
+        return err;
+    }
+    if (simplified.int_part == 0 && simplified.twelfths == 0)
+    {
+        strcpy(numeral, NUMERUS_ZERO_ROMAN);
+        return NUMERUS_OK;
+    }
+    if (simplified.int_part < 0)
+    {
+        *(numeral++) = '-';
+        simplified.int_part = -simplified.int_part;
+    }
+    if (simplified.int_part > NUMERUS_BASIC_MAX)
+    {
+        // Vinculum part
+        *(numeral++) = '_';
+        const int32_t vinculum_value = simplified.int_part / 1000;
+        err = numerus_to_roman(numeral, vinculum_value);
+        if (err != NUMERUS_OK)
+        {
+            *numeral = '\0';
+            return err;
+        }
+        *(numeral++) = '_';
+        simplified.int_part -= vinculum_value;
+    }
+    err = numerus_to_roman(numeral, simplified.int_part);
+    if (err != NUMERUS_OK)
+    {
+        *numeral = '\0';
+        return err;
+    }
+    if (simplified.twelfths >= 6)
+    {
+        *(numeral++) = 'S';
+        simplified.twelfths -= 6;
+    }
+    if (simplified.twelfths >= 1)
+    {
+        *(numeral++) = '.';
+        simplified.twelfths -= 1;
+        if (simplified.twelfths >= 1)
+        {
+            *(numeral++) = '.';
+            simplified.twelfths -= 1;
+            if (simplified.twelfths >= 1)
+            {
+                *(numeral++) = '.';
+                simplified.twelfths -= 1;
+                if (simplified.twelfths >= 1)
+                {
+                    *(numeral++) = '.';
+                    simplified.twelfths -= 1;
+                    if (simplified.twelfths >= 1)
+                    {
+                        *(numeral++) = '.';
+                        simplified.twelfths -= 1;
+                    }
+                }
+            }
+        }
+    }
+    *numeral = '\0';
+    return NUMERUS_OK;
 }
