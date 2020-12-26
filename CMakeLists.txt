@@ -66,9 +66,12 @@ set(TEST_NUMERUS_SRC
     tst/atto.c
     tst/main.c
     tst/test_constants.c
-    tst/test_to_roman.c
+    tst/test_to_roman_basic.c
     tst/test_strutils.c
-    tst/test_fraction.c)
+    tst/test_fraction.c
+    tst/test_from_roman.c
+    tst/test_fmt.c
+    )
 set(NUMERUS_DOXYGEN_SRC
     ${LIBNUMERUS_HEADER}
     LICENSE.md

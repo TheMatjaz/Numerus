@@ -94,20 +94,18 @@ static void test_fraction_to_double_invalid(void)
     numerus_frac_t fraction;
     double real = 1.0;
 
-    atto_eq(numerus_fraction_to_double(NULL, NULL), NUMERUS_ERR_NULL_DOUBLE);
-    atto_eq(numerus_fraction_to_double(&real, NULL),
-            NUMERUS_ERR_NULL_FRACTION);
+    atto_eq(numerus_fraction_to_double(NULL, fraction), NUMERUS_ERR_NULL_DOUBLE);
     atto_nan(real);
     real = 1.0;
     fraction.int_part = NUMERUS_EXTENDED_INT_MAX;
     fraction.twelfths = 12;
-    atto_eq(numerus_fraction_to_double(&real, &fraction),
+    atto_eq(numerus_fraction_to_double(&real, fraction),
             NUMERUS_ERR_VALUE_OUT_OF_RANGE);
     atto_nan(real);
     real = 1.0;
     fraction.int_part = NUMERUS_EXTENDED_INT_MAX + 1;
     fraction.twelfths = 0;
-    atto_eq(numerus_fraction_to_double(&real, &fraction),
+    atto_eq(numerus_fraction_to_double(&real, fraction),
             NUMERUS_ERR_VALUE_OUT_OF_RANGE);
     atto_nan(real);
 }
@@ -119,62 +117,62 @@ static void test_fraction_to_double_valid(void)
 
     fraction.int_part = 0;
     fraction.twelfths = 0;
-    atto_eq(numerus_fraction_to_double(&real, &fraction), NUMERUS_OK);
+    atto_eq(numerus_fraction_to_double(&real, fraction), NUMERUS_OK);
     atto_ddelta(real, 0.0, 1e-4);
 
     fraction.int_part = 1;
     fraction.twelfths = 0;
-    atto_eq(numerus_fraction_to_double(&real, &fraction), NUMERUS_OK);
+    atto_eq(numerus_fraction_to_double(&real, fraction), NUMERUS_OK);
     atto_ddelta(real, 1.0, 1e-4);
 
     fraction.int_part = 1;
     fraction.twelfths = -10;
-    atto_eq(numerus_fraction_to_double(&real, &fraction), NUMERUS_OK);
+    atto_eq(numerus_fraction_to_double(&real, fraction), NUMERUS_OK);
     atto_ddelta(real, 2.0 / 12, 1e-4);
 
     fraction.int_part = -1;
     fraction.twelfths = -10;
-    atto_eq(numerus_fraction_to_double(&real, &fraction), NUMERUS_OK);
+    atto_eq(numerus_fraction_to_double(&real, fraction), NUMERUS_OK);
     atto_ddelta(real, -1.0 - 10.0 / 12, 1e-4);
 
     fraction.int_part = -1;
     fraction.twelfths = -12;
-    atto_eq(numerus_fraction_to_double(&real, &fraction), NUMERUS_OK);
+    atto_eq(numerus_fraction_to_double(&real, fraction), NUMERUS_OK);
     atto_ddelta(real, -2.0, 1e-4);
 
     fraction.int_part = 10;
     fraction.twelfths = -15;
-    atto_eq(numerus_fraction_to_double(&real, &fraction), NUMERUS_OK);
+    atto_eq(numerus_fraction_to_double(&real, fraction), NUMERUS_OK);
     atto_ddelta(real, 8.0 + 9.0 / 12, 1e-4);
 
     fraction.int_part = -100;
     fraction.twelfths = -61;
-    atto_eq(numerus_fraction_to_double(&real, &fraction), NUMERUS_OK);
+    atto_eq(numerus_fraction_to_double(&real, fraction), NUMERUS_OK);
     atto_ddelta(real, -105.0 - 1.0 / 12, 1e-4);
 
     fraction.int_part = -100;
     fraction.twelfths = 61;
-    atto_eq(numerus_fraction_to_double(&real, &fraction), NUMERUS_OK);
+    atto_eq(numerus_fraction_to_double(&real, fraction), NUMERUS_OK);
     atto_ddelta(real, -94 - 11.0 / 12, 1e-4);
 
     fraction.int_part = NUMERUS_EXTENDED_INT_MIN + 1;
     fraction.twelfths = -23;
-    atto_eq(numerus_fraction_to_double(&real, &fraction), NUMERUS_OK);
+    atto_eq(numerus_fraction_to_double(&real, fraction), NUMERUS_OK);
     atto_ddelta(real, NUMERUS_EXTENDED_INT_MIN - 11.0 / 12, 1e-4);
 
     fraction.int_part = NUMERUS_EXTENDED_INT_MAX - 1;
     fraction.twelfths = 23;
-    atto_eq(numerus_fraction_to_double(&real, &fraction), NUMERUS_OK);
+    atto_eq(numerus_fraction_to_double(&real, fraction), NUMERUS_OK);
     atto_ddelta(real, NUMERUS_EXTENDED_INT_MAX + 11.0 / 12, 1e-4);
 
     fraction.int_part = NUMERUS_EXTENDED_INT_MIN;
     fraction.twelfths = -11;
-    atto_eq(numerus_fraction_to_double(&real, &fraction), NUMERUS_OK);
+    atto_eq(numerus_fraction_to_double(&real, fraction), NUMERUS_OK);
     atto_ddelta(real, NUMERUS_EXTENDED_MIN, 1e-4);
 
     fraction.int_part = NUMERUS_EXTENDED_INT_MAX;
     fraction.twelfths = 11;
-    atto_eq(numerus_fraction_to_double(&real, &fraction), NUMERUS_OK);
+    atto_eq(numerus_fraction_to_double(&real, fraction), NUMERUS_OK);
     atto_ddelta(real, NUMERUS_EXTENDED_MAX, 1e-4);
 }
 
