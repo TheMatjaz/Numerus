@@ -17,7 +17,7 @@ extern "C"
 
 #include <stdbool.h>
 #include <stdint.h>
-#include <stdlib.h>
+#include <stdlib.h> // For malloc()
 #include <string.h>
 #include <ctype.h> // toupper()
 #include <math.h> // NAN, round
@@ -63,7 +63,8 @@ typedef enum
     NUMERUS_ERR_PARSING_INVALID_SYNTAX,
     NUMERUS_ERR_PARSING_NON_TERMINATED_VINCULUM,
     NUMERUS_ERR_PARSING_M_AFTER_VINCULUM,
-    NUMERUS_ERR_NULL_FORMATTED
+    NUMERUS_ERR_NULL_FORMATTED,
+    NUMERUS_ERR_MALLOC_FAILURE,
 } numerus_err_t;
 
 extern const char NUMERUS_ZERO_ROMAN[NUMERUS_ZERO_ROMAN_LEN];
@@ -93,6 +94,18 @@ numerus_to_roman_extended_fraction(
 
 numerus_err_t
 numerus_to_roman_extended_double(char* numeral, double value);
+
+
+//  --------------- From int/double/fraction to roman numeral with allocation
+numerus_err_t
+numerus_to_roman_alloc(char** numeral, int_fast32_t value);
+
+numerus_err_t
+numerus_to_roman_extended_fraction_alloc(
+        char** numeral, numerus_frac_t fraction);
+
+numerus_err_t
+numerus_to_roman_extended_double_alloc(char** numeral, double value);
 
 
 // --------------- Utilities on roman numerals ---------------

@@ -67,7 +67,7 @@ set(TEST_NUMERUS_SRC
     tst/test_to_roman.c
     tst/test_strutils.c
     tst/test_fraction.c
-    src/numerus_fmt.c)
+    src/numerus_fmt.c src/numerus_to_roman_alloc.c)
 set(NUMERUS_DOXYGEN_SRC
     ${LIBNUMERUS_HEADER}
     LICENSE.md
