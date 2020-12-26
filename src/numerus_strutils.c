@@ -25,9 +25,18 @@ inline bool numerus_is_zero(const char* numeral)
 
 inline int_fast8_t numerus_sign(const char* const numeral)
 {
-    if (numeral == NULL
-        || numerus_is_zero(numeral)
-        || numeral[0] == '\0') { return 0; }
-    else if (numeral[0] == '-') { return -1; }
-    else { return 1; };
+    if (numeral == NULL || numerus_is_zero(numeral)) { return 0; }
+    if (numeral[0] == '-') { return -1; }
+    const int first = toupper(numeral[0]);
+    if (first == '_'
+        || first == 'M'
+        || first == 'D'
+        || first == 'C'
+        || first == 'L'
+        || first == 'X'
+        || first == 'V'
+        || first == 'I'
+        || first == 'S'
+        || first == '.') { return +1; }
+    return 0;
 }
