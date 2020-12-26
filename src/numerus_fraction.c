@@ -65,24 +65,13 @@ numerus_err_t numerus_fraction_to_double(
     return NUMERUS_OK;
 }
 
-double numerus_fraction_to_double_noerr(const numerus_frac_t fraction)
-{
-    double result = NAN;
-    numerus_fraction_to_double(&result, fraction);
-    return result;
-}
-
 numerus_err_t numerus_double_to_fraction(
         numerus_frac_t* const fraction,
         const double real)
 {
-    //Todo accept 0.5/12.0 above the limit as its rounded down
     if (fraction == NULL) { return NUMERUS_ERR_NULL_FRACTION; }
     if (!isfinite(real)) { return NUMERUS_ERR_NOT_FINITE_DOUBLE; }
-    if (OUT_OF_EXTENDED_RANGE(real))
-    {
-        return NUMERUS_ERR_VALUE_OUT_OF_RANGE;
-    }
+    if (OUT_OF_EXTENDED_RANGE(real)) { return NUMERUS_ERR_VALUE_OUT_OF_RANGE; }
     fraction->int_part = (int32_t) real;
     fraction->twelfths = (int32_t) round((real - fraction->int_part) * TWELVE);
     return numerus_simplify_fraction(fraction);

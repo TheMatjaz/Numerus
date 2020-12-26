@@ -106,7 +106,6 @@ numerus_simplify_fraction(numerus_frac_t* fraction);
 numerus_err_t numerus_fraction_to_double(
         double* result,
         numerus_frac_t fraction);
-double numerus_fraction_to_double_v2(numerus_frac_t fraction);
 numerus_err_t numerus_double_to_fraction(
         numerus_frac_t* fraction,
         double real);

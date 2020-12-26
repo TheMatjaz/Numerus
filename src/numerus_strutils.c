@@ -11,7 +11,7 @@
 
 inline bool numerus_is_zero(const char* numeral)
 {
-    // Lightweight case-INsensitive strcmp for a fixed 5-char string
+    // Lightweight case-INsensitive strncmp for a fixed 5-char string
     if (numeral == NULL) { return false; }
     if (numeral[0] == '-') { numeral++; }
     return numeral != NULL
