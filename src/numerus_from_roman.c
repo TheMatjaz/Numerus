@@ -275,5 +275,5 @@ numerus_roman_extended_to_double(double* const real, const char* numeral)
     numerus_err_t
             err = numerus_roman_extended_to_fraction(&fraction, numeral);
     if (err != NUMERUS_OK) { return err; }
-    return numerus_fraction_to_double(real, &fraction);
+    return numerus_fraction_to_double(real, fraction);
 }

@@ -50,26 +50,22 @@ numerus_simplify_fraction(numerus_frac_t* const fraction)
 
 numerus_err_t numerus_fraction_to_double(
         double* const result,
-        const numerus_frac_t* const fraction)
+        const numerus_frac_t fraction)
 {
     if (result == NULL) { return NUMERUS_ERR_NULL_DOUBLE; }
     *result = NAN;  // Unusable result in case of errors after this line
-    if (fraction == NULL) { return NUMERUS_ERR_NULL_FRACTION; }
-    double local_result = fraction->twelfths;
+    double local_result = fraction.twelfths;
     local_result /= TWELVE;  // True division
-    local_result += fraction->int_part;
+    local_result += fraction.int_part;
     if (OUT_OF_EXTENDED_RANGE(local_result))
     {
         return NUMERUS_ERR_VALUE_OUT_OF_RANGE;
     }
-    else
-    {
-        *result = local_result;
-        return NUMERUS_OK;
-    }
+    *result = local_result;
+    return NUMERUS_OK;
 }
 
-double numerus_fraction_to_double_noerr(const numerus_frac_t* const fraction)
+double numerus_fraction_to_double_noerr(const numerus_frac_t fraction)
 {
     double result = NAN;
     numerus_fraction_to_double(&result, fraction);

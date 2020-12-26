@@ -155,45 +155,36 @@ numerus_to_roman_extended_double(char* numeral, double value)
         *numeral = '\0';
         return err;
     }
-    return numerus_to_roman_extended_fraction(numeral, &fraction);
+    return numerus_to_roman_extended_fraction(numeral, fraction);
 }
 
 numerus_err_t
 numerus_to_roman_extended_fraction(
         char* numeral,
-        const numerus_frac_t* const fraction)
+        numerus_frac_t fraction)
 {
     if (numeral == NULL) { return NUMERUS_ERR_NULL_NUMERAL; }
-    if (fraction == NULL)
-    {
-        *numeral = '\0';
-        return NUMERUS_ERR_NULL_FRACTION;
-    }
-    numerus_frac_t simplified = {
-            fraction->int_part,
-            fraction->twelfths
-    };
-    numerus_err_t err = numerus_simplify_fraction(&simplified);
+    numerus_err_t err = numerus_simplify_fraction(&fraction);
     if (err != NUMERUS_OK)
     {
         *numeral = '\0';
         return err;
     }
-    if (simplified.int_part == 0 && simplified.twelfths == 0)
+    if (fraction.int_part == 0 && fraction.twelfths == 0)
     {
         strcpy(numeral, NUMERUS_ZERO_ROMAN);
         return NUMERUS_OK;
     }
-    if (simplified.int_part < 0)
+    if (fraction.int_part < 0)
     {
         *(numeral++) = '-';
-        simplified.int_part = -simplified.int_part;
+        fraction.int_part = -fraction.int_part;
     }
-    if (simplified.int_part > NUMERUS_BASIC_MAX)
+    if (fraction.int_part > NUMERUS_BASIC_MAX)
     {
         // Vinculum part
         *(numeral++) = '_';
-        const int32_t vinculum_value = simplified.int_part / 1000;
+        const int32_t vinculum_value = fraction.int_part / 1000;
         err = numerus_to_roman(numeral, vinculum_value);
         if (err != NUMERUS_OK)
         {
@@ -201,39 +192,39 @@ numerus_to_roman_extended_fraction(
             return err;
         }
         *(numeral++) = '_';
-        simplified.int_part -= vinculum_value;
+        fraction.int_part -= vinculum_value;
     }
-    err = numerus_to_roman(numeral, simplified.int_part);
+    err = numerus_to_roman(numeral, fraction.int_part);
     if (err != NUMERUS_OK)
     {
         *numeral = '\0';
         return err;
     }
-    if (simplified.twelfths >= 6)
+    if (fraction.twelfths >= 6)
     {
         *(numeral++) = 'S';
-        simplified.twelfths -= 6;
+        fraction.twelfths -= 6;
     }
-    if (simplified.twelfths >= 1)
+    if (fraction.twelfths >= 1)
     {
         *(numeral++) = '.';
-        simplified.twelfths -= 1;
-        if (simplified.twelfths >= 1)
+        fraction.twelfths -= 1;
+        if (fraction.twelfths >= 1)
         {
             *(numeral++) = '.';
-            simplified.twelfths -= 1;
-            if (simplified.twelfths >= 1)
+            fraction.twelfths -= 1;
+            if (fraction.twelfths >= 1)
             {
                 *(numeral++) = '.';
-                simplified.twelfths -= 1;
-                if (simplified.twelfths >= 1)
+                fraction.twelfths -= 1;
+                if (fraction.twelfths >= 1)
                 {
                     *(numeral++) = '.';
-                    simplified.twelfths -= 1;
-                    if (simplified.twelfths >= 1)
+                    fraction.twelfths -= 1;
+                    if (fraction.twelfths >= 1)
                     {
                         *(numeral++) = '.';
-                        simplified.twelfths -= 1;
+                        fraction.twelfths -= 1;
                     }
                 }
             }
