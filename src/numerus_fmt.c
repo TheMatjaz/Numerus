@@ -51,13 +51,15 @@ inline static void safe_strncpy(char* dst, const char* src, uint_fast8_t len)
     *dst = '\0'; // Forcibly terminate destination
 }
 
-static numerus_err_t
-fmt_overlined(char* formatted, const char* numeral, const bool windows)
+numerus_err_t numerus_fmt_overlined(
+        char* formatted,
+        const char* numeral,
+        const bool use_windows_eol)
 {
     if (formatted == NULL) { return NUMERUS_ERR_NULL_FORMATTED; }
     if (numeral == NULL)
     {
-        *formatted = '\0';  // Provide emtpy string output in case of error
+        *formatted = '\0';  // Provide empty string output in case of error
         return NUMERUS_ERR_NULL_NUMERAL;
     }
     const bool is_negative = (*numeral == '-');
@@ -82,8 +84,8 @@ fmt_overlined(char* formatted, const char* numeral, const bool windows)
             }
             else { numeral++; }
         }
-        // End of overlining, go to next line. Append EOL character
-        if (windows) { *(formatted++) = '\r'; }
+        // End of overlining, go to next line. Append EOL character(s)
+        if (use_windows_eol) { *(formatted++) = '\r'; }
         *(formatted++) = '\n';
         // Write the minus before the overlined part
         if (is_negative) { *(formatted++) = '-'; }
@@ -93,18 +95,6 @@ fmt_overlined(char* formatted, const char* numeral, const bool windows)
     // at all) simply the whole string. The function null terminates properly.
     safe_strncpy(formatted, numeral, NUMERUS_POST_VINCULUM_MAX_LEN);
     return NUMERUS_OK;
-}
-
-inline numerus_err_t numerus_fmt_overlined_wineol(
-        char* formatted, const char* numeral)
-{
-    return fmt_overlined(formatted, numeral, true);
-}
-
-inline numerus_err_t numerus_fmt_overlined_unixeol(
-        char* formatted, const char* numeral)
-{
-    return fmt_overlined(formatted, numeral, false);
 }
 
 /**

@@ -18,20 +18,21 @@ extern "C"
 
 #include <stdbool.h>
 #include <stdint.h>
-#include <stdlib.h> // For malloc()
+#include <inttypes.h> // To format integers // todo optional iff stdio used
 #include <string.h>
 #include <ctype.h> // toupper()
 #include <math.h> // NAN, round
-#include <inttypes.h> // To format integers // todo optional iff stdio used
 #include <stdio.h> // For sprintf()   // todo make it optional
 
-/**
- * Version of the Numerus library using semantic versioning.
- *
- * <https://semver.org/spec/v2.0.0.html>
- */
+
+#if NUMERUS_HAS_MALLOC
+#include <stdlib.h>
+#endif
+
+/** Version of the Numerus library using semantic versioning. */
 #define NUMERUS_VERSION "v3.0.0"
 
+//  ----- Extremes of the values represented by roman numerals ----------------
 /** Largest value (int16) a basic roman numeral can represent. */
 #define NUMERUS_BASIC_MAX (+3999)
 /** Smallest value (int16) a basic roman numeral can represent. */
@@ -45,7 +46,7 @@ extern "C"
 /** Smallest real number (double) an extended roman numeral can represent. */
 #define NUMERUS_EXTENDED_MIN (-3999999.9166666665)
 
-//  --------------- Buffer sizes and maximum string sizes ---------------
+//  ----- Maximum string sizes a.k.a. buffer sizes ----------------------------
 /**
  * Maximum length a basic roman numeral string may have, including the
  * null terminator, thus useful for buffer sizes.
@@ -98,6 +99,7 @@ extern "C"
 extern const char NUMERUS_ZERO_ROMAN[NUMERUS_ZERO_ROMAN_LEN_WITH_TERM];
 
 
+// ----- Error codes and data types -------------------------------------------
 /** Error codes returned by Numerus functions. */
 typedef enum
 {
@@ -117,7 +119,7 @@ typedef enum
     NUMERUS_ERR_MALLOC_FAILURE, ///< Heap memory allocation failed
 } numerus_err_t;
 
-
+// Todo doxygen
 typedef struct
 {
     int32_t int_part;
@@ -145,7 +147,8 @@ numerus_err_t
 numerus_to_roman_extended_double(char* numeral, double value);
 
 
-//  --------------- From int/double/fraction to roman numeral with allocation
+//  ----- From int/double/fraction to roman numeral with heap-allocation ------
+#if NUMERUS_HAS_MALLOC
 numerus_err_t
 numerus_to_roman_alloc(char** numeral, int_fast32_t value);
 
@@ -155,9 +158,10 @@ numerus_to_roman_extended_fraction_alloc(
 
 numerus_err_t
 numerus_to_roman_extended_double_alloc(char** numeral, double value);
+#endif  /* NUMERUS_HAS_MALLOC */
 
 
-// --------------- Utilities on roman numerals ---------------
+// ----- Utilities on roman numerals ------------------------------------------
 bool numerus_is_zero(const char* numeral);
 int_fast8_t numerus_sign(const char* numeral);
 
@@ -206,10 +210,9 @@ numerus_err_t numerus_fmt_fraction(
  * Does no checks whether the roman numeral uses the proper syntax and thus
  * correctly represents a valid value.
  *
- * numerus_fmt_overlined_wineol() applies the Windows-style end-of-line
- * terminator "\r\n" (carriage return + line feed).
- * numerus_fmt_overlined_unixeol() applies the Unix-style end-of-line
- * terminator "\n" (line feed only).
+ * The end-of-line (EOL) terminator chan be chosed to be Windows-style
+ * "\r\n" (carriage return + line feed) or Unix-style "\n" (line feed only)
+ * with the \p use_windows_eol parameter.
  *
  * Examples:
  * - `-_CXX_VIII` becomes ` ___\r\n-CXXVIII` or ` ___\n-CXXVIII`
@@ -225,18 +228,42 @@ numerus_err_t numerus_fmt_fraction(
  *     #NUMERUS_EXTENDED_OVERLINED_MAX_LEN_WITH_TERM bytes where to write
  *     the overlined numeral
  * @param [in] numeral to overline
+ * @param [in] use_windows_eol when true, the EOL terminator will be "\r\n"
+ *             otherwise is "\n"
  * @retval #NUMERUS_OK on success
  * @retval #NUMERUS_NULL_FORMATTED when \p formatted is NULL
  * @retval #NUMERUS_NULL_NUMERAL when \p numeral is NULL
  * @retval #NUMERUS_ERR_PARSING_NON_TERMINATED_VINCULUM when \p numeral
  *         is missing the end of the vinculum, the second '_'.
  */
-numerus_err_t numerus_fmt_overlined_wineol(
-        char* formatted, const char* numeral);
+numerus_err_t numerus_fmt_overlined(
+        char* formatted, const char* numeral, bool use_windows_eol);
 
-/** @copydoc numerus_fmt_overlined_wineol() */
-numerus_err_t numerus_fmt_overlined_unixeol(
-        char* formatted, const char* numeral);
+#if NUMERUS_HAS_MALLOC
+/**
+ * Formats the #numerus_frac_t fraction as a human-readable heap-allocated
+ * string.
+ *
+ * @copydetails numerus_fmt_fraction
+ * @retval #NUMERUS_ERR_MALLOC_FAILURE when strdup() fails to allocated heap
+ *         memory
+ */
+numerus_err_t numerus_fmt_fraction_alloc(
+        char** formatted, numerus_frac_t fraction);
+
+/**
+ * Formats a roman numeral as two heap-allocated lines, using underscores in
+ * the first to overline the vinculum part of the numeral, and the numeral
+ * itself in the second line.
+ *
+ * @copydetails numerus_fmt_overlined
+ * @retval #NUMERUS_ERR_MALLOC_FAILURE when strdup() fails to allocated heap
+ *         memory
+ */
+numerus_err_t numerus_fmt_overlined_alloc(
+        char** formatted, const char* numeral, bool use_windows_eol);
+
+#endif /* NUMERUS_HAS_MALLOC */
 
 #ifdef __cplusplus
 }

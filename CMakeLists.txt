@@ -61,7 +61,7 @@ set(LIBNUMERUS_SRC
     src/numerus_from_roman.c
     src/numerus_fmt.c
     src/numerus_to_roman_alloc.c
-    )
+    src/numerus_fmt_alloc.c)
 set(TEST_NUMERUS_SRC
     tst/atto.c
     tst/main.c
@@ -93,6 +93,7 @@ configure_file(${LIBNUMERUS_HEADER} ${CMAKE_BINARY_DIR} COPYONLY)
 # Static library
 add_library(numerus_static ${LIBNUMERUS_SRC})
 target_include_directories(numerus_static PUBLIC inc/ src/)
+target_compile_definitions(numerus_static PUBLIC NUMERUS_HAS_MALLOC=1)
 
 # Shared library (.dylib / .dll)
 # Does not reuse the static library object files, as they are
@@ -100,10 +101,12 @@ target_include_directories(numerus_static PUBLIC inc/ src/)
 add_library(numerus SHARED ${LIBNUMERUS_SRC})
 set_property(TARGET numerus PROPERTY POSITION_INDEPENDENT_CODE ON)
 target_include_directories(numerus PUBLIC inc/ src/)
+target_compile_definitions(numerus PUBLIC NUMERUS_HAS_MALLOC=1)
 
 # Test runner executable
 add_executable(test_numerus ${LIBNUMERUS_SRC} ${TEST_NUMERUS_SRC})
 target_include_directories(test_numerus PUBLIC inc/ tst/)
+target_compile_definitions(test_numerus PUBLIC NUMERUS_HAS_MALLOC=1)
 
 # Doxygen documentation builder
 find_package(Doxygen)
