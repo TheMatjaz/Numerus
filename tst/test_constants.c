@@ -12,7 +12,7 @@
 
 void test_constants(void) {
     atto_streq(NUMERUS_ZERO_ROMAN, "NULLA", 5);
-    atto_eq(NUMERUS_ZERO_ROMAN_LEN, 5+1);
+    atto_eq(NUMERUS_ZERO_ROMAN_LEN_WITH_TERM, 5+1);
     atto_eq(NUMERUS_BASIC_MAX, +3999);
     atto_eq(NUMERUS_BASIC_MIN, -3999);
     atto_eq(NUMERUS_EXTENDED_INT_MAX, +3999999L);

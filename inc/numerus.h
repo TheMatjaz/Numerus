@@ -1,6 +1,7 @@
 /**
  * @file
- * @brief
+ * Numerus: roman numerals library API.
+ *
  * @copyright Copyright © 2015-2020, Matjaž Guštin <dev@matjaz.it>
  * <https://matjaz.it>. All rights reserved.
  * @license BSD 3-clause license.
@@ -46,32 +47,13 @@ extern "C"
 
 //  --------------- Buffer sizes and maximum string sizes ---------------
 /**
- * Maximum length a basic roman numeral string may have, excluding the
- * null terminator, thus comparable with strlen().
- *
- * That is the length of the roman numeral `-MMMDCCCLXXXVIII`
- * with value 3888.
- */
-#define NUMERUS_BASIC_MAX_LEN_NO_TERM (16U)
-
-/**
  * Maximum length a basic roman numeral string may have, including the
  * null terminator, thus useful for buffer sizes.
  *
  * That is the length of the roman numeral `-MMMDCCCLXXXVIII\0`
  * with value 3888.
  */
-#define NUMERUS_BASIC_MAX_LEN_WITH_TERM (NUMERUS_BASIC_MAX_LEN_NO_TERM + 1U)
-
-/**
- * Maximum length an extended roman numeral string may have, excluding
- * the null terminator, thus comparable with strlen().
- *
- * That is the length of the roman numeral
- * `-_MMMDCCCLXXXVIII_DCCCLXXXVIIIS.....`
- * with value (-3888888 and -11/12) = -3888888.9166666665.
- */
-#define NUMERUS_EXTENDED_MAX_LEN_NO_TERM (36U)
+#define NUMERUS_BASIC_MAX_LEN_WITH_TERM (16U + 1U)
 
 /**
  * Maximum length an extended roman numeral string may have, including
@@ -81,18 +63,7 @@ extern "C"
  * `-_MMMDCCCLXXXVIII_DCCCLXXXVIIIS.....\0`
  * with value (-3888888 and -11/12) = -3888888.9166666665.
  */
-#define NUMERUS_EXTENDED_MAX_LEN_WITH_TERM \
-    (NUMERUS_EXTENDED_MAX_LEN_NO_TERM + 1U)
-
-/**
- * Maximum length an extended roman numeral formatted by numerus_fmt_overline()
- * may have, excluding the null terminator, thus comparable with strlen().
- *
- * This is the length of the string
- * ` _______________\r\n-MMMDCCCLXXXVIIIDCCCLXXXVIIIS.....`
- * with value (-3888888 and -11/12) = -3888888.9166666665.
- */
-#define NUMERUS_EXTENDED_OVERLINED_MAX_LEN_NO_TERM (52U)
+#define NUMERUS_EXTENDED_MAX_LEN_WITH_TERM (36U + 1U)
 
 /**
  * Maximum length an extended roman numeral formatted by numerus_fmt_overline()
@@ -102,20 +73,23 @@ extern "C"
  * ` _______________\r\n-MMMDCCCLXXXVIIIDCCCLXXXVIIIS.....\0`
  * with value (-3888888 and -11/12) = -3888888.9166666665.
  */
-#define NUMERUS_EXTENDED_OVERLINED_MAX_LEN_WITH_TERM \
-    (NUMERUS_EXTENDED_OVERLINED_MAX_LEN_NO_TERM + 1U)
+#define NUMERUS_EXTENDED_OVERLINED_MAX_LEN_WITH_TERM (52U + 1U)
 
 /**
- * Exact length of the roman numeral with value 0 (zero) #NUMERUS_ZERO_ROMAN
- * excluding the null terminator, thus comparable with strlen().
+ * Maximum length a #numerus_frac_t fraction formatted by
+ * numerus_fmt_fraction() may have, including the null terminator,
+ * thus useful for buffer sizes.
+ *
+ * This is the length of the string
+ * `-12345, -11/12\0` (or any other 5-digit integer part)
  */
-#define NUMERUS_ZERO_ROMAN_LEN_NO_TERM (5U)
+#define NUMERUS_FORMATTED_FRACTION_MAX_LEN_WITH_TERM (14U + 1U)
 
 /**
  * Exact length of the roman numeral with value 0 (zero) #NUMERUS_ZERO_ROMAN
  * including the null terminator, thus useful for buffer sizes.
  */
-#define NUMERUS_ZERO_ROMAN_LEN_WITH_TERM (NUMERUS_ZERO_ROMAN_LEN_NO_TERM + 1U)
+#define NUMERUS_ZERO_ROMAN_LEN_WITH_TERM (5U + 1U)
 
 /** Roman numeral with value 0 (zero).
  * Length without terminator: #NUMERUS_ZERO_ROMAN_LEN_NO_TERM.
@@ -201,15 +175,66 @@ numerus_err_t numerus_double_to_fraction(
 
 // --------------- Formatting ---------------
 /**
+ * Formats the #numerus_frac_t fraction as a human-readable string.
  *
- * @param [out] formatted
- * @param [in] fraction
- * @retval
+ * Examples:
+ * - `{1, 0/12}` -> "1", simpler form when no twelfths
+ * - `{1, 1/12}` -> "1, 1/12", twelfths after the comma
+ * - `{1, 2/12}` -> "1, 1/6", twelfths are simplified
+ * - `{-10, -9/12}` -> "-10, -3/4", negative numbers supported
+ * - `{-10, +14/12} == {-9, +2/12} == {-8, -10/12}` -> "-8, -5/6",
+ *   the whole fraction is simplified
+ *
+ * @param [out] formatted buffer of
+ *     #NUMERUS_FORMATTED_FRACTION_MAX_LEN_WITH_TERM bytes where to write
+ *     the fraction formatted to string
+ * @param [in] fraction to convert to string
+ * @retval #NUMERUS_OK on success
+ * @retval #NUMERUS_NULL_FORMATTED when \p formatted is NULL
+ * @retval #NUMERUS_ERR_VALUE_OUT_OF_RANGE when \p fraction is out of the
+ *     allowed range of [#NUMERUS_EXTENDED_MIN, #NUMERUS_EXTENDED_MAX].
  */
 numerus_err_t numerus_fmt_fraction(
         char* formatted, numerus_frac_t fraction);
+
+/**
+ * Formats a roman numeral as two lines, using underscores in the first
+ * to overline the vinculum part of the numeral, and the numeral itself
+ * in the second line.
+ *
+ * In case of no overlining, it provides a copy of the original numeral.
+ * Does no checks whether the roman numeral uses the proper syntax and thus
+ * correctly represents a valid value.
+ *
+ * numerus_fmt_overlined_wineol() applies the Windows-style end-of-line
+ * terminator "\r\n" (carriage return + line feed).
+ * numerus_fmt_overlined_unixeol() applies the Unix-style end-of-line
+ * terminator "\n" (line feed only).
+ *
+ * Examples:
+ * - `-_CXX_VIII` becomes ` ___\r\n-CXXVIII` or ` ___\n-CXXVIII`
+ * - `VIII` becomes `VIII`
+ *
+ * The printed strings look like this:
+ *
+ *                      ___
+ *     -_CXX_VIII  =>  -CXXVIII
+ *     VIII        =>   VIII
+ *
+ * @param [out] formatted buffer of
+ *     #NUMERUS_EXTENDED_OVERLINED_MAX_LEN_WITH_TERM bytes where to write
+ *     the overlined numeral
+ * @param [in] numeral to overline
+ * @retval #NUMERUS_OK on success
+ * @retval #NUMERUS_NULL_FORMATTED when \p formatted is NULL
+ * @retval #NUMERUS_NULL_NUMERAL when \p numeral is NULL
+ * @retval #NUMERUS_ERR_PARSING_NON_TERMINATED_VINCULUM when \p numeral
+ *         is missing the end of the vinculum, the second '_'.
+ */
 numerus_err_t numerus_fmt_overlined_wineol(
         char* formatted, const char* numeral);
+
+/** @copydoc numerus_fmt_overlined_wineol() */
 numerus_err_t numerus_fmt_overlined_unixeol(
         char* formatted, const char* numeral);
 

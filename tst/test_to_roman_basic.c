@@ -146,7 +146,7 @@ static void test_to_roman_basic_valid_few_basic(void)
 
     err = numerus_to_roman(roman, 0);
     atto_eq(err, NUMERUS_OK);
-    atto_streq("NULLA", roman, NUMERUS_ZERO_ROMAN_LEN);
+    atto_streq("NULLA", roman, NUMERUS_ZERO_ROMAN_LEN_WITH_TERM-1);
     err = numerus_to_roman(roman, 1);
     atto_eq(err, NUMERUS_OK);
     atto_streq("I", roman, 1);
