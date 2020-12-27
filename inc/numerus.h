@@ -31,43 +31,118 @@ extern "C"
  */
 #define NUMERUS_VERSION "v3.0.0"
 
+/** Largest value (int16) a basic roman numeral can represent. */
 #define NUMERUS_BASIC_MAX (+3999)
+/** Smallest value (int16) a basic roman numeral can represent. */
 #define NUMERUS_BASIC_MIN (-3999)
+/** Largest integer value (int32) an extended roman numeral can represent. */
 #define NUMERUS_EXTENDED_INT_MAX (+3999999L)
+/** Smallest integer value (int32) an extended roman numeral can represent. */
 #define NUMERUS_EXTENDED_INT_MIN (-3999999L)
+/** Largest real number (double) an extended roman numeral can represent. */
 #define NUMERUS_EXTENDED_MAX (+3999999.9166666665)
+/** Smallest real number (double) an extended roman numeral can represent. */
 #define NUMERUS_EXTENDED_MIN (-3999999.9166666665)
+
+//  --------------- Buffer sizes and maximum string sizes ---------------
 /**
- * The maximum length a basic roman numeral string may have.
+ * Maximum length a basic roman numeral string may have, excluding the
+ * null terminator, thus comparable with strlen().
  *
- * It includes the null terminator `\0`.
+ * That is the length of the roman numeral `-MMMDCCCLXXXVIII`
+ * with value 3888.
+ */
+#define NUMERUS_BASIC_MAX_LEN_NO_TERM (16U)
+
+/**
+ * Maximum length a basic roman numeral string may have, including the
+ * null terminator, thus useful for buffer sizes.
  *
  * That is the length of the roman numeral `-MMMDCCCLXXXVIII\0`
  * with value 3888.
  */
-#define NUMERUS_BASIC_MAX_LEN (17U)
-#define NUMERUS_EXTENDED_MAX_LEN (37U)
-#define NUMERUS_EXTENDED_OVERLINED_MAX_LEN (53U)
-#define NUMERUS_ZERO_ROMAN_LEN (6U)
+#define NUMERUS_BASIC_MAX_LEN_WITH_TERM (NUMERUS_BASIC_MAX_LEN_NO_TERM + 1U)
 
+/**
+ * Maximum length an extended roman numeral string may have, excluding
+ * the null terminator, thus comparable with strlen().
+ *
+ * That is the length of the roman numeral
+ * `-_MMMDCCCLXXXVIII_DCCCLXXXVIIIS.....`
+ * with value (-3888888 and -11/12) = -3888888.9166666665.
+ */
+#define NUMERUS_EXTENDED_MAX_LEN_NO_TERM (36U)
+
+/**
+ * Maximum length an extended roman numeral string may have, including
+ * the null terminator, thus useful for buffer sizes.
+ *
+ * That is the length of the roman numeral
+ * `-_MMMDCCCLXXXVIII_DCCCLXXXVIIIS.....\0`
+ * with value (-3888888 and -11/12) = -3888888.9166666665.
+ */
+#define NUMERUS_EXTENDED_MAX_LEN_WITH_TERM \
+    (NUMERUS_EXTENDED_MAX_LEN_NO_TERM + 1U)
+
+/**
+ * Maximum length an extended roman numeral formatted by numerus_fmt_overline()
+ * may have, excluding the null terminator, thus comparable with strlen().
+ *
+ * This is the length of the string
+ * ` _______________\r\n-MMMDCCCLXXXVIIIDCCCLXXXVIIIS.....`
+ * with value (-3888888 and -11/12) = -3888888.9166666665.
+ */
+#define NUMERUS_EXTENDED_OVERLINED_MAX_LEN_NO_TERM (52U)
+
+/**
+ * Maximum length an extended roman numeral formatted by numerus_fmt_overline()
+ * may have, including the null terminator, thus useful for buffer sizes.
+ *
+ * This is the length of the string
+ * ` _______________\r\n-MMMDCCCLXXXVIIIDCCCLXXXVIIIS.....\0`
+ * with value (-3888888 and -11/12) = -3888888.9166666665.
+ */
+#define NUMERUS_EXTENDED_OVERLINED_MAX_LEN_WITH_TERM \
+    (NUMERUS_EXTENDED_OVERLINED_MAX_LEN_NO_TERM + 1U)
+
+/**
+ * Exact length of the roman numeral with value 0 (zero) #NUMERUS_ZERO_ROMAN
+ * excluding the null terminator, thus comparable with strlen().
+ */
+#define NUMERUS_ZERO_ROMAN_LEN_NO_TERM (5U)
+
+/**
+ * Exact length of the roman numeral with value 0 (zero) #NUMERUS_ZERO_ROMAN
+ * including the null terminator, thus useful for buffer sizes.
+ */
+#define NUMERUS_ZERO_ROMAN_LEN_WITH_TERM (NUMERUS_ZERO_ROMAN_LEN_NO_TERM + 1U)
+
+/** Roman numeral with value 0 (zero).
+ * Length without terminator: #NUMERUS_ZERO_ROMAN_LEN_NO_TERM.
+ * Length with terminator: #NUMERUS_ZERO_ROMAN_LEN_WITH_TERM.
+ */
+extern const char NUMERUS_ZERO_ROMAN[NUMERUS_ZERO_ROMAN_LEN_WITH_TERM];
+
+
+/** Error codes returned by Numerus functions. */
 typedef enum
 {
-    NUMERUS_OK = 0,
-    NUMERUS_ERR_NULL_NUMERAL,
-    NUMERUS_ERR_NULL_FRACTION,
-    NUMERUS_ERR_NULL_DOUBLE,
-    NUMERUS_ERR_NULL_INT,
-    NUMERUS_ERR_VALUE_OUT_OF_RANGE,
-    NUMERUS_ERR_NOT_FINITE_DOUBLE,
-    NUMERUS_ERR_PARSING_EMPTY_NUMERAL,
-    NUMERUS_ERR_PARSING_INVALID_SYNTAX,
-    NUMERUS_ERR_PARSING_NON_TERMINATED_VINCULUM,
+    NUMERUS_OK = 0, ///< Successful completion
+    NUMERUS_ERR_NULL_NUMERAL, ///< Roman numeral must be not-NULL
+    NUMERUS_ERR_NULL_FRACTION, ///< Fraction #numerus_frac_t must be not-NULL
+    NUMERUS_ERR_NULL_DOUBLE, ///< Double value must be not-NULL
+    NUMERUS_ERR_NULL_INT,  ///< Integer value must be not-NULL
+    NUMERUS_ERR_NULL_FORMATTED, ///< Formatted string must be not-NULL
+    NUMERUS_ERR_VALUE_OUT_OF_RANGE, ///< Too large/small value to convert
+    NUMERUS_ERR_NOT_FINITE_DOUBLE, ///< Cannot operate on non finite double
+    NUMERUS_ERR_PARSING_EMPTY_NUMERAL, ///< Roman numeral is empty/only spaces
+    NUMERUS_ERR_PARSING_INVALID_SYNTAX, ///< Illegal roman char or order  // TODO link to syntax file
+    NUMERUS_ERR_PARSING_NON_TERMINATED_VINCULUM, ///< Missing end of vinculum
+    /** The 'M' roman char is not allowed after the vinculum's end */
     NUMERUS_ERR_PARSING_M_AFTER_VINCULUM,
-    NUMERUS_ERR_NULL_FORMATTED,
-    NUMERUS_ERR_MALLOC_FAILURE,
+    NUMERUS_ERR_MALLOC_FAILURE, ///< Heap memory allocation failed
 } numerus_err_t;
 
-extern const char NUMERUS_ZERO_ROMAN[NUMERUS_ZERO_ROMAN_LEN];
 
 typedef struct
 {
@@ -125,6 +200,12 @@ numerus_err_t numerus_double_to_fraction(
 
 
 // --------------- Formatting ---------------
+/**
+ *
+ * @param [out] formatted
+ * @param [in] fraction
+ * @retval
+ */
 numerus_err_t numerus_fmt_fraction(
         char* formatted, numerus_frac_t fraction);
 numerus_err_t numerus_fmt_overlined_wineol(

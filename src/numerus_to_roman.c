@@ -9,7 +9,7 @@
 #include "numerus.h"
 
 
-const char NUMERUS_ZERO_ROMAN[6] = "NULLA";
+const char NUMERUS_ZERO_ROMAN[NUMERUS_ZERO_ROMAN_LEN_WITH_TERM] = "NULLA";
 
 numerus_err_t
 numerus_to_roman(char* numeral, int_fast32_t value)

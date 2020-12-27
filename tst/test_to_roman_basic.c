@@ -12,7 +12,7 @@
 
 
 #define CANARY '@'
-#define ATTO_CANARY_IS_INTACT() atto_eq(roman[NUMERUS_BASIC_MAX_LEN], CANARY)
+#define ATTO_CANARY_IS_INTACT() atto_eq(roman[NUMERUS_BASIC_MAX_LEN_WITH_TERM], CANARY)
 #define EXPECTED_ROMANS_ELEMENTS 101
 
 static const char* EXPECTED_ROMANS[EXPECTED_ROMANS_ELEMENTS] =
@@ -123,7 +123,7 @@ static const char* EXPECTED_ROMANS[EXPECTED_ROMANS_ELEMENTS] =
 
 static void test_to_roman_basic_invalid(void)
 {
-    char roman[NUMERUS_BASIC_MAX_LEN] = {CANARY};
+    char roman[NUMERUS_BASIC_MAX_LEN_WITH_TERM] = {CANARY};
     numerus_err_t err;
 
     err = numerus_to_roman(NULL, 0);
@@ -141,7 +141,7 @@ static void test_to_roman_basic_invalid(void)
 
 static void test_to_roman_basic_valid_few_basic(void)
 {
-    char roman[NUMERUS_BASIC_MAX_LEN];
+    char roman[NUMERUS_BASIC_MAX_LEN_WITH_TERM];
     numerus_err_t err;
 
     err = numerus_to_roman(roman, 0);
@@ -172,8 +172,8 @@ static void test_to_roman_basic_valid_few_basic(void)
 
 static void test_to_roman_basic_valid_positives(void)
 {
-    char roman[NUMERUS_BASIC_MAX_LEN + 1];
-    roman[NUMERUS_BASIC_MAX_LEN] = CANARY;
+    char roman[NUMERUS_BASIC_MAX_LEN_WITH_TERM + 1];
+    roman[NUMERUS_BASIC_MAX_LEN_WITH_TERM] = CANARY;
     numerus_err_t err;
     int_fast16_t i;
 
@@ -188,8 +188,8 @@ static void test_to_roman_basic_valid_positives(void)
 
 static void test_to_roman_basic_valid_negatives(void)
 {
-    char roman[NUMERUS_BASIC_MAX_LEN + 1];
-    roman[NUMERUS_BASIC_MAX_LEN] = CANARY;
+    char roman[NUMERUS_BASIC_MAX_LEN_WITH_TERM + 1];
+    roman[NUMERUS_BASIC_MAX_LEN_WITH_TERM] = CANARY;
     numerus_err_t err;
     int_fast16_t i;
 

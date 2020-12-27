@@ -118,6 +118,7 @@ if (DOXYGEN_FOUND)
     set(DOXYGEN_IMAGE_PATH ${PROJECT_SOURCE_DIR}/images)
     set(DOXYGEN_ALIASES license="**License:**")
     set(DOXYGEN_USE_MDFILE_AS_MAINPAGE README.md)
+    # TODO activate all warnings, upgrade them to errors
     doxygen_add_docs(doxygen
                      ALL # Build doxygen on make-all
                      # List of input files for Doxygen

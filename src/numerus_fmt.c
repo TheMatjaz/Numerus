@@ -1,5 +1,7 @@
 /**
  * @file
+ * @internal
+ * String formatting functions for roman numerals and fractions.
  *
  * @copyright Copyright © 2015-2020, Matjaž Guštin <dev@matjaz.it>
  * <https://matjaz.it>. All rights reserved.
@@ -9,17 +11,45 @@
 #include "numerus.h"
 
 
-#define FMTSTR_INT "%"PRId32
-#define FMTSTR_INT_AND_TWELFTH "%"PRId32", %"PRId32"/%"PRIdFAST8
+/** @internal
+ * Format string for an integer part of a #numerus_frac_t */
+#define FMTSTR_INTPART "%"PRId32
+
+/** @internal
+ * Format string for the integer part and twelfths of a #numerus_frac_t */
+#define FMTSTR_INTPART_AND_TWELFTH FMTSTR_INTPART", %"PRId32"/%"PRIdFAST8
+
 /**
- * The maximum length a basic roman numeral string may have.
+ * @internal
+ * The maximum length a basic roman numeral string may have, excluding the
+ * null terminator `\0`.
  *
- * It includes the null terminator `\0`.
- *
- * That is the length of the roman numeral `-DCCCLXXXVIIIS.....\0`
+ * That is the length of the roman numeral "-DCCCLXXXVIIIS....."
  * with value -888-11/12.
  */
-#define NUMERUS_POST_VINCULUM_MAX_LEN (20)
+#define NUMERUS_POST_VINCULUM_MAX_LEN (19)
+
+/**
+ * @internal
+ * Behaves like strncpy() but always forcibly null-terminates the destination.
+ *
+ * Copies \p src to \p dst until the end of \p src or until \p len
+ * characters are copied over. Then, regardless of which of the two cases
+ * happened, forcibly terminates the destination string with '\0';
+ *
+ * @param [out] dst copy of \p src
+ * @param [in] src original string to copy
+ * @param [in] len max amount of bytes (chars) to copy
+ */
+inline static void safe_strncpy(char* dst, const char* src, uint_fast8_t len)
+{
+    while (*src != '\0' && len)
+    {
+        *(dst++) = *(src++);
+        len--;
+    }
+    *dst = '\0'; // Forcibly terminate destination
+}
 
 static numerus_err_t
 fmt_overlined(char* formatted, const char* numeral, const bool windows)
@@ -27,39 +57,41 @@ fmt_overlined(char* formatted, const char* numeral, const bool windows)
     if (formatted == NULL) { return NUMERUS_ERR_NULL_FORMATTED; }
     if (numeral == NULL)
     {
-        *formatted = '\0';
+        *formatted = '\0';  // Provide emtpy string output in case of error
         return NUMERUS_ERR_NULL_NUMERAL;
     }
     const bool is_negative = (*numeral == '-');
     if (*numeral == '_')
     {
-        // Has vinculum.
+        // Has vinculum, thus the overlining must be applied.
         if (is_negative)
         {
             // Write space above the minus sign, before the vinculum line
             *(formatted++) = ' ';
-            numeral++; // Skip the minus sign in the original
+            numeral++;  // Skip the minus sign in the original string
         }
-        numeral++; // Skip start of vinculum
+        numeral++;  // Skip start of vinculum in the original string
+        // Start overlining the vinculum
         while (*numeral != '_')
         {
-            *(formatted++) = '_';
+            *(formatted++) = '_';  // Overline a character in the vinculum
             if (*numeral == '\0')
             {
                 *formatted = '\0';
                 return NUMERUS_ERR_PARSING_NON_TERMINATED_VINCULUM;
             }
-            numeral++;
+            else { numeral++; }
         }
-        // Add the end of line, both Windows or Unix styles supported.
+        // End of overlining, go to next line. Append EOL character
         if (windows) { *(formatted++) = '\r'; }
         *(formatted++) = '\n';
         // Write the minus before the overlined part
         if (is_negative) { *(formatted++) = '-'; }
-        numeral++; // Skip end of vinculum
+        numeral++; // Skip end of vinculum in the original string
     }
-    // Copy the part after the vinculum
-    strncpy(formatted, numeral, NUMERUS_POST_VINCULUM_MAX_LEN);
+    // Copy the rest of the string after the vinculum or (if no vinculum
+    // at all) simply the whole string. The function null terminates properly.
+    safe_strncpy(formatted, numeral, NUMERUS_POST_VINCULUM_MAX_LEN);
     return NUMERUS_OK;
 }
 
@@ -74,7 +106,6 @@ inline numerus_err_t numerus_fmt_overlined_unixeol(
 {
     return fmt_overlined(formatted, numeral, false);
 }
-
 
 /**
  * @internal
@@ -97,6 +128,7 @@ inline numerus_err_t numerus_fmt_overlined_unixeol(
 inline static void
 simplify_fraction(int32_t* const numerator, int_fast8_t* const denominator)
 {
+    // Store the negative sign to reapply it at the end
     const bool is_negative = *numerator < 0;
     if (is_negative) { *numerator = -*numerator; }
     switch (*numerator)
@@ -152,6 +184,7 @@ simplify_fraction(int32_t* const numerator, int_fast8_t* const denominator)
         }
         default: break; // Nothing to simplify, stays the same
     }
+    // Reapply negative sign, if any
     if (is_negative) { *numerator = -*numerator; }
 }
 
@@ -162,21 +195,24 @@ numerus_err_t numerus_fmt_fraction(
     numerus_err_t err = numerus_simplify_fraction(&fraction);
     if (err != NUMERUS_OK)
     {
-        *formatted = '\0';
+        *formatted = '\0';  // Provide emtpy string output in case of error
         return err;
     }
     if (fraction.twelfths == 0)
     {
-        formatted += sprintf(formatted, FMTSTR_INT, fraction.int_part);
+        // No fractional part to write, so simply write just the int part.
+        formatted += sprintf(formatted, FMTSTR_INTPART, fraction.int_part);
     }
     else
     {
+        // Write the int part and the fractional part.
+        // Simplify the fraction first to provide more human-readable output.
         int_fast8_t denominator = 12;
         simplify_fraction(&fraction.twelfths, &denominator);
         formatted += sprintf(
-                formatted, FMTSTR_INT_AND_TWELFTH,
+                formatted, FMTSTR_INTPART_AND_TWELFTH,
                 fraction.int_part, fraction.twelfths, denominator);
     }
-    *formatted = '\0';
+    *formatted = '\0';  // Always null terminate the output.
     return NUMERUS_OK;
 }
