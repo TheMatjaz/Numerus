@@ -1,5 +1,6 @@
 /**
  * @file
+ * Test cases for the string-utilities functions from numerus_strutils.c
  *
  * @copyright Copyright © 2015-2020, Matjaž Guštin <dev@matjaz.it>
  * <https://matjaz.it>. All rights reserved.

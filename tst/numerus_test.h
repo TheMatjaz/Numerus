@@ -1,6 +1,7 @@
 /**
  * @file
- * @brief
+ * API to the collection of tests of the components of Numerus.
+ *
  * @copyright Copyright © 2015-2020, Matjaž Guštin <dev@matjaz.it>
  * <https://matjaz.it>. All rights reserved.
  * @license BSD 3-clause license.
@@ -19,9 +20,13 @@ extern "C"
 
 
 void test_constants(void);
-void test_to_roman(void);
 void test_strutils(void);
 void test_fraction(void);
+void test_fmt(void);
+void test_to_roman_basic(void);
+void test_to_roman_extended(void);
+void test_from_roman_basic(void);
+void test_from_roman_extended(void);
 
 #ifdef __cplusplus
 }

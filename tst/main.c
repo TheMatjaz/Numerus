@@ -1,5 +1,6 @@
 /**
  * @file
+ * Test suite runner of the Numerus library.
  *
  * @copyright Copyright © 2015-2020, Matjaž Guštin <dev@matjaz.it>
  * <https://matjaz.it>. All rights reserved.
@@ -12,8 +13,12 @@
 int main(void)
 {
     test_constants();
-    test_to_roman();
     test_strutils();
     test_fraction();
+    test_fmt();
+    test_to_roman_basic();
+    test_to_roman_extended();
+    test_from_roman_basic();
+    test_from_roman_extended();
     return atto_at_least_one_fail;
 }

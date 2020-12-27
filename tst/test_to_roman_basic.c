@@ -1,5 +1,7 @@
 /**
  * @file
+ * Test cases for the value to **basic** roman numeral conversion functions
+ * from numerus_to_roman.c and numerus_to_roman_alloc.c
  *
  * @copyright Copyright © 2015-2020, Matjaž Guštin <dev@matjaz.it>
  * <https://matjaz.it>. All rights reserved.
@@ -119,7 +121,7 @@ static const char* EXPECTED_ROMANS[EXPECTED_ROMANS_ELEMENTS] =
         };
 
 
-static void test_to_roman_invalid(void)
+static void test_to_roman_basic_invalid(void)
 {
     char roman[NUMERUS_BASIC_MAX_LEN] = {CANARY};
     numerus_err_t err;
@@ -137,7 +139,7 @@ static void test_to_roman_invalid(void)
     atto_eq(roman[0], CANARY); // Roman untouched
 }
 
-static void test_to_roman_valid_few_basic(void)
+static void test_to_roman_basic_valid_few_basic(void)
 {
     char roman[NUMERUS_BASIC_MAX_LEN];
     numerus_err_t err;
@@ -168,7 +170,7 @@ static void test_to_roman_valid_few_basic(void)
     atto_streq("MMMCMXCIX", roman, 9);
 }
 
-static void test_to_roman_valid_positives(void)
+static void test_to_roman_basic_valid_positives(void)
 {
     char roman[NUMERUS_BASIC_MAX_LEN + 1];
     roman[NUMERUS_BASIC_MAX_LEN] = CANARY;
@@ -184,7 +186,7 @@ static void test_to_roman_valid_positives(void)
     }
 }
 
-static void test_to_roman_valid_negatives(void)
+static void test_to_roman_basic_valid_negatives(void)
 {
     char roman[NUMERUS_BASIC_MAX_LEN + 1];
     roman[NUMERUS_BASIC_MAX_LEN] = CANARY;
@@ -201,7 +203,7 @@ static void test_to_roman_valid_negatives(void)
     }
 }
 
-static void test_to_roman_valid_alloc(void)
+static void test_to_roman_basic_valid_alloc(void)
 {
     char* roman = NULL;
     numerus_err_t err;
@@ -229,11 +231,11 @@ static void test_to_roman_valid_alloc(void)
 }
 
 
-void test_to_roman(void)
+void test_to_roman_basic(void)
 {
-    test_to_roman_invalid();
-    test_to_roman_valid_few_basic();
-    test_to_roman_valid_positives();
-    test_to_roman_valid_negatives();
-    test_to_roman_valid_alloc();
+    test_to_roman_basic_invalid();
+    test_to_roman_basic_valid_few_basic();
+    test_to_roman_basic_valid_positives();
+    test_to_roman_basic_valid_negatives();
+    test_to_roman_basic_valid_alloc();
 }

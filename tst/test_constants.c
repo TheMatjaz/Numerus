@@ -1,5 +1,7 @@
 /**
  * @file
+ * Test cases for the constants of the Numerus library, either defines
+ * or const data types values.
  *
  * @copyright Copyright © 2015-2020, Matjaž Guštin <dev@matjaz.it>
  * <https://matjaz.it>. All rights reserved.

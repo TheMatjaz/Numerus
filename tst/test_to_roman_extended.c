@@ -1,6 +1,7 @@
 /**
  * @file
- * Test cases for the string-formatting functions from numerus_fmt.c
+ * Test cases for the value to **extended** roman numeral conversion functions
+ * from numerus_to_roman.c and numerus_to_roman_alloc.
  *
  * @copyright Copyright © 2015-2020, Matjaž Guštin <dev@matjaz.it>
  * <https://matjaz.it>. All rights reserved.
@@ -10,7 +11,7 @@
 #include "numerus_test.h"
 
 
-void test_fmt(void)
+void test_to_roman_extended(void)
 {
     atto_fail();
 }
