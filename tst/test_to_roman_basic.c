@@ -123,20 +123,23 @@ static const char* EXPECTED_ROMANS[EXPECTED_ROMANS_ELEMENTS] =
 
 static void test_to_roman_basic_invalid(void)
 {
-    char roman[NUMERUS_BASIC_MAX_LEN_WITH_TERM] = {CANARY};
+    char roman[NUMERUS_BASIC_MAX_LEN_WITH_TERM] = {'A'};
     numerus_err_t err;
 
+    roman[0] = 'A';
     err = numerus_to_roman(NULL, 0);
     atto_eq(NUMERUS_ERR_NULL_NUMERAL, err);
-    atto_eq(roman[0], CANARY); // Roman untouched
+    atto_streq(roman, "A", NUMERUS_BASIC_MAX_LEN_WITH_TERM);
 
+    roman[0] = 'A';
     err = numerus_to_roman(roman, NUMERUS_BASIC_MAX + 1);
     atto_eq(NUMERUS_ERR_VALUE_OUT_OF_RANGE, err);
-    atto_eq(roman[0], CANARY); // Roman untouched
+    atto_streq(roman, "", NUMERUS_BASIC_MAX_LEN_WITH_TERM);
 
+    roman[0] = 'A';
     err = numerus_to_roman(roman, NUMERUS_BASIC_MIN - 1);
     atto_eq(NUMERUS_ERR_VALUE_OUT_OF_RANGE, err);
-    atto_eq(roman[0], CANARY); // Roman untouched
+    atto_streq(roman, "", NUMERUS_BASIC_MAX_LEN_WITH_TERM);
 }
 
 static void test_to_roman_basic_valid_few_basic(void)
@@ -181,7 +184,7 @@ static void test_to_roman_basic_valid_positives(void)
     {
         err = numerus_to_roman(roman, i);
         atto_eq(err, NUMERUS_OK);
-        atto_streq(EXPECTED_ROMANS[i], roman, strlen(EXPECTED_ROMANS[i]));
+        atto_streq(EXPECTED_ROMANS[i], roman, NUMERUS_BASIC_MAX_LEN_WITH_TERM-1);
         ATTO_CANARY_IS_INTACT();
     }
 }
@@ -198,7 +201,7 @@ static void test_to_roman_basic_valid_negatives(void)
         err = numerus_to_roman(roman, -i);
         atto_eq(err, NUMERUS_OK);
         atto_eq('-', roman[0]);
-        atto_streq(EXPECTED_ROMANS[i], &roman[1], strlen(EXPECTED_ROMANS[i]));
+        atto_streq(EXPECTED_ROMANS[i], &roman[1], NUMERUS_BASIC_MAX_LEN_WITH_TERM-1);
         ATTO_CANARY_IS_INTACT();
     }
 }
@@ -214,17 +217,17 @@ static void test_to_roman_basic_valid_alloc(void)
         err = numerus_to_roman_alloc(&roman, i);
         atto_eq(err, NUMERUS_OK);
         atto_neq(roman, NULL);
-        atto_streq(EXPECTED_ROMANS[i], roman, strlen(EXPECTED_ROMANS[i]));
+        atto_streq(EXPECTED_ROMANS[i], roman, NUMERUS_BASIC_MAX_LEN_WITH_TERM-1);
         free(roman);
         roman = NULL;
     }
     for (i = 1; i < EXPECTED_ROMANS_ELEMENTS; i++)
     {
-        err = numerus_to_roman(roman, -i);
+        err = numerus_to_roman_alloc(&roman, -i);
         atto_eq(err, NUMERUS_OK);
         atto_neq(roman, NULL);
         atto_eq('-', roman[0]);
-        atto_streq(EXPECTED_ROMANS[i], &roman[1], strlen(EXPECTED_ROMANS[i]));
+        atto_streq(EXPECTED_ROMANS[i], &roman[1], NUMERUS_BASIC_MAX_LEN_WITH_TERM-1);
         free(roman);
         roman = NULL;
     }

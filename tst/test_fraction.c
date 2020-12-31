@@ -96,8 +96,6 @@ static void test_fraction_to_double_invalid(void)
     double real = 1.0;
 
     atto_eq(numerus_fraction_to_double(NULL, fraction), NUMERUS_ERR_NULL_DOUBLE);
-    atto_nan(real);
-    real = 1.0;
     fraction.int_part = NUMERUS_EXTENDED_INT_MAX;
     fraction.twelfths = 12;
     atto_eq(numerus_fraction_to_double(&real, fraction),
