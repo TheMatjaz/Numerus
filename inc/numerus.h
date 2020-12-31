@@ -120,7 +120,7 @@ typedef enum
 } numerus_err_t;
 
 // Todo doxygen
-typedef struct
+typedef struct numerus_frac
 {
     int32_t int_part;
     int32_t twelfths;
@@ -166,7 +166,7 @@ bool numerus_is_zero(const char* numeral);
 int_fast8_t numerus_sign(const char* numeral);
 
 
-// --------------- Utilities on fractions ---------------
+// ----- Utilities on fractions -----------------------------------------------
 numerus_err_t
 numerus_simplify_fraction(numerus_frac_t* fraction);
 numerus_err_t numerus_fraction_to_double(
@@ -177,7 +177,7 @@ numerus_err_t numerus_double_to_fraction(
         double real);
 
 
-// --------------- Formatting ---------------
+// ---- Formatting ------------------------------------------------------------
 /**
  * Formats the #numerus_frac_t fraction as a human-readable string.
  *
