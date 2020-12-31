@@ -34,8 +34,8 @@ static void test_sign(void)
     atto_eq(numerus_sign("nulla"), 0);
     atto_eq(numerus_sign("-NULLA"), 0);
     atto_eq(numerus_sign("-nulla"), 0);
-    atto_eq(numerus_sign("HELLO"), 1);
-    atto_eq(numerus_sign("-HELLO"), -1);
+    atto_eq(numerus_sign("HELLO"), 0);
+    atto_eq(numerus_sign("-HELLO"), 0);
 }
 
 void test_strutils(void) {
