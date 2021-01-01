@@ -40,8 +40,9 @@
  * @param [out] dst copy of \p src
  * @param [in] src original string to copy
  * @param [in] len max amount of bytes (chars) to copy
+ * @returns end of the \p dst (the null terminator)
  */
-inline static void safe_strncpy(char* dst, const char* src, uint_fast8_t len)
+inline static char* safe_strncpy(char* dst, const char* src, size_t len)
 {
     while (*src != '\0' && len)
     {
@@ -49,6 +50,7 @@ inline static void safe_strncpy(char* dst, const char* src, uint_fast8_t len)
         len--;
     }
     *dst = '\0'; // Forcibly terminate destination
+    return dst;
 }
 
 numerus_err_t numerus_fmt_overlined(
@@ -56,6 +58,7 @@ numerus_err_t numerus_fmt_overlined(
         const char* numeral,
         const bool use_windows_eol)
 {
+    // TODO what if the numeral is too long? Do this check everywhere!
     if (formatted == NULL) { return NUMERUS_ERR_NULL_FORMATTED; }
     if (numeral == NULL)
     {
@@ -63,7 +66,9 @@ numerus_err_t numerus_fmt_overlined(
         return NUMERUS_ERR_NULL_NUMERAL;
     }
     const bool is_negative = (*numeral == '-');
-    if (*numeral == '_')
+    const bool has_vinculum =
+            (is_negative && numeral[1] == '_') || (numeral[0] == '_');
+    if (has_vinculum)
     {
         // Has vinculum, thus the overlining must be applied.
         if (is_negative)
@@ -74,21 +79,26 @@ numerus_err_t numerus_fmt_overlined(
         }
         numeral++;  // Skip start of vinculum in the original string
         // Start overlining the vinculum
+        size_t vinculum_len = 0;
         while (*numeral != '_')
         {
-            *(formatted++) = '_';  // Overline a character in the vinculum
             if (*numeral == '\0')
             {
                 *formatted = '\0';
                 return NUMERUS_ERR_PARSING_NON_TERMINATED_VINCULUM;
             }
-            else { numeral++; }
+            *(formatted++) = '_';  // Overline a character in the vinculum
+            numeral++;
+            vinculum_len++;
         }
         // End of overlining, go to next line. Append EOL character(s)
         if (use_windows_eol) { *(formatted++) = '\r'; }
         *(formatted++) = '\n';
         // Write the minus before the overlined part
         if (is_negative) { *(formatted++) = '-'; }
+        // Copy the part within the vinculum until the second '_'
+        formatted = safe_strncpy(
+                formatted, numeral - vinculum_len, vinculum_len);
         numeral++; // Skip end of vinculum in the original string
     }
     // Copy the rest of the string after the vinculum or (if no vinculum

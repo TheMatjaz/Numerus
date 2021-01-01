@@ -74,7 +74,7 @@ extern "C"
  * ` _______________\r\n-MMMDCCCLXXXVIIIDCCCLXXXVIIIS.....\0`
  * with value (-3888888 and -11/12) = -3888888.9166666665.
  */
-#define NUMERUS_EXTENDED_OVERLINED_MAX_LEN_WITH_TERM (52U + 1U)
+#define NUMERUS_OVERLINED_MAX_LEN_WITH_TERM (52U + 1U)
 
 /**
  * Maximum length a #numerus_frac_t fraction formatted by
@@ -101,7 +101,7 @@ extern const char NUMERUS_ZERO_ROMAN[NUMERUS_ZERO_ROMAN_LEN_WITH_TERM];
 
 // ----- Error codes and data types -------------------------------------------
 /** Error codes returned by Numerus functions. */
-typedef enum
+typedef enum numerus_err
 {
     NUMERUS_OK = 0, ///< Successful completion
     NUMERUS_ERR_NULL_NUMERAL, ///< Roman numeral must be not-NULL
@@ -124,7 +124,7 @@ typedef struct numerus_frac
 {
     int32_t int_part;
     int32_t twelfths;
-} numerus_frac_t;
+} numerus_frac_t; // Todo better name than frac: value? extvalue?
 
 
 //  --------------- From roman numeral to int/double/fraction ---------------

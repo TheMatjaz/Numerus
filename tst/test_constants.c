@@ -21,5 +21,5 @@ void test_constants(void) {
     atto_ddelta(NUMERUS_EXTENDED_MIN, -3999999.0 - 11.0/12.0, 1e-6);
     atto_eq(NUMERUS_BASIC_MAX_LEN_WITH_TERM, 17);
     atto_eq(NUMERUS_EXTENDED_MAX_LEN_WITH_TERM, 37);
-    atto_eq(NUMERUS_EXTENDED_OVERLINED_MAX_LEN_WITH_TERM, 53);
+    atto_eq(NUMERUS_OVERLINED_MAX_LEN_WITH_TERM, 53);
 }

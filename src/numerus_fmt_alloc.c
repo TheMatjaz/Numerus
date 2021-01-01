@@ -31,7 +31,7 @@ numerus_err_t numerus_fmt_overlined_alloc(
 {
     if (formatted == NULL) { return NUMERUS_ERR_NULL_FORMATTED; }
     *formatted = NULL;  // Provide unusable output in case of error
-    char buffer[NUMERUS_FORMATTED_FRACTION_MAX_LEN_WITH_TERM];
+    char buffer[NUMERUS_OVERLINED_MAX_LEN_WITH_TERM];
     const numerus_err_t err = numerus_fmt_overlined(
             buffer, numeral, use_windows_eol);
     if (err != NUMERUS_OK) { return err; }
