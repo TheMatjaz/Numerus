@@ -16,8 +16,13 @@
 #define FMTSTR_INTPART "%"PRId32
 
 /** @internal
- * Format string for the integer part and twelfths of a #numerus_frac_t */
-#define FMTSTR_INTPART_AND_TWELFTH FMTSTR_INTPART", %"PRId32"/%"PRIdFAST8
+ * Format string for the twelfths of a #numerus_frac_t */
+#define FMTSTR_TWELFTHS "%"PRId32"/%"PRIdFAST8
+
+/** @internal
+ * Format string for the separator between the integer part and twelfths of a
+ * #numerus_frac_t */
+#define FMTSTR_SEPARATOR ", "
 
 /**
  * @internal
@@ -126,7 +131,9 @@ numerus_err_t numerus_fmt_overlined(
  * @param[out] denominator simplified denominator
  */
 inline static void
-simplify_fraction(int32_t* const numerator, int_fast8_t* const denominator)
+simplify_fraction_smaller_than_1(
+        int32_t* const numerator,
+        int_fast8_t* const denominator)
 {
     // Store the negative sign to reapply it at the end
     const bool is_negative = *numerator < 0;
@@ -198,20 +205,26 @@ numerus_err_t numerus_fmt_fraction(
         *formatted = '\0';  // Provide emtpy string output in case of error
         return err;
     }
-    if (fraction.twelfths == 0)
+    if (fraction.twelfths == 0 || fraction.int_part != 0)
     {
-        // No fractional part to write, so simply write just the int part.
+        // Write only the integer part, regardless of its value.
+        // This covers the case when the fraction is zero and
+        // when there is only an integer part.
         formatted += sprintf(formatted, FMTSTR_INTPART, fraction.int_part);
     }
-    else
+    if (fraction.twelfths != 0)
     {
-        // Write the int part and the fractional part.
-        // Simplify the fraction first to provide more human-readable output.
+        if (fraction.int_part != 0)
+        {
+            // Something was written down for the integer part so far, so
+            // add a separator between it and the twelfths.
+            formatted += sprintf(formatted, FMTSTR_SEPARATOR);
+        }
+        // Write down the twelfths part
         int_fast8_t denominator = 12;
-        simplify_fraction(&fraction.twelfths, &denominator);
-        formatted += sprintf(
-                formatted, FMTSTR_INTPART_AND_TWELFTH,
-                fraction.int_part, fraction.twelfths, denominator);
+        simplify_fraction_smaller_than_1(&fraction.twelfths, &denominator);
+        formatted += sprintf(formatted, FMTSTR_TWELFTHS,
+                             fraction.twelfths, denominator);
     }
     *formatted = '\0';  // Always null terminate the output.
     return NUMERUS_OK;
