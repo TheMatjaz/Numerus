@@ -53,13 +53,16 @@ set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -DRELEASE \
 # Source files
 # -----------------------------------------------------------------------------
 set(LIBNUMERUS_HEADER inc/numerus.h)
-set(LIBNUMERUS_SRC
+set(LIBNUMERUS_SRC_NOALLOC
     ${LIBNUMERUS_HEADER}
     src/numerus_to_roman.c
     src/numerus_strutils.c
     src/numerus_fraction.c
     src/numerus_from_roman.c
     src/numerus_fmt.c
+    )
+set(LIBNUMERUS_SRC_ALLOC
+    ${LIBNUMERUS_SRC_NOALLOC}
     src/numerus_to_roman_alloc.c
     src/numerus_fmt_alloc.c)
 set(TEST_NUMERUS_SRC
@@ -80,7 +83,6 @@ set(NUMERUS_DOXYGEN_SRC
     README.md
     CHANGELOG.md
     )
-include_directories(AFTER SYSTEM inc/ tst/)
 
 
 # -----------------------------------------------------------------------------
@@ -91,42 +93,74 @@ include_directories(AFTER SYSTEM inc/ tst/)
 configure_file(${LIBNUMERUS_HEADER} ${CMAKE_BINARY_DIR} COPYONLY)
 
 # Static library
-add_library(numerus_static ${LIBNUMERUS_SRC})
-target_include_directories(numerus_static PUBLIC inc/ src/)
+add_library(numerus_static_noalloc ${LIBNUMERUS_SRC_NOALLOC})
+target_include_directories(numerus_static_noalloc PUBLIC inc/)
+target_compile_definitions(numerus_static_noalloc PUBLIC NUMERUS_HAS_MALLOC=0)
+add_library(numerus_static ${LIBNUMERUS_SRC_ALLOC})
+target_include_directories(numerus_static PUBLIC inc/)
 target_compile_definitions(numerus_static PUBLIC NUMERUS_HAS_MALLOC=1)
 
 # Shared library (.dylib / .dll)
 # Does not reuse the static library object files, as they are
 # recompiled in order to have position-independent code
-add_library(numerus SHARED ${LIBNUMERUS_SRC})
+add_library(numerus_noalloc SHARED ${LIBNUMERUS_SRC_NOALLOC})
+set_property(TARGET numerus_noalloc PROPERTY POSITION_INDEPENDENT_CODE ON)
+target_include_directories(numerus_noalloc PUBLIC inc/)
+target_compile_definitions(numerus_noalloc PUBLIC NUMERUS_HAS_MALLOC=0)
+add_library(numerus SHARED ${LIBNUMERUS_SRC_ALLOC})
 set_property(TARGET numerus PROPERTY POSITION_INDEPENDENT_CODE ON)
-target_include_directories(numerus PUBLIC inc/ src/)
+target_include_directories(numerus PUBLIC inc/)
 target_compile_definitions(numerus PUBLIC NUMERUS_HAS_MALLOC=1)
 
 # Test runner executable
-add_executable(test_numerus ${LIBNUMERUS_SRC} ${TEST_NUMERUS_SRC})
+add_executable(test_numerus ${LIBNUMERUS_SRC_ALLOC} ${TEST_NUMERUS_SRC})
 target_include_directories(test_numerus PUBLIC inc/ tst/)
 target_compile_definitions(test_numerus PUBLIC NUMERUS_HAS_MALLOC=1)
 
 # Doxygen documentation builder
-find_package(Doxygen)
+find_package(Doxygen OPTIONAL_COMPONENTS dot)
 if (DOXYGEN_FOUND)
     # Cmake's wrapper of Doxygen, constructing a doxyfile from the
     # DOXYGEN_* variables, which are mapped to the Doxygen variables.
+
+    # Output format
     set(DOXYGEN_GENERATE_HTML YES)
     set(DOXYGEN_GENERATE_MAN YES)
-    set(DOXYGEN_JAVADOC_AUTOBRIEF YES)
-    set(DOXYGEN_OPTIMIZE_OUTPUT_FOR_C YES)
     set(DOXYGEN_SORT_MEMBER_DOCS NO)
-    set(DOXYGEN_IMAGE_PATH ${PROJECT_SOURCE_DIR}/images)
+    set(DOXYGEN_OPTIMIZE_OUTPUT_FOR_C YES)
+    set(DOXYGEN_OUTPUT_LANGUAGE English)
+    set(DOXYGEN_OUTPUT_DIRECTORY docs/)
+
+    # Input format
+    set(DOXYGEN_JAVADOC_AUTOBRIEF YES)
     set(DOXYGEN_ALIASES license="**License:**")
+    set(DOXYGEN_EXTRACT_ALL NO)
+    set(DOXYGEN_INPUT_ENCODING UTF-8)
+
+    # Input files
     set(DOXYGEN_USE_MDFILE_AS_MAINPAGE README.md)
-    # TODO activate all warnings, upgrade them to errors
+    set(DOXYGEN_EXCLUDE src/ tst/ numerus2/ builds/)
+    set(DOXYGEN_IMAGE_PATH ${PROJECT_SOURCE_DIR}/images)
+
+    # Turn on all warnings, as errors
+    set(DOXYGEN_WARNINGS YES)
+    set(DOXYGEN_WARN_IF_UNDOCUMENTED YES)
+    set(DOXYGEN_WARN_IF_DOC_ERROR YES)
+    set(DOXYGEN_WARN_IF_NO_PARAMDOC YES)
+    set(DOXYGEN_WARN_AS_ERROR YES)
+
+    # Parallelise
+    set(DOXYGEN_NUM_PROC_THREADS 0)  # Auto set based on CPU
+
+    # Graphviz's dot
+    set(DOXYGEN_DOT_NUM_THREADS 0)  # Auto set based on CPU
+    set(DOXYGEN_DOT_PATH )  # Empty path = search in $PATH
+
+    # Generate command
     doxygen_add_docs(doxygen
                      ALL # Build doxygen on make-all
-                     # List of input files for Doxygen
-                     ${LIBNUMERUS_DOXYGEN_SRC}
-    )
+                     ${LIBNUMERUS_DOXYGEN_SRC} # List of input files
+                     )
 else (DOXYGEN_FOUND)
     message(WARNING "Doxygen not found. Cannot generate documentation.")
 endif (DOXYGEN_FOUND)
