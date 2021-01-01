@@ -199,7 +199,7 @@ numerus_err_t numerus_fmt_fraction(
         char* formatted, numerus_frac_t fraction)
 {
     if (formatted == NULL) { return NUMERUS_ERR_NULL_FORMATTED; }
-    numerus_err_t err = numerus_simplify_fraction(&fraction);
+    numerus_err_t err = numerus_fraction_simplify(&fraction);
     if (err != NUMERUS_OK)
     {
         *formatted = '\0';  // Provide emtpy string output in case of error

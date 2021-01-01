@@ -1,7 +1,7 @@
 /**
  * @file
  * Test cases for the value to **extended** roman numeral conversion functions
- * from numerus_to_roman.c and numerus_to_roman_alloc.
+ * from numerus_roman_from_int.c and numerus_roman_from_int_alloc.
  *
  * @copyright Copyright © 2015-2020, Matjaž Guštin <dev@matjaz.it>
  * <https://matjaz.it>. All rights reserved.

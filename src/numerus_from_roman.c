@@ -216,8 +216,8 @@ numerus_roman_to_int(int32_t* const value, const char* numeral)
 }
 
 
-numerus_err_t numerus_roman_extended_to_fraction(
-        numerus_frac_t* const fraction,
+numerus_err_t numerus_roman_to_fraction(
+        numerus_frac_t* fraction,
         const char* numeral)
 {
     if (fraction == NULL) { return NUMERUS_ERR_NULL_FRACTION; }
@@ -269,11 +269,11 @@ numerus_err_t numerus_roman_extended_to_fraction(
 }
 
 numerus_err_t
-numerus_roman_extended_to_double(double* const real, const char* numeral)
+numerus_roman_to_double(double* const real, const char* numeral)
 {
     numerus_frac_t fraction = {0, 0};
     numerus_err_t
-            err = numerus_roman_extended_to_fraction(&fraction, numeral);
+            err = numerus_roman_to_fraction(&fraction, numeral);
     if (err != NUMERUS_OK) { return err; }
     return numerus_fraction_to_double(real, fraction);
 }

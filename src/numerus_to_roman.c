@@ -12,7 +12,7 @@
 const char NUMERUS_ZERO_ROMAN[NUMERUS_ZERO_ROMAN_LEN_WITH_TERM] = "NULLA";
 
 numerus_err_t
-numerus_to_roman(char* numeral, int_fast32_t value)
+numerus_roman_from_int(char* numeral, int_fast32_t value)
 {
     if (numeral == NULL) { return NUMERUS_ERR_NULL_NUMERAL; }
     if (value < NUMERUS_BASIC_MIN || value > NUMERUS_BASIC_MAX)
@@ -146,25 +146,25 @@ numerus_to_roman(char* numeral, int_fast32_t value)
 }
 
 numerus_err_t
-numerus_to_roman_extended_double(char* numeral, double value)
+numerus_roman_from_double(char* numeral, double value)
 {
     numerus_frac_t fraction = {0, 0};
-    numerus_err_t err = numerus_double_to_fraction(&fraction, value);
+    numerus_err_t err = numerus_fraction_from_double(&fraction, value);
     if (err != NUMERUS_OK)
     {
         *numeral = '\0';
         return err;
     }
-    return numerus_to_roman_extended_fraction(numeral, fraction);
+    return numerus_roman_from_fraction(numeral, fraction);
 }
 
 numerus_err_t
-numerus_to_roman_extended_fraction(
+numerus_roman_from_fraction(
         char* numeral,
         numerus_frac_t fraction)
 {
     if (numeral == NULL) { return NUMERUS_ERR_NULL_NUMERAL; }
-    numerus_err_t err = numerus_simplify_fraction(&fraction);
+    numerus_err_t err = numerus_fraction_simplify(&fraction);
     if (err != NUMERUS_OK)
     {
         *numeral = '\0';
@@ -185,7 +185,7 @@ numerus_to_roman_extended_fraction(
         // Vinculum part
         *(numeral++) = '_';
         const int32_t vinculum_value = fraction.int_part / 1000;
-        err = numerus_to_roman(numeral, vinculum_value);
+        err = numerus_roman_from_int(numeral, vinculum_value);
         if (err != NUMERUS_OK)
         {
             *numeral = '\0';
@@ -194,7 +194,7 @@ numerus_to_roman_extended_fraction(
         *(numeral++) = '_';
         fraction.int_part -= vinculum_value;
     }
-    err = numerus_to_roman(numeral, fraction.int_part);
+    err = numerus_roman_from_int(numeral, fraction.int_part);
     if (err != NUMERUS_OK)
     {
         *numeral = '\0';

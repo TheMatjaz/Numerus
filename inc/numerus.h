@@ -26,7 +26,10 @@ extern "C"
 
 
 #if NUMERUS_HAS_MALLOC
+
 #include <stdlib.h>
+
+
 #endif
 
 /** Version of the Numerus library using semantic versioning. */
@@ -119,7 +122,10 @@ typedef enum numerus_err
     NUMERUS_ERR_MALLOC_FAILURE, ///< Heap memory allocation failed
 } numerus_err_t;
 
-// Todo doxygen
+/**
+ * Value of an extended roman numeral, made of its integer part
+ * and fractional part as amount of twelfths (1/12).
+ */
 typedef struct numerus_frac
 {
     int32_t int_part;
@@ -129,35 +135,35 @@ typedef struct numerus_frac
 
 //  --------------- From roman numeral to int/double/fraction ---------------
 numerus_err_t numerus_roman_to_int(int32_t* value, const char* numeral);
-numerus_err_t numerus_roman_extended_to_fraction(
+numerus_err_t numerus_roman_to_fraction(
         numerus_frac_t* fraction,
         const char* numeral);
 numerus_err_t
-numerus_roman_extended_to_double(double* real, const char* numeral);
+numerus_roman_to_double(double* real, const char* numeral);
 
 //  --------------- From int/double/fraction to roman numeral ---------------
 numerus_err_t
-numerus_to_roman(char* numeral, int_fast32_t value);
+numerus_roman_from_int(char* numeral, int_fast32_t value);
 
 numerus_err_t
-numerus_to_roman_extended_fraction(
+numerus_roman_from_fraction(
         char* numeral, numerus_frac_t fraction);
 
 numerus_err_t
-numerus_to_roman_extended_double(char* numeral, double value);
+numerus_roman_from_double(char* numeral, double value);
 
 
 //  ----- From int/double/fraction to roman numeral with heap-allocation ------
 #if NUMERUS_HAS_MALLOC
 numerus_err_t
-numerus_to_roman_alloc(char** numeral, int_fast32_t value);
+numerus_roman_from_int_alloc(char** numeral, int_fast32_t value);
 
 numerus_err_t
-numerus_to_roman_extended_fraction_alloc(
+numerus_roman_from_fraction_alloc(
         char** numeral, numerus_frac_t fraction);
 
 numerus_err_t
-numerus_to_roman_extended_double_alloc(char** numeral, double value);
+numerus_roman_from_double_alloc(char** numeral, double value);
 #endif  /* NUMERUS_HAS_MALLOC */
 
 
@@ -168,11 +174,11 @@ int_fast8_t numerus_sign(const char* numeral);
 
 // ----- Utilities on fractions -----------------------------------------------
 numerus_err_t
-numerus_simplify_fraction(numerus_frac_t* fraction);
+numerus_fraction_simplify(numerus_frac_t* fraction);
 numerus_err_t numerus_fraction_to_double(
         double* result,
         numerus_frac_t fraction);
-numerus_err_t numerus_double_to_fraction(
+numerus_err_t numerus_fraction_from_double(
         numerus_frac_t* fraction,
         double real);
 
