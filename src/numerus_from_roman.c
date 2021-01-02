@@ -257,22 +257,25 @@ numerus_err_t numerus_roman_to_fraction(
     int32_t int_part = 0;
     if (*numeral == '_')
     {
-        numeral++;
+        numeral++;  // Skip beginning of vinculum
         numeral = parse_int_part(&int_part, numeral);
         int_part *= VINCULUM_MULTIPLIER;
         if (*numeral != '_')
         {
             return NUMERUS_ERR_PARSING_NON_TERMINATED_VINCULUM;
         }
+        numeral++;  // Skip end of vinculum
     }
-    numeral = parse_int_part(&int_part, numeral);
-    if (int_part > NUMERUS_POST_VINCULUM_MAX)
+    int32_t int_part_post_vinculum = 0;
+    numeral = parse_int_part(&int_part_post_vinculum, numeral);
+    if (int_part > 0 && int_part_post_vinculum > NUMERUS_POST_VINCULUM_MAX)
     {
         // After the vinculum, the 'M' char is not allowed.
         // If the value received is larger than 999 = "CMXCIX", then
         // an 'M' was used.
         return NUMERUS_ERR_PARSING_M_AFTER_VINCULUM;
     }
+    int_part += int_part_post_vinculum;
     int32_t twelfths = 0;
     numeral = parse_twelfths_part(&twelfths, numeral);
     // If at this point the string is over, we parsed successfully everything.

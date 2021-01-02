@@ -15,15 +15,17 @@
 
 
 #define CANARY '@'
+#define LOG_FREQUENCY 30000L
 
-static const uint32_t TOTAL_ITERATIONS = (NUMERUS_MAX_INT + 1UL) * 12UL;
+static const uint32_t TOTAL_ITERATIONS = (NUMERUS_MAX_INT + 1UL) * 12UL * 2UL;
 
 inline static void log_state(const numerus_frac_t input_fraction)
 {
     double perc = input_fraction.int_part * 12.0;
     perc /= TOTAL_ITERATIONS;
     perc *= 100;
-    printf("\r> %8"PRId32", %9.5f%%", input_fraction.int_part, perc);
+    printf("\r> %8"PRId32", %6.2f%%", input_fraction.int_part, perc);
+    fflush(stdout);
 }
 
 void test_bijectivity(void)
@@ -39,7 +41,7 @@ void test_bijectivity(void)
          input_fraction.int_part <= NUMERUS_MAX_INT;
          input_fraction.int_part++)
     {
-        if (input_fraction.int_part % 10000L == 0)
+        if (input_fraction.int_part % 20000L == 0)
         {
             log_state(input_fraction);
         }
@@ -110,11 +112,6 @@ void test_bijectivity(void)
                        output_fraction.twelfths);
                 atto_fail();
             }
-            // Logging
-            if (input_fraction.int_part % 10000L == 0)
-            {
-                log_state(input_fraction);
-            }
         }
     }
     puts("\rNon-negatives fully bijective.");
@@ -122,7 +119,7 @@ void test_bijectivity(void)
          input_fraction.int_part >= NUMERUS_MIN_INT;
          input_fraction.int_part--)
     {
-        if (input_fraction.int_part % 10000L == 0)
+        if (input_fraction.int_part % LOG_FREQUENCY == 0)
         {
             log_state(input_fraction);
         }
@@ -192,11 +189,6 @@ void test_bijectivity(void)
                        output_fraction.int_part,
                        output_fraction.twelfths);
                 atto_fail();
-            }
-            // Logging
-            if (input_fraction.int_part % 10000L == 0)
-            {
-                log_state(input_fraction);
             }
         }
     }
