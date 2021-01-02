@@ -592,7 +592,7 @@ static void test_to_roman_all_classic(void)
     {
         err = numerus_roman_from_int(roman, i);
         atto_eq(err, NUMERUS_OK);
-        atto_le(strlen(roman), NUMERUS_MAX_LEN_CLASSIC_WITH_TERM - 1);
+        atto_lt(strlen(roman), NUMERUS_MAX_LEN_CLASSIC_WITH_TERM);
         atto_eq(roman[NUMERUS_MAX_LEN_CLASSIC_WITH_TERM], CANARY);
     }
 }

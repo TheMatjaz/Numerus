@@ -22,5 +22,6 @@ int main(void)
     test_roman_to_int();
     test_roman_to_double();
     test_roman_to_fraction();
+    test_bijectivity();
     return atto_at_least_one_fail;
 }

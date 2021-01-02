@@ -29,6 +29,7 @@ void test_roman_from_fraction(void);
 void test_roman_to_int(void);
 void test_roman_to_double(void);
 void test_roman_to_fraction(void);
+void test_bijectivity(void);
 
 #ifdef __cplusplus
 }
