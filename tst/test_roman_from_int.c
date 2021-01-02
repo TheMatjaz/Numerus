@@ -19,17 +19,17 @@ static void test_to_roman_invalid(void)
     roman[0] = 'A';
     err = numerus_roman_from_int(NULL, 0);
     atto_eq(NUMERUS_ERR_NULL_NUMERAL, err);
-    atto_streq(roman, "A", NUMERUS_MAX_LEN_CLASSIC_WITH_TERM);
+    atto_streq(roman, "A", NUMERUS_MAX_LEN_WITH_TERM);
 
     roman[0] = 'A';
     err = numerus_roman_from_int(roman, NUMERUS_MAX_INT + 1);
     atto_eq(NUMERUS_ERR_VALUE_OUT_OF_RANGE, err);
-    atto_streq(roman, "", NUMERUS_MAX_LEN_CLASSIC_WITH_TERM);
+    atto_streq(roman, "", NUMERUS_MAX_LEN_WITH_TERM);
 
     roman[0] = 'A';
     err = numerus_roman_from_int(roman, NUMERUS_MIN_INT - 1);
     atto_eq(NUMERUS_ERR_VALUE_OUT_OF_RANGE, err);
-    atto_streq(roman, "", NUMERUS_MAX_LEN_CLASSIC_WITH_TERM);
+    atto_streq(roman, "", NUMERUS_MAX_LEN_WITH_TERM);
 }
 
 

@@ -199,13 +199,11 @@ numerus_roman_from_int(char* numeral, int32_t value)
 numerus_err_t
 numerus_roman_from_double(char* numeral, double value)
 {
+    if (numeral == NULL) { return NUMERUS_ERR_NULL_NUMERAL; }
+    *numeral = '\0';  // Provide empty string in case of error
     numerus_frac_t fraction = {0, 0};
     numerus_err_t err = numerus_fraction_from_double(&fraction, value);
-    if (err != NUMERUS_OK)
-    {
-        *numeral = '\0';
-        return err;
-    }
+    if (err != NUMERUS_OK) { return err; }
     return numerus_roman_from_fraction(numeral, fraction);
 }
 
@@ -215,21 +213,19 @@ numerus_roman_from_fraction(
         numerus_frac_t fraction)
 {
     if (numeral == NULL) { return NUMERUS_ERR_NULL_NUMERAL; }
+    *numeral = '\0';  // Provide empty string in case of error
     numerus_err_t err = numerus_fraction_simplify(&fraction);
-    if (err != NUMERUS_OK)
-    {
-        *numeral = '\0';
-        return err;
-    }
+    if (err != NUMERUS_OK) { return err; }
     if (fraction.int_part == 0 && fraction.twelfths == 0)
     {
         strcpy(numeral, NUMERUS_ZERO_ROMAN);
         return NUMERUS_OK;
     }
-    if (fraction.int_part < 0)
+    if (fraction.int_part < 0 || fraction.twelfths < 0)
     {
         *(numeral++) = '-';
         fraction.int_part = -fraction.int_part;
+        fraction.twelfths = -fraction.twelfths;
     }
     if (fraction.int_part > NUMERUS_MAX_INT_CLASSIC)
     {
