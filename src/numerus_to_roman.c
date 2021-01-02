@@ -11,6 +11,9 @@
 #include "numerus.h"
 
 
+/** Multiplier of the value of the roman characters within the vinculum. */
+#define VINCULUM_MULTIPLIER 1000
+
 const char NUMERUS_ZERO_ROMAN[NUMERUS_ZERO_ROMAN_LEN_WITH_TERM] = "NULLA";
 
 /**
@@ -23,7 +26,7 @@ const char NUMERUS_ZERO_ROMAN[NUMERUS_ZERO_ROMAN_LEN_WITH_TERM] = "NULLA";
  * @param [in] value integer part of the value to convert to roman numeral
  * @return position of the null-terminator written in \p numeral
  */
-static char* roman_from_int_part(char* numeral, int32_t value)
+static char* build_int_part(char* numeral, int32_t value)
 {
     if (value >= 1000)
     {
@@ -140,7 +143,17 @@ static char* roman_from_int_part(char* numeral, int32_t value)
     return numeral;
 }
 
-static char* roman_from_twelfths(char* numeral, int32_t twelfths)
+/**
+ * @internal
+ * Converts an fractional part (twelfths) of a value to a roman numeral.
+ *
+ * @warning has no security checks, internal usage only.
+ *
+ * @param [out] numeral where to write the roman numeral string
+ * @param [in] value twelfths part of the value to convert to roman numeral
+ * @return position of the null-terminator written in \p numeral
+ */
+static char* build_twelfths_part(char* numeral, int32_t twelfths)
 {
     if (twelfths >= 6)
     {
@@ -220,14 +233,15 @@ numerus_roman_from_fraction(
     }
     if (fraction.int_part > NUMERUS_MAX_INT_CLASSIC)
     {
-        // Vinculum part
-        *(numeral++) = '_';
-        const int32_t vinculum_value = fraction.int_part / 1000;
-        numeral = roman_from_int_part(numeral, vinculum_value);
-        *(numeral++) = '_';
-        fraction.int_part -= vinculum_value * 1000;
+        *(numeral++) = '_'; // Start the vinculum
+        const int32_t vinculum_value = fraction.int_part / VINCULUM_MULTIPLIER;
+        numeral = build_int_part(numeral, vinculum_value);
+        fraction.int_part -= vinculum_value * VINCULUM_MULTIPLIER;
+        *(numeral++) = '_'; // Terminate the vinculum
     }
-    numeral = roman_from_int_part(numeral, fraction.int_part);
-    roman_from_twelfths(numeral, fraction.twelfths);
+    // Integer part after the vinculum
+    numeral = build_int_part(numeral, fraction.int_part);
+    // Twelfths part after the integer part
+    build_twelfths_part(numeral, fraction.twelfths);
     return NUMERUS_OK;
 }

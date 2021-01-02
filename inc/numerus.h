@@ -120,6 +120,8 @@ typedef enum numerus_err
     /** The 'M' roman char is not allowed after the vinculum's end */
     NUMERUS_ERR_PARSING_M_AFTER_VINCULUM,
     NUMERUS_ERR_MALLOC_FAILURE, ///< Heap memory allocation failed
+    /** The numeral contains twelfths characters `S.` when it shouldn't */
+    NUMERUS_ERR_PARSING_UNEXPECTED_TWELFTHS,
 } numerus_err_t;
 
 /**

@@ -13,7 +13,7 @@
  * @internal
  * Advances the char pointer to the first non-ASCII whitespace in the string.
  */
-#define SKIP_LEADING_WHITESPACE(str) { while(isspace(*(str))) { (str)++; } }
+#define SKIP_LEADING_WHITESPACE(str) while(isspace(*(str))) { (str)++; }
 
 /**
  * @internal
@@ -29,8 +29,21 @@
 #define NUMERUS_POST_VINCULUM_MAX (+999)
 
 
-
-const char* scan_basic(int32_t* const value, const char* numeral)
+/**
+ * @internal
+ * Parses an integer part of a numeral into a value.
+ *
+ * As a Regex, it parses case INsensitively the following pattern
+ * `M{0,3}((CM)|(CD)|(D?C{0,3}))((XC)|(XL)|(L?X{0,3}))((IX)|(IV)|(V?I{0,3}))`
+ * (without any grouping)
+ *
+ * @param [out] value the parsed integer value
+ * @param [in] numeral part of a roman numeral containing integer-only
+ *             characters.
+ * @return pointer to the end of the parsed part of the numeral, i.e. to the
+ *         char after the last analysed one
+ */
+static const char* parse_int_part(int32_t* const value, const char* numeral)
 {
     // As Regex: "M{0,3}", case INsensitive
     if (toupper(*numeral) == 'M')
@@ -154,15 +167,29 @@ const char* scan_basic(int32_t* const value, const char* numeral)
 }
 
 
+/**
+ * @internal
+ * Parses a fractional (twelfths) part of a numeral into a value.
+ *
+ * As a Regex, it parses case INsensitively the following pattern:
+ * `S?\.{0,5}`
+ *
+ * @param [out] value the parsed integer value
+ * @param [in] numeral part of a roman numeral containing twelfths-only
+ *             characters.
+ * @return pointer to the end of the parsed part of the numeral, i.e. to the
+ *         char after the last analysed one
+ */
 static const char*
-scan_twelfts(int32_t* const twelfths, const char* numeral)
+parse_twelfths_part(int32_t* const twelfths, const char* numeral)
 {
-    // As Regex: "S?\.{0,5}", case INsensitive
+    // As Regex: "S?", case INsensitive
     if (toupper(*numeral) == 'S')
     {
         *twelfths += 6U;  // 6/12 = 0.5
         numeral++;
     }
+    // As Regex: "\.{0,5}"
     if (*numeral == '.')
     {
         *twelfths += 1;  // 1/12 = 0.0833333
@@ -196,22 +223,15 @@ numerus_roman_to_int(int32_t* const value, const char* numeral)
 {
     if (value == NULL) { return NUMERUS_ERR_NULL_INT; }
     *value = 0;
-    if (numeral == NULL) { return NUMERUS_ERR_NULL_NUMERAL; }
-    SKIP_LEADING_WHITESPACE(numeral);
-    if (*numeral == '\0') { return NUMERUS_ERR_PARSING_EMPTY_NUMERAL; }
-    if (numerus_is_zero(numeral)) { return NUMERUS_OK; }
-    bool is_negative = false;
-    if (*numeral == '-')
+    numerus_frac_t fraction = {0, 0};
+    numerus_err_t
+            err = numerus_roman_to_fraction(&fraction, numeral);
+    if (err != NUMERUS_OK) { return err; }
+    if (fraction.twelfths != 0)
     {
-        is_negative = true;
-        numeral++;
+        return NUMERUS_ERR_PARSING_UNEXPECTED_TWELFTHS;
     }
-    numeral = scan_basic(value, numeral);
-    // If at this point the string is over, we parsed successfully everything.
-    // Otherwise an unexpected character was found (either unknown or
-    // repeated too many times.
-    if (*numeral != '\0') { return NUMERUS_ERR_PARSING_INVALID_SYNTAX; }
-    if (is_negative) { *value = -(*value); }
+    *value = fraction.int_part;
     return NUMERUS_OK;
 }
 
@@ -227,24 +247,20 @@ numerus_err_t numerus_roman_to_fraction(
     SKIP_LEADING_WHITESPACE(numeral);
     if (*numeral == '\0') { return NUMERUS_ERR_PARSING_EMPTY_NUMERAL; }
     if (numerus_is_zero(numeral)) { return NUMERUS_OK; }
-    bool is_negative = false;
-    if (*numeral == '-')
-    {
-        is_negative = true;
-        numeral++;
-    }
+    const bool is_negative = (*numeral == '-');
+    if (is_negative) { numeral++; }
     int32_t int_part = 0;
     if (*numeral == '_')
     {
         numeral++;
-        numeral = scan_basic(&int_part, numeral);
+        numeral = parse_int_part(&int_part, numeral);
         int_part *= 1000;  // The vinculum is a 1000x multiplier
         if (*numeral != '_')
         {
             return NUMERUS_ERR_PARSING_NON_TERMINATED_VINCULUM;
         }
     }
-    numeral = scan_basic(&int_part, numeral);
+    numeral = parse_int_part(&int_part, numeral);
     if (int_part > NUMERUS_POST_VINCULUM_MAX)
     {
         // After the vinculum, the 'M' char is not allowed.
@@ -253,7 +269,7 @@ numerus_err_t numerus_roman_to_fraction(
         return NUMERUS_ERR_PARSING_M_AFTER_VINCULUM;
     }
     int32_t twelfths = 0;
-    numeral = scan_twelfts(&twelfths, numeral);
+    numeral = parse_twelfths_part(&twelfths, numeral);
     // If at this point the string is over, we parsed successfully everything.
     // Otherwise an unexpected character was found (either unknown or
     // repeated too many times.
