@@ -1,5 +1,7 @@
 /**
  * @file
+ * Conversions of romain numeral strings to integer, floats and fractional
+ * values.
  *
  * @copyright Copyright © 2015-2021, Matjaž Guštin <dev@matjaz.it>
  * <https://matjaz.it>. All rights reserved.
@@ -7,6 +9,9 @@
  */
 
 #include "numerus.h"
+
+/** Multiplier of the value of the roman characters within the vinculum. */
+#define VINCULUM_MULTIPLIER 1000
 
 
 /**
@@ -254,7 +259,7 @@ numerus_err_t numerus_roman_to_fraction(
     {
         numeral++;
         numeral = parse_int_part(&int_part, numeral);
-        int_part *= 1000;  // The vinculum is a 1000x multiplier
+        int_part *= VINCULUM_MULTIPLIER;
         if (*numeral != '_')
         {
             return NUMERUS_ERR_PARSING_NON_TERMINATED_VINCULUM;

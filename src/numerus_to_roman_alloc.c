@@ -1,5 +1,7 @@
 /**
  * @file
+ * Conversions of integer, floats and fractional value to roman numeral
+ * strings with the usage of heap-allocation.
  *
  * @copyright Copyright © 2015-2021, Matjaž Guštin <dev@matjaz.it>
  * <https://matjaz.it>. All rights reserved.
