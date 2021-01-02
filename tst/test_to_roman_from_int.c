@@ -12,34 +12,34 @@
 
 
 #define CANARY '@'
-#define ATTO_CANARY_IS_INTACT() atto_eq(roman[NUMERUS_BASIC_MAX_LEN_WITH_TERM], CANARY)
+#define ATTO_CANARY_IS_INTACT() atto_eq(roman[NUMERUS_MAX_LEN_CLASSIC_WITH_TERM], CANARY)
 
 
-static void test_to_roman_basic_invalid(void)
+static void test_to_roman_invalid(void)
 {
-    char roman[NUMERUS_BASIC_MAX_LEN_WITH_TERM] = {'A'};
+    char roman[NUMERUS_MAX_LEN_CLASSIC_WITH_TERM] = {'A'};
     numerus_err_t err;
 
     roman[0] = 'A';
     err = numerus_roman_from_int(NULL, 0);
     atto_eq(NUMERUS_ERR_NULL_NUMERAL, err);
-    atto_streq(roman, "A", NUMERUS_BASIC_MAX_LEN_WITH_TERM);
+    atto_streq(roman, "A", NUMERUS_MAX_LEN_CLASSIC_WITH_TERM);
 
     roman[0] = 'A';
-    err = numerus_roman_from_int(roman, NUMERUS_BASIC_MAX + 1);
+    err = numerus_roman_from_int(roman, NUMERUS_MAX_INT + 1);
     atto_eq(NUMERUS_ERR_VALUE_OUT_OF_RANGE, err);
-    atto_streq(roman, "", NUMERUS_BASIC_MAX_LEN_WITH_TERM);
+    atto_streq(roman, "", NUMERUS_MAX_LEN_CLASSIC_WITH_TERM);
 
     roman[0] = 'A';
-    err = numerus_roman_from_int(roman, NUMERUS_BASIC_MIN - 1);
+    err = numerus_roman_from_int(roman, NUMERUS_MIN_INT - 1);
     atto_eq(NUMERUS_ERR_VALUE_OUT_OF_RANGE, err);
-    atto_streq(roman, "", NUMERUS_BASIC_MAX_LEN_WITH_TERM);
+    atto_streq(roman, "", NUMERUS_MAX_LEN_CLASSIC_WITH_TERM);
 }
 
 /**
  * @internal
  * Compares the generated roman numeral with the expected one,
- * making the code of the tests_to_roman_basic_valid*() test cases easier to
+ * making the code of the tests_to_roman_valid*() test cases easier to
  * read.
  */
 #define TO_ROMAN_FROM_INT_EQ(x, str) \
@@ -51,10 +51,10 @@ static void test_to_roman_basic_invalid(void)
     } while(0)
 
 
-static void test_to_roman_basic_valid_first_hundred_positives(void)
+static void test_to_roman_valid_first_hundred_positives(void)
 {
-    char roman[NUMERUS_BASIC_MAX_LEN_WITH_TERM + 1];
-    roman[NUMERUS_BASIC_MAX_LEN_WITH_TERM] = CANARY;
+    char roman[NUMERUS_MAX_LEN_CLASSIC_WITH_TERM + 1];
+    roman[NUMERUS_MAX_LEN_CLASSIC_WITH_TERM] = CANARY;
     numerus_err_t err;
 
     TO_ROMAN_FROM_INT_EQ(0, "NULLA");
@@ -160,10 +160,10 @@ static void test_to_roman_basic_valid_first_hundred_positives(void)
     TO_ROMAN_FROM_INT_EQ(100, "C");
 }
 
-static void test_to_roman_basic_valid_first_hundred_negatives(void)
+static void test_to_roman_valid_first_hundred_negatives(void)
 {
-    char roman[NUMERUS_BASIC_MAX_LEN_WITH_TERM + 1];
-    roman[NUMERUS_BASIC_MAX_LEN_WITH_TERM] = CANARY;
+    char roman[NUMERUS_MAX_LEN_CLASSIC_WITH_TERM + 1];
+    roman[NUMERUS_MAX_LEN_CLASSIC_WITH_TERM] = CANARY;
     numerus_err_t err;
 
     TO_ROMAN_FROM_INT_EQ(-0, "NULLA");
@@ -269,20 +269,48 @@ static void test_to_roman_basic_valid_first_hundred_negatives(void)
     TO_ROMAN_FROM_INT_EQ(-100, "-C");
 }
 
-static void test_to_roman_basic_valid_extremes(void)
+static void test_to_roman_valid_some_extended(void)
 {
-    char roman[NUMERUS_BASIC_MAX_LEN_WITH_TERM + 1];
-    roman[NUMERUS_BASIC_MAX_LEN_WITH_TERM] = CANARY;
+    char roman[NUMERUS_MAX_LEN_CLASSIC_WITH_TERM + 1];
+    roman[NUMERUS_MAX_LEN_CLASSIC_WITH_TERM] = CANARY;
     numerus_err_t err;
 
-    TO_ROMAN_FROM_INT_EQ(NUMERUS_BASIC_MIN, "-MMMCMXCIX");
-    TO_ROMAN_FROM_INT_EQ(NUMERUS_BASIC_MAX, "MMMCMXCIX");
+    TO_ROMAN_FROM_INT_EQ(3000, "MMM");
+    TO_ROMAN_FROM_INT_EQ(3999, "MMMCMXCIX");
+    TO_ROMAN_FROM_INT_EQ(4000, "_IV_");
+    TO_ROMAN_FROM_INT_EQ(4001, "_IV_I");
+    TO_ROMAN_FROM_INT_EQ(4002, "_IV_II");
+    TO_ROMAN_FROM_INT_EQ(5000, "_V_");
+    TO_ROMAN_FROM_INT_EQ(5555, "_V_DLV");
+    TO_ROMAN_FROM_INT_EQ(39000001, "_MMMCM_I");
+
+    TO_ROMAN_FROM_INT_EQ(-3000, "-MMM");
+    TO_ROMAN_FROM_INT_EQ(-3999, "-MMMCMXCIX");
+    TO_ROMAN_FROM_INT_EQ(-4000, "-_IV_");
+    TO_ROMAN_FROM_INT_EQ(-4001, "-_IV_I");
+    TO_ROMAN_FROM_INT_EQ(-4002, "-_IV_II");
+    TO_ROMAN_FROM_INT_EQ(-5000, "-_V_");
+    TO_ROMAN_FROM_INT_EQ(-5555, "-_V_DLV");
+    TO_ROMAN_FROM_INT_EQ(-39000001, "-_MMMCM_I");
+}
+
+static void test_to_roman_valid_extremes(void)
+{
+    char roman[NUMERUS_MAX_LEN_CLASSIC_WITH_TERM + 1];
+    roman[NUMERUS_MAX_LEN_CLASSIC_WITH_TERM] = CANARY;
+    numerus_err_t err;
+
+    TO_ROMAN_FROM_INT_EQ(NUMERUS_MIN_INT_CLASSIC, "-MMMCMXCIX");
+    TO_ROMAN_FROM_INT_EQ(NUMERUS_MAX_INT_CLASSIC, "MMMCMXCIX");
+
+    TO_ROMAN_FROM_INT_EQ(NUMERUS_MIN_INT, "-_MMMCMXCIX_CMXCIX");
+    TO_ROMAN_FROM_INT_EQ(NUMERUS_MAX_INT, "_MMMCMXCIX_CMXCIX");
 }
 
 /**
  * @internal
  * Compares the allocated roman numeral with the expected one,
- * making the code of the tests_to_roman_basic_alloc_valid*() test cases
+ * making the code of the tests_to_roman_alloc_valid*() test cases
  * easier to read.
  */
 #define TO_ROMAN_FROM_INT_ALLOC_EQ(x, str) \
@@ -294,7 +322,7 @@ static void test_to_roman_basic_valid_extremes(void)
     } while(0)
 
 
-static void test_to_roman_basic_alloc_valid_first_hundred_positives(void)
+static void test_to_roman_alloc_valid_first_hundred_positives(void)
 {
     char* roman = NULL;
     numerus_err_t err;
@@ -402,7 +430,7 @@ static void test_to_roman_basic_alloc_valid_first_hundred_positives(void)
     TO_ROMAN_FROM_INT_ALLOC_EQ(100, "C");
 }
 
-static void test_to_roman_basic_alloc_valid_first_hundred_negatives(void)
+static void test_to_roman_alloc_valid_first_hundred_negatives(void)
 {
     char* roman = NULL;
     numerus_err_t err;
@@ -510,22 +538,52 @@ static void test_to_roman_basic_alloc_valid_first_hundred_negatives(void)
     TO_ROMAN_FROM_INT_ALLOC_EQ(-100, "-C");
 }
 
-static void test_to_roman_basic_alloc_valid_extremes(void)
+
+static void test_to_roman_alloc_valid_some_extended(void)
 {
     char* roman = NULL;
     numerus_err_t err;
 
-    TO_ROMAN_FROM_INT_ALLOC_EQ(NUMERUS_BASIC_MIN, "-MMMCMXCIX");
-    TO_ROMAN_FROM_INT_ALLOC_EQ(NUMERUS_BASIC_MAX, "MMMCMXCIX");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(3000, "MMM");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(3999, "MMMCMXCIX");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(4000, "_IV_");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(4001, "_IV_I");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(4002, "_IV_II");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(5000, "_V_");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(5555, "_V_DLV");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(39000001, "_MMMCM_I");
+
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-3000, "-MMM");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-3999, "-MMMCMXCIX");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-4000, "-_IV_");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-4001, "-_IV_I");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-4002, "-_IV_II");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-5000, "-_V_");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-5555, "-_V_DLV");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-39000001, "-_MMMCM_I");
 }
 
-void test_to_roman_basic(void)
+static void test_to_roman_alloc_valid_extremes(void)
 {
-    test_to_roman_basic_invalid();
-    test_to_roman_basic_valid_first_hundred_positives();
-    test_to_roman_basic_valid_first_hundred_negatives();
-    test_to_roman_basic_valid_extremes();
-    test_to_roman_basic_alloc_valid_first_hundred_positives();
-    test_to_roman_basic_alloc_valid_first_hundred_negatives();
-    test_to_roman_basic_alloc_valid_extremes();
+    char* roman = NULL;
+    numerus_err_t err;
+
+    TO_ROMAN_FROM_INT_ALLOC_EQ(NUMERUS_MIN_INT_CLASSIC, "-MMMCMXCIX");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(NUMERUS_MAX_INT_CLASSIC, "MMMCMXCIX");
+
+    TO_ROMAN_FROM_INT_ALLOC_EQ(NUMERUS_MIN_INT, "-_MMMCMXCIX_CMXCIX");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(NUMERUS_MAX_INT, "_MMMCMXCIX_CMXCIX");
+}
+
+void test_to_roman(void)
+{
+    test_to_roman_invalid();
+    test_to_roman_valid_first_hundred_positives();
+    test_to_roman_valid_first_hundred_negatives();
+    test_to_roman_valid_some_extended();
+    test_to_roman_valid_extremes();
+    test_to_roman_alloc_valid_first_hundred_positives();
+    test_to_roman_alloc_valid_first_hundred_negatives();
+    test_to_roman_alloc_valid_some_extended();
+    test_to_roman_alloc_valid_extremes();
 }

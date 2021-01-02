@@ -15,7 +15,7 @@ numerus_roman_from_int_alloc(char** numeral, int_fast32_t value)
 {
     if (numeral == NULL) { return NUMERUS_ERR_NULL_NUMERAL; }
     *numeral = NULL;  // Provide unusable output in case of error
-    char buffer[NUMERUS_BASIC_MAX_LEN_WITH_TERM];
+    char buffer[NUMERUS_MAX_LEN_CLASSIC_WITH_TERM];
     numerus_err_t err = numerus_roman_from_int(buffer, value);
     if (err != NUMERUS_OK) { return err; }
     *numeral = strdup(buffer);
@@ -29,7 +29,7 @@ numerus_roman_from_fraction_alloc(
 {
     if (numeral == NULL) { return NUMERUS_ERR_NULL_NUMERAL; }
     *numeral = NULL;  // Provide unusable output in case of error
-    char buffer[NUMERUS_EXTENDED_MAX_LEN_WITH_TERM];
+    char buffer[NUMERUS_MAX_LEN_WITH_TERM];
     numerus_err_t err = numerus_roman_from_fraction(buffer, fraction);
     if (err != NUMERUS_OK) { return err; }
     *numeral = strdup(buffer);
@@ -44,7 +44,7 @@ numerus_roman_from_double_alloc(
 {
     if (numeral == NULL) { return NUMERUS_ERR_NULL_NUMERAL; }
     *numeral = NULL;  // Provide unusable output in case of error
-    char buffer[NUMERUS_EXTENDED_MAX_LEN_WITH_TERM];
+    char buffer[NUMERUS_MAX_LEN_WITH_TERM];
     numerus_err_t err = numerus_roman_from_double(buffer, value);
     if (err != NUMERUS_OK) { return err; }
     *numeral = strdup(buffer);

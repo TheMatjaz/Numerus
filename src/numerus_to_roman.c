@@ -15,7 +15,7 @@ numerus_err_t
 numerus_roman_from_int(char* numeral, int_fast32_t value)
 {
     if (numeral == NULL) { return NUMERUS_ERR_NULL_NUMERAL; }
-    if (value < NUMERUS_BASIC_MIN || value > NUMERUS_BASIC_MAX)
+    if (value < NUMERUS_MIN_INT_CLASSIC || value > NUMERUS_MAX_INT_CLASSIC)
     {
         *numeral = '\0';
         return NUMERUS_ERR_VALUE_OUT_OF_RANGE;
@@ -180,7 +180,7 @@ numerus_roman_from_fraction(
         *(numeral++) = '-';
         fraction.int_part = -fraction.int_part;
     }
-    if (fraction.int_part > NUMERUS_BASIC_MAX)
+    if (fraction.int_part > NUMERUS_MAX_INT_CLASSIC)
     {
         // Vinculum part
         *(numeral++) = '_';

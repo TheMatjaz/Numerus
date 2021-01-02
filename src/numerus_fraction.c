@@ -12,9 +12,9 @@
 static const int8_t TWELVE = 12;
 
 #define OUT_OF_EXTENDED_INT_RANGE(x) \
-    ((x) < NUMERUS_EXTENDED_INT_MIN || (x) > NUMERUS_EXTENDED_INT_MAX)
+    ((x) < NUMERUS_MIN_INT || (x) > NUMERUS_MAX_INT)
 #define OUT_OF_EXTENDED_RANGE(x) \
-    ((x) < NUMERUS_EXTENDED_MIN || (x) > NUMERUS_EXTENDED_MAX)
+    ((x) < NUMERUS_MIN_DOUBLE || (x) > NUMERUS_MAX_DOUBLE)
 
 numerus_err_t
 numerus_fraction_simplify(numerus_frac_t* fraction)

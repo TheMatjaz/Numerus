@@ -37,17 +37,17 @@ extern "C"
 
 //  ----- Extremes of the values represented by roman numerals ----------------
 /** Largest value (int16) a basic roman numeral can represent. */
-#define NUMERUS_BASIC_MAX (+3999)
+#define NUMERUS_MAX_INT_CLASSIC (+3999)
 /** Smallest value (int16) a basic roman numeral can represent. */
-#define NUMERUS_BASIC_MIN (-3999)
+#define NUMERUS_MIN_INT_CLASSIC (-3999)
 /** Largest integer value (int32) an extended roman numeral can represent. */
-#define NUMERUS_EXTENDED_INT_MAX (+3999999L)
+#define NUMERUS_MAX_INT (+3999999L)
 /** Smallest integer value (int32) an extended roman numeral can represent. */
-#define NUMERUS_EXTENDED_INT_MIN (-3999999L)
+#define NUMERUS_MIN_INT (-3999999L)
 /** Largest real number (double) an extended roman numeral can represent. */
-#define NUMERUS_EXTENDED_MAX (+3999999.9166666665)
+#define NUMERUS_MAX_DOUBLE (+3999999.9166666665)
 /** Smallest real number (double) an extended roman numeral can represent. */
-#define NUMERUS_EXTENDED_MIN (-3999999.9166666665)
+#define NUMERUS_MIN_DOUBLE (-3999999.9166666665)
 
 //  ----- Maximum string sizes a.k.a. buffer sizes ----------------------------
 /**
@@ -57,7 +57,7 @@ extern "C"
  * That is the length of the roman numeral `-MMMDCCCLXXXVIII\0`
  * with value 3888.
  */
-#define NUMERUS_BASIC_MAX_LEN_WITH_TERM (16U + 1U)
+#define NUMERUS_MAX_LEN_CLASSIC_WITH_TERM (16U + 1U)
 
 /**
  * Maximum length an extended roman numeral string may have, including
@@ -67,7 +67,7 @@ extern "C"
  * `-_MMMDCCCLXXXVIII_DCCCLXXXVIIIS.....\0`
  * with value (-3888888 and -11/12) = -3888888.9166666665.
  */
-#define NUMERUS_EXTENDED_MAX_LEN_WITH_TERM (36U + 1U)
+#define NUMERUS_MAX_LEN_WITH_TERM (36U + 1U)
 
 /**
  * Maximum length an extended roman numeral formatted by numerus_fmt_overline()

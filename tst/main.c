@@ -16,8 +16,7 @@ int main(void)
     test_strutils();
     test_fraction();
     test_fmt();
-    test_to_roman_basic();
-    test_to_roman_extended();
+    test_to_roman();
     test_from_roman_basic();
     test_from_roman_extended();
     return atto_at_least_one_fail;

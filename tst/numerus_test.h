@@ -23,8 +23,7 @@ void test_constants(void);
 void test_strutils(void);
 void test_fraction(void);
 void test_fmt(void);
-void test_to_roman_basic(void);
-void test_to_roman_extended(void);
+void test_to_roman(void);
 void test_from_roman_basic(void);
 void test_from_roman_extended(void);
 
