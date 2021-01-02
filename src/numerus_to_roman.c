@@ -1,5 +1,7 @@
 /**
  * @file
+ * Conversions of integer, floats and fractional value to roman numeral
+ * strings without heap-allocation.
  *
  * @copyright Copyright © 2015-2021, Matjaž Guštin <dev@matjaz.it>
  * <https://matjaz.it>. All rights reserved.
@@ -11,25 +13,18 @@
 
 const char NUMERUS_ZERO_ROMAN[NUMERUS_ZERO_ROMAN_LEN_WITH_TERM] = "NULLA";
 
-numerus_err_t
-numerus_roman_from_int(char* numeral, int_fast32_t value)
+/**
+ * @internal
+ * Converts an integer part of a value to a roman numeral.
+ *
+ * @warning has no security checks, internal usage only.
+ *
+ * @param [out] numeral where to write the roman numeral string
+ * @param [in] value integer part of the value to convert to roman numeral
+ * @return position of the null-terminator written in \p numeral
+ */
+static char* roman_from_int_part(char* numeral, int32_t value)
 {
-    if (numeral == NULL) { return NUMERUS_ERR_NULL_NUMERAL; }
-    if (value < NUMERUS_MIN_INT_CLASSIC || value > NUMERUS_MAX_INT_CLASSIC)
-    {
-        *numeral = '\0';
-        return NUMERUS_ERR_VALUE_OUT_OF_RANGE;
-    }
-    if (value == 0)
-    {
-        strcpy(numeral, NUMERUS_ZERO_ROMAN);
-        return NUMERUS_OK;
-    }
-    if (value < 0)
-    {
-        *(numeral++) = '-';
-        value = -value;
-    }
     if (value >= 1000)
     {
         *(numeral++) = 'M';
@@ -142,7 +137,50 @@ numerus_roman_from_int(char* numeral, int_fast32_t value)
         }
     }
     *numeral = '\0';
-    return NUMERUS_OK;
+    return numeral;
+}
+
+static char* roman_from_twelfths(char* numeral, int32_t twelfths)
+{
+    if (twelfths >= 6)
+    {
+        *(numeral++) = 'S';
+        twelfths -= 6;
+    }
+    if (twelfths >= 1)
+    {
+        *(numeral++) = '.';
+        twelfths -= 1;
+        if (twelfths >= 1)
+        {
+            *(numeral++) = '.';
+            twelfths -= 1;
+            if (twelfths >= 1)
+            {
+                *(numeral++) = '.';
+                twelfths -= 1;
+                if (twelfths >= 1)
+                {
+                    *(numeral++) = '.';
+                    twelfths -= 1;
+                    if (twelfths >= 1)
+                    {
+                        *(numeral++) = '.';
+                        twelfths -= 1;
+                    }
+                }
+            }
+        }
+    }
+    *numeral = '\0';
+    return numeral;
+}
+
+numerus_err_t
+numerus_roman_from_int(char* numeral, int32_t value)
+{
+    const numerus_frac_t fraction = {value, 0};
+    return numerus_roman_from_fraction(numeral, fraction);
 }
 
 numerus_err_t
@@ -185,51 +223,11 @@ numerus_roman_from_fraction(
         // Vinculum part
         *(numeral++) = '_';
         const int32_t vinculum_value = fraction.int_part / 1000;
-        err = numerus_roman_from_int(numeral, vinculum_value);
-        if (err != NUMERUS_OK)
-        {
-            *numeral = '\0';
-            return err;
-        }
+        numeral = roman_from_int_part(numeral, vinculum_value);
         *(numeral++) = '_';
-        fraction.int_part -= vinculum_value;
+        fraction.int_part -= vinculum_value * 1000;
     }
-    err = numerus_roman_from_int(numeral, fraction.int_part);
-    if (err != NUMERUS_OK)
-    {
-        *numeral = '\0';
-        return err;
-    }
-    if (fraction.twelfths >= 6)
-    {
-        *(numeral++) = 'S';
-        fraction.twelfths -= 6;
-    }
-    if (fraction.twelfths >= 1)
-    {
-        *(numeral++) = '.';
-        fraction.twelfths -= 1;
-        if (fraction.twelfths >= 1)
-        {
-            *(numeral++) = '.';
-            fraction.twelfths -= 1;
-            if (fraction.twelfths >= 1)
-            {
-                *(numeral++) = '.';
-                fraction.twelfths -= 1;
-                if (fraction.twelfths >= 1)
-                {
-                    *(numeral++) = '.';
-                    fraction.twelfths -= 1;
-                    if (fraction.twelfths >= 1)
-                    {
-                        *(numeral++) = '.';
-                        fraction.twelfths -= 1;
-                    }
-                }
-            }
-        }
-    }
-    *numeral = '\0';
+    numeral = roman_from_int_part(numeral, fraction.int_part);
+    roman_from_twelfths(numeral, fraction.twelfths);
     return NUMERUS_OK;
 }

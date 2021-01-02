@@ -143,7 +143,7 @@ numerus_roman_to_double(double* real, const char* numeral);
 
 //  --------------- From int/double/fraction to roman numeral ---------------
 numerus_err_t
-numerus_roman_from_int(char* numeral, int_fast32_t value);
+numerus_roman_from_int(char* numeral, int32_t value);
 
 numerus_err_t
 numerus_roman_from_fraction(

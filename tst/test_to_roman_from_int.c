@@ -12,12 +12,10 @@
 
 
 #define CANARY '@'
-#define ATTO_CANARY_IS_INTACT() atto_eq(roman[NUMERUS_MAX_LEN_CLASSIC_WITH_TERM], CANARY)
-
 
 static void test_to_roman_invalid(void)
 {
-    char roman[NUMERUS_MAX_LEN_CLASSIC_WITH_TERM] = {'A'};
+    char roman[NUMERUS_MAX_LEN_WITH_TERM] = {'A'};
     numerus_err_t err;
 
     roman[0] = 'A';
@@ -36,6 +34,7 @@ static void test_to_roman_invalid(void)
     atto_streq(roman, "", NUMERUS_MAX_LEN_CLASSIC_WITH_TERM);
 }
 
+
 /**
  * @internal
  * Compares the generated roman numeral with the expected one,
@@ -46,15 +45,15 @@ static void test_to_roman_invalid(void)
     do { \
         err = numerus_roman_from_int(roman, (x)); \
         atto_eq(err, NUMERUS_OK); \
-        atto_streq((str), roman, NUMERUS_ZERO_ROMAN_LEN_WITH_TERM-1); \
-        ATTO_CANARY_IS_INTACT(); \
+        atto_streq(roman, (str), NUMERUS_MAX_LEN_WITH_TERM-1); \
+        atto_eq(roman[NUMERUS_MAX_LEN_WITH_TERM], CANARY); \
     } while(0)
 
 
 static void test_to_roman_valid_first_hundred_positives(void)
 {
-    char roman[NUMERUS_MAX_LEN_CLASSIC_WITH_TERM + 1];
-    roman[NUMERUS_MAX_LEN_CLASSIC_WITH_TERM] = CANARY;
+    char roman[NUMERUS_MAX_LEN_WITH_TERM + 1];
+    roman[NUMERUS_MAX_LEN_WITH_TERM] = CANARY;
     numerus_err_t err;
 
     TO_ROMAN_FROM_INT_EQ(0, "NULLA");
@@ -162,8 +161,8 @@ static void test_to_roman_valid_first_hundred_positives(void)
 
 static void test_to_roman_valid_first_hundred_negatives(void)
 {
-    char roman[NUMERUS_MAX_LEN_CLASSIC_WITH_TERM + 1];
-    roman[NUMERUS_MAX_LEN_CLASSIC_WITH_TERM] = CANARY;
+    char roman[NUMERUS_MAX_LEN_WITH_TERM + 1];
+    roman[NUMERUS_MAX_LEN_WITH_TERM] = CANARY;
     numerus_err_t err;
 
     TO_ROMAN_FROM_INT_EQ(-0, "NULLA");
@@ -271,8 +270,8 @@ static void test_to_roman_valid_first_hundred_negatives(void)
 
 static void test_to_roman_valid_some_extended(void)
 {
-    char roman[NUMERUS_MAX_LEN_CLASSIC_WITH_TERM + 1];
-    roman[NUMERUS_MAX_LEN_CLASSIC_WITH_TERM] = CANARY;
+    char roman[NUMERUS_MAX_LEN_WITH_TERM + 1];
+    roman[NUMERUS_MAX_LEN_WITH_TERM] = CANARY;
     numerus_err_t err;
 
     TO_ROMAN_FROM_INT_EQ(3000, "MMM");
@@ -282,7 +281,7 @@ static void test_to_roman_valid_some_extended(void)
     TO_ROMAN_FROM_INT_EQ(4002, "_IV_II");
     TO_ROMAN_FROM_INT_EQ(5000, "_V_");
     TO_ROMAN_FROM_INT_EQ(5555, "_V_DLV");
-    TO_ROMAN_FROM_INT_EQ(39000001, "_MMMCM_I");
+    TO_ROMAN_FROM_INT_EQ(3900001, "_MMMCM_I");
 
     TO_ROMAN_FROM_INT_EQ(-3000, "-MMM");
     TO_ROMAN_FROM_INT_EQ(-3999, "-MMMCMXCIX");
@@ -291,17 +290,21 @@ static void test_to_roman_valid_some_extended(void)
     TO_ROMAN_FROM_INT_EQ(-4002, "-_IV_II");
     TO_ROMAN_FROM_INT_EQ(-5000, "-_V_");
     TO_ROMAN_FROM_INT_EQ(-5555, "-_V_DLV");
-    TO_ROMAN_FROM_INT_EQ(-39000001, "-_MMMCM_I");
+    TO_ROMAN_FROM_INT_EQ(-3900001, "-_MMMCM_I");
 }
 
 static void test_to_roman_valid_extremes(void)
 {
-    char roman[NUMERUS_MAX_LEN_CLASSIC_WITH_TERM + 1];
-    roman[NUMERUS_MAX_LEN_CLASSIC_WITH_TERM] = CANARY;
+    char roman[NUMERUS_MAX_LEN_WITH_TERM + 1];
+    roman[NUMERUS_MAX_LEN_WITH_TERM] = CANARY;
     numerus_err_t err;
 
     TO_ROMAN_FROM_INT_EQ(NUMERUS_MIN_INT_CLASSIC, "-MMMCMXCIX");
     TO_ROMAN_FROM_INT_EQ(NUMERUS_MAX_INT_CLASSIC, "MMMCMXCIX");
+
+    // Longest integer numeral (without twelfths part)
+    TO_ROMAN_FROM_INT_EQ(-3888888, "-_MMMDCCCLXXXVIII_DCCCLXXXVIII");
+    TO_ROMAN_FROM_INT_EQ(3888888, "_MMMDCCCLXXXVIII_DCCCLXXXVIII");
 
     TO_ROMAN_FROM_INT_EQ(NUMERUS_MIN_INT, "-_MMMCMXCIX_CMXCIX");
     TO_ROMAN_FROM_INT_EQ(NUMERUS_MAX_INT, "_MMMCMXCIX_CMXCIX");
@@ -317,7 +320,7 @@ static void test_to_roman_valid_extremes(void)
     do { \
         err = numerus_roman_from_int_alloc(&roman, (x)); \
         atto_eq(err, NUMERUS_OK); \
-        atto_streq((str), roman, NUMERUS_ZERO_ROMAN_LEN_WITH_TERM-1); \
+        atto_streq((str), roman, NUMERUS_MAX_LEN_WITH_TERM-1); \
         free(roman); \
     } while(0)
 
@@ -551,7 +554,7 @@ static void test_to_roman_alloc_valid_some_extended(void)
     TO_ROMAN_FROM_INT_ALLOC_EQ(4002, "_IV_II");
     TO_ROMAN_FROM_INT_ALLOC_EQ(5000, "_V_");
     TO_ROMAN_FROM_INT_ALLOC_EQ(5555, "_V_DLV");
-    TO_ROMAN_FROM_INT_ALLOC_EQ(39000001, "_MMMCM_I");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(3900001, "_MMMCM_I");
 
     TO_ROMAN_FROM_INT_ALLOC_EQ(-3000, "-MMM");
     TO_ROMAN_FROM_INT_ALLOC_EQ(-3999, "-MMMCMXCIX");
@@ -560,7 +563,7 @@ static void test_to_roman_alloc_valid_some_extended(void)
     TO_ROMAN_FROM_INT_ALLOC_EQ(-4002, "-_IV_II");
     TO_ROMAN_FROM_INT_ALLOC_EQ(-5000, "-_V_");
     TO_ROMAN_FROM_INT_ALLOC_EQ(-5555, "-_V_DLV");
-    TO_ROMAN_FROM_INT_ALLOC_EQ(-39000001, "-_MMMCM_I");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-3900001, "-_MMMCM_I");
 }
 
 static void test_to_roman_alloc_valid_extremes(void)
@@ -571,8 +574,29 @@ static void test_to_roman_alloc_valid_extremes(void)
     TO_ROMAN_FROM_INT_ALLOC_EQ(NUMERUS_MIN_INT_CLASSIC, "-MMMCMXCIX");
     TO_ROMAN_FROM_INT_ALLOC_EQ(NUMERUS_MAX_INT_CLASSIC, "MMMCMXCIX");
 
+    // Longest integer numeral (without twelfths part)
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-3888888, "-_MMMDCCCLXXXVIII_DCCCLXXXVIII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(3888888, "_MMMDCCCLXXXVIII_DCCCLXXXVIII");
+
     TO_ROMAN_FROM_INT_ALLOC_EQ(NUMERUS_MIN_INT, "-_MMMCMXCIX_CMXCIX");
     TO_ROMAN_FROM_INT_ALLOC_EQ(NUMERUS_MAX_INT, "_MMMCMXCIX_CMXCIX");
+}
+
+static void test_to_roman_all_classic(void)
+{
+    char roman[NUMERUS_MAX_LEN_CLASSIC_WITH_TERM + 1];
+    roman[NUMERUS_MAX_LEN_CLASSIC_WITH_TERM] = CANARY;
+    numerus_err_t err;
+
+    for (int_fast32_t i = NUMERUS_MIN_INT_CLASSIC;
+         i <= NUMERUS_MIN_INT_CLASSIC;
+         i++)
+    {
+        err = numerus_roman_from_int(roman, i);
+        atto_eq(err, NUMERUS_OK);
+        atto_le(strlen(roman), NUMERUS_MAX_LEN_CLASSIC_WITH_TERM - 1);
+        atto_eq(roman[NUMERUS_MAX_LEN_CLASSIC_WITH_TERM], CANARY);
+    }
 }
 
 void test_to_roman(void)
@@ -586,4 +610,10 @@ void test_to_roman(void)
     test_to_roman_alloc_valid_first_hundred_negatives();
     test_to_roman_alloc_valid_some_extended();
     test_to_roman_alloc_valid_extremes();
+    test_to_roman_all_classic();
+    // TODO test all conversions: all roman numerals value->numeral->value
+    // to check bijectivity, correctness of generated values, length of
+    // generated numeral being <= max length for extended
+    // Maybe split it into multiple threads to make it faster. Don't use
+    // allocations to speed it up.
 }

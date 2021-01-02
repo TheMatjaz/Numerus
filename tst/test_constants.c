@@ -10,9 +10,13 @@
 
 #include "numerus_test.h"
 
-void test_constants(void) {
+
+void test_constants(void)
+{
     atto_streq(NUMERUS_ZERO_ROMAN, "NULLA", 5);
-    atto_eq(NUMERUS_ZERO_ROMAN_LEN_WITH_TERM, 5+1);
+    atto_eq(strlen(NUMERUS_ZERO_ROMAN),
+            NUMERUS_ZERO_ROMAN_LEN_WITH_TERM - 1);
+    atto_eq(NUMERUS_ZERO_ROMAN_LEN_WITH_TERM, 5 + 1);
     atto_eq(NUMERUS_MAX_INT_CLASSIC, +3999);
     atto_eq(NUMERUS_MIN_INT_CLASSIC, -3999);
     atto_eq(NUMERUS_MAX_INT, +3999999L);
