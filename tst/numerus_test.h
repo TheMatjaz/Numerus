@@ -23,9 +23,12 @@ void test_constants(void);
 void test_strutils(void);
 void test_fraction(void);
 void test_fmt(void);
-void test_to_roman(void);
-void test_from_roman_basic(void);
-void test_from_roman_extended(void);
+void test_roman_from_int(void);
+void test_roman_from_double(void);
+void test_roman_from_fraction(void);
+void test_roman_to_int(void);
+void test_roman_to_double(void);
+void test_roman_to_fraction(void);
 
 #ifdef __cplusplus
 }

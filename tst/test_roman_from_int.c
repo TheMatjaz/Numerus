@@ -1,0 +1,617 @@
+/**
+ * @file
+ *
+ * @copyright Copyright © 2015-2021, Matjaž Guštin <dev@matjaz.it>
+ * <https://matjaz.it>. All rights reserved.
+ * @license BSD 3-clause license.
+ */
+
+#include "numerus_test.h"
+
+
+#define CANARY '@'
+
+static void test_to_roman_invalid(void)
+{
+    char roman[NUMERUS_MAX_LEN_WITH_TERM] = {'A'};
+    numerus_err_t err;
+
+    roman[0] = 'A';
+    err = numerus_roman_from_int(NULL, 0);
+    atto_eq(NUMERUS_ERR_NULL_NUMERAL, err);
+    atto_streq(roman, "A", NUMERUS_MAX_LEN_CLASSIC_WITH_TERM);
+
+    roman[0] = 'A';
+    err = numerus_roman_from_int(roman, NUMERUS_MAX_INT + 1);
+    atto_eq(NUMERUS_ERR_VALUE_OUT_OF_RANGE, err);
+    atto_streq(roman, "", NUMERUS_MAX_LEN_CLASSIC_WITH_TERM);
+
+    roman[0] = 'A';
+    err = numerus_roman_from_int(roman, NUMERUS_MIN_INT - 1);
+    atto_eq(NUMERUS_ERR_VALUE_OUT_OF_RANGE, err);
+    atto_streq(roman, "", NUMERUS_MAX_LEN_CLASSIC_WITH_TERM);
+}
+
+
+/**
+ * @internal
+ * Compares the generated roman numeral with the expected one,
+ * making the code of the tests_to_roman_valid*() test cases easier to
+ * read.
+ */
+#define TO_ROMAN_FROM_INT_EQ(x, str) \
+    do { \
+        err = numerus_roman_from_int(roman, (x)); \
+        atto_eq(err, NUMERUS_OK); \
+        atto_streq(roman, (str), NUMERUS_MAX_LEN_WITH_TERM-1); \
+        atto_eq(roman[NUMERUS_MAX_LEN_WITH_TERM], CANARY); \
+    } while(0)
+
+
+static void test_to_roman_valid_first_hundred_positives(void)
+{
+    char roman[NUMERUS_MAX_LEN_WITH_TERM + 1];
+    roman[NUMERUS_MAX_LEN_WITH_TERM] = CANARY;
+    numerus_err_t err;
+
+    TO_ROMAN_FROM_INT_EQ(0, "NULLA");
+    TO_ROMAN_FROM_INT_EQ(1, "I");
+    TO_ROMAN_FROM_INT_EQ(2, "II");
+    TO_ROMAN_FROM_INT_EQ(3, "III");
+    TO_ROMAN_FROM_INT_EQ(4, "IV");
+    TO_ROMAN_FROM_INT_EQ(5, "V");
+    TO_ROMAN_FROM_INT_EQ(6, "VI");
+    TO_ROMAN_FROM_INT_EQ(7, "VII");
+    TO_ROMAN_FROM_INT_EQ(8, "VIII");
+    TO_ROMAN_FROM_INT_EQ(9, "IX");
+    TO_ROMAN_FROM_INT_EQ(10, "X");
+    TO_ROMAN_FROM_INT_EQ(11, "XI");
+    TO_ROMAN_FROM_INT_EQ(12, "XII");
+    TO_ROMAN_FROM_INT_EQ(13, "XIII");
+    TO_ROMAN_FROM_INT_EQ(14, "XIV");
+    TO_ROMAN_FROM_INT_EQ(15, "XV");
+    TO_ROMAN_FROM_INT_EQ(16, "XVI");
+    TO_ROMAN_FROM_INT_EQ(17, "XVII");
+    TO_ROMAN_FROM_INT_EQ(18, "XVIII");
+    TO_ROMAN_FROM_INT_EQ(19, "XIX");
+    TO_ROMAN_FROM_INT_EQ(20, "XX");
+    TO_ROMAN_FROM_INT_EQ(21, "XXI");
+    TO_ROMAN_FROM_INT_EQ(22, "XXII");
+    TO_ROMAN_FROM_INT_EQ(23, "XXIII");
+    TO_ROMAN_FROM_INT_EQ(24, "XXIV");
+    TO_ROMAN_FROM_INT_EQ(25, "XXV");
+    TO_ROMAN_FROM_INT_EQ(26, "XXVI");
+    TO_ROMAN_FROM_INT_EQ(27, "XXVII");
+    TO_ROMAN_FROM_INT_EQ(28, "XXVIII");
+    TO_ROMAN_FROM_INT_EQ(29, "XXIX");
+    TO_ROMAN_FROM_INT_EQ(30, "XXX");
+    TO_ROMAN_FROM_INT_EQ(31, "XXXI");
+    TO_ROMAN_FROM_INT_EQ(32, "XXXII");
+    TO_ROMAN_FROM_INT_EQ(33, "XXXIII");
+    TO_ROMAN_FROM_INT_EQ(34, "XXXIV");
+    TO_ROMAN_FROM_INT_EQ(35, "XXXV");
+    TO_ROMAN_FROM_INT_EQ(36, "XXXVI");
+    TO_ROMAN_FROM_INT_EQ(37, "XXXVII");
+    TO_ROMAN_FROM_INT_EQ(38, "XXXVIII");
+    TO_ROMAN_FROM_INT_EQ(39, "XXXIX");
+    TO_ROMAN_FROM_INT_EQ(40, "XL");
+    TO_ROMAN_FROM_INT_EQ(41, "XLI");
+    TO_ROMAN_FROM_INT_EQ(42, "XLII");
+    TO_ROMAN_FROM_INT_EQ(43, "XLIII");
+    TO_ROMAN_FROM_INT_EQ(44, "XLIV");
+    TO_ROMAN_FROM_INT_EQ(45, "XLV");
+    TO_ROMAN_FROM_INT_EQ(46, "XLVI");
+    TO_ROMAN_FROM_INT_EQ(47, "XLVII");
+    TO_ROMAN_FROM_INT_EQ(48, "XLVIII");
+    TO_ROMAN_FROM_INT_EQ(49, "XLIX");
+    TO_ROMAN_FROM_INT_EQ(50, "L");
+    TO_ROMAN_FROM_INT_EQ(51, "LI");
+    TO_ROMAN_FROM_INT_EQ(52, "LII");
+    TO_ROMAN_FROM_INT_EQ(53, "LIII");
+    TO_ROMAN_FROM_INT_EQ(54, "LIV");
+    TO_ROMAN_FROM_INT_EQ(55, "LV");
+    TO_ROMAN_FROM_INT_EQ(56, "LVI");
+    TO_ROMAN_FROM_INT_EQ(57, "LVII");
+    TO_ROMAN_FROM_INT_EQ(58, "LVIII");
+    TO_ROMAN_FROM_INT_EQ(59, "LIX");
+    TO_ROMAN_FROM_INT_EQ(60, "LX");
+    TO_ROMAN_FROM_INT_EQ(61, "LXI");
+    TO_ROMAN_FROM_INT_EQ(62, "LXII");
+    TO_ROMAN_FROM_INT_EQ(63, "LXIII");
+    TO_ROMAN_FROM_INT_EQ(64, "LXIV");
+    TO_ROMAN_FROM_INT_EQ(65, "LXV");
+    TO_ROMAN_FROM_INT_EQ(66, "LXVI");
+    TO_ROMAN_FROM_INT_EQ(67, "LXVII");
+    TO_ROMAN_FROM_INT_EQ(68, "LXVIII");
+    TO_ROMAN_FROM_INT_EQ(69, "LXIX");
+    TO_ROMAN_FROM_INT_EQ(70, "LXX");
+    TO_ROMAN_FROM_INT_EQ(71, "LXXI");
+    TO_ROMAN_FROM_INT_EQ(72, "LXXII");
+    TO_ROMAN_FROM_INT_EQ(73, "LXXIII");
+    TO_ROMAN_FROM_INT_EQ(74, "LXXIV");
+    TO_ROMAN_FROM_INT_EQ(75, "LXXV");
+    TO_ROMAN_FROM_INT_EQ(76, "LXXVI");
+    TO_ROMAN_FROM_INT_EQ(77, "LXXVII");
+    TO_ROMAN_FROM_INT_EQ(78, "LXXVIII");
+    TO_ROMAN_FROM_INT_EQ(79, "LXXIX");
+    TO_ROMAN_FROM_INT_EQ(80, "LXXX");
+    TO_ROMAN_FROM_INT_EQ(81, "LXXXI");
+    TO_ROMAN_FROM_INT_EQ(82, "LXXXII");
+    TO_ROMAN_FROM_INT_EQ(83, "LXXXIII");
+    TO_ROMAN_FROM_INT_EQ(84, "LXXXIV");
+    TO_ROMAN_FROM_INT_EQ(85, "LXXXV");
+    TO_ROMAN_FROM_INT_EQ(86, "LXXXVI");
+    TO_ROMAN_FROM_INT_EQ(87, "LXXXVII");
+    TO_ROMAN_FROM_INT_EQ(88, "LXXXVIII");
+    TO_ROMAN_FROM_INT_EQ(89, "LXXXIX");
+    TO_ROMAN_FROM_INT_EQ(90, "XC");
+    TO_ROMAN_FROM_INT_EQ(91, "XCI");
+    TO_ROMAN_FROM_INT_EQ(92, "XCII");
+    TO_ROMAN_FROM_INT_EQ(93, "XCIII");
+    TO_ROMAN_FROM_INT_EQ(94, "XCIV");
+    TO_ROMAN_FROM_INT_EQ(95, "XCV");
+    TO_ROMAN_FROM_INT_EQ(96, "XCVI");
+    TO_ROMAN_FROM_INT_EQ(97, "XCVII");
+    TO_ROMAN_FROM_INT_EQ(98, "XCVIII");
+    TO_ROMAN_FROM_INT_EQ(99, "XCIX");
+    TO_ROMAN_FROM_INT_EQ(100, "C");
+}
+
+static void test_to_roman_valid_first_hundred_negatives(void)
+{
+    char roman[NUMERUS_MAX_LEN_WITH_TERM + 1];
+    roman[NUMERUS_MAX_LEN_WITH_TERM] = CANARY;
+    numerus_err_t err;
+
+    TO_ROMAN_FROM_INT_EQ(-0, "NULLA");
+    TO_ROMAN_FROM_INT_EQ(-1, "-I");
+    TO_ROMAN_FROM_INT_EQ(-2, "-II");
+    TO_ROMAN_FROM_INT_EQ(-3, "-III");
+    TO_ROMAN_FROM_INT_EQ(-4, "-IV");
+    TO_ROMAN_FROM_INT_EQ(-5, "-V");
+    TO_ROMAN_FROM_INT_EQ(-6, "-VI");
+    TO_ROMAN_FROM_INT_EQ(-7, "-VII");
+    TO_ROMAN_FROM_INT_EQ(-8, "-VIII");
+    TO_ROMAN_FROM_INT_EQ(-9, "-IX");
+    TO_ROMAN_FROM_INT_EQ(-10, "-X");
+    TO_ROMAN_FROM_INT_EQ(-11, "-XI");
+    TO_ROMAN_FROM_INT_EQ(-12, "-XII");
+    TO_ROMAN_FROM_INT_EQ(-13, "-XIII");
+    TO_ROMAN_FROM_INT_EQ(-14, "-XIV");
+    TO_ROMAN_FROM_INT_EQ(-15, "-XV");
+    TO_ROMAN_FROM_INT_EQ(-16, "-XVI");
+    TO_ROMAN_FROM_INT_EQ(-17, "-XVII");
+    TO_ROMAN_FROM_INT_EQ(-18, "-XVIII");
+    TO_ROMAN_FROM_INT_EQ(-19, "-XIX");
+    TO_ROMAN_FROM_INT_EQ(-20, "-XX");
+    TO_ROMAN_FROM_INT_EQ(-21, "-XXI");
+    TO_ROMAN_FROM_INT_EQ(-22, "-XXII");
+    TO_ROMAN_FROM_INT_EQ(-23, "-XXIII");
+    TO_ROMAN_FROM_INT_EQ(-24, "-XXIV");
+    TO_ROMAN_FROM_INT_EQ(-25, "-XXV");
+    TO_ROMAN_FROM_INT_EQ(-26, "-XXVI");
+    TO_ROMAN_FROM_INT_EQ(-27, "-XXVII");
+    TO_ROMAN_FROM_INT_EQ(-28, "-XXVIII");
+    TO_ROMAN_FROM_INT_EQ(-29, "-XXIX");
+    TO_ROMAN_FROM_INT_EQ(-30, "-XXX");
+    TO_ROMAN_FROM_INT_EQ(-31, "-XXXI");
+    TO_ROMAN_FROM_INT_EQ(-32, "-XXXII");
+    TO_ROMAN_FROM_INT_EQ(-33, "-XXXIII");
+    TO_ROMAN_FROM_INT_EQ(-34, "-XXXIV");
+    TO_ROMAN_FROM_INT_EQ(-35, "-XXXV");
+    TO_ROMAN_FROM_INT_EQ(-36, "-XXXVI");
+    TO_ROMAN_FROM_INT_EQ(-37, "-XXXVII");
+    TO_ROMAN_FROM_INT_EQ(-38, "-XXXVIII");
+    TO_ROMAN_FROM_INT_EQ(-39, "-XXXIX");
+    TO_ROMAN_FROM_INT_EQ(-40, "-XL");
+    TO_ROMAN_FROM_INT_EQ(-41, "-XLI");
+    TO_ROMAN_FROM_INT_EQ(-42, "-XLII");
+    TO_ROMAN_FROM_INT_EQ(-43, "-XLIII");
+    TO_ROMAN_FROM_INT_EQ(-44, "-XLIV");
+    TO_ROMAN_FROM_INT_EQ(-45, "-XLV");
+    TO_ROMAN_FROM_INT_EQ(-46, "-XLVI");
+    TO_ROMAN_FROM_INT_EQ(-47, "-XLVII");
+    TO_ROMAN_FROM_INT_EQ(-48, "-XLVIII");
+    TO_ROMAN_FROM_INT_EQ(-49, "-XLIX");
+    TO_ROMAN_FROM_INT_EQ(-50, "-L");
+    TO_ROMAN_FROM_INT_EQ(-51, "-LI");
+    TO_ROMAN_FROM_INT_EQ(-52, "-LII");
+    TO_ROMAN_FROM_INT_EQ(-53, "-LIII");
+    TO_ROMAN_FROM_INT_EQ(-54, "-LIV");
+    TO_ROMAN_FROM_INT_EQ(-55, "-LV");
+    TO_ROMAN_FROM_INT_EQ(-56, "-LVI");
+    TO_ROMAN_FROM_INT_EQ(-57, "-LVII");
+    TO_ROMAN_FROM_INT_EQ(-58, "-LVIII");
+    TO_ROMAN_FROM_INT_EQ(-59, "-LIX");
+    TO_ROMAN_FROM_INT_EQ(-60, "-LX");
+    TO_ROMAN_FROM_INT_EQ(-61, "-LXI");
+    TO_ROMAN_FROM_INT_EQ(-62, "-LXII");
+    TO_ROMAN_FROM_INT_EQ(-63, "-LXIII");
+    TO_ROMAN_FROM_INT_EQ(-64, "-LXIV");
+    TO_ROMAN_FROM_INT_EQ(-65, "-LXV");
+    TO_ROMAN_FROM_INT_EQ(-66, "-LXVI");
+    TO_ROMAN_FROM_INT_EQ(-67, "-LXVII");
+    TO_ROMAN_FROM_INT_EQ(-68, "-LXVIII");
+    TO_ROMAN_FROM_INT_EQ(-69, "-LXIX");
+    TO_ROMAN_FROM_INT_EQ(-70, "-LXX");
+    TO_ROMAN_FROM_INT_EQ(-71, "-LXXI");
+    TO_ROMAN_FROM_INT_EQ(-72, "-LXXII");
+    TO_ROMAN_FROM_INT_EQ(-73, "-LXXIII");
+    TO_ROMAN_FROM_INT_EQ(-74, "-LXXIV");
+    TO_ROMAN_FROM_INT_EQ(-75, "-LXXV");
+    TO_ROMAN_FROM_INT_EQ(-76, "-LXXVI");
+    TO_ROMAN_FROM_INT_EQ(-77, "-LXXVII");
+    TO_ROMAN_FROM_INT_EQ(-78, "-LXXVIII");
+    TO_ROMAN_FROM_INT_EQ(-79, "-LXXIX");
+    TO_ROMAN_FROM_INT_EQ(-80, "-LXXX");
+    TO_ROMAN_FROM_INT_EQ(-81, "-LXXXI");
+    TO_ROMAN_FROM_INT_EQ(-82, "-LXXXII");
+    TO_ROMAN_FROM_INT_EQ(-83, "-LXXXIII");
+    TO_ROMAN_FROM_INT_EQ(-84, "-LXXXIV");
+    TO_ROMAN_FROM_INT_EQ(-85, "-LXXXV");
+    TO_ROMAN_FROM_INT_EQ(-86, "-LXXXVI");
+    TO_ROMAN_FROM_INT_EQ(-87, "-LXXXVII");
+    TO_ROMAN_FROM_INT_EQ(-88, "-LXXXVIII");
+    TO_ROMAN_FROM_INT_EQ(-89, "-LXXXIX");
+    TO_ROMAN_FROM_INT_EQ(-90, "-XC");
+    TO_ROMAN_FROM_INT_EQ(-91, "-XCI");
+    TO_ROMAN_FROM_INT_EQ(-92, "-XCII");
+    TO_ROMAN_FROM_INT_EQ(-93, "-XCIII");
+    TO_ROMAN_FROM_INT_EQ(-94, "-XCIV");
+    TO_ROMAN_FROM_INT_EQ(-95, "-XCV");
+    TO_ROMAN_FROM_INT_EQ(-96, "-XCVI");
+    TO_ROMAN_FROM_INT_EQ(-97, "-XCVII");
+    TO_ROMAN_FROM_INT_EQ(-98, "-XCVIII");
+    TO_ROMAN_FROM_INT_EQ(-99, "-XCIX");
+    TO_ROMAN_FROM_INT_EQ(-100, "-C");
+}
+
+static void test_to_roman_valid_some_extended(void)
+{
+    char roman[NUMERUS_MAX_LEN_WITH_TERM + 1];
+    roman[NUMERUS_MAX_LEN_WITH_TERM] = CANARY;
+    numerus_err_t err;
+
+    TO_ROMAN_FROM_INT_EQ(3000, "MMM");
+    TO_ROMAN_FROM_INT_EQ(3999, "MMMCMXCIX");
+    TO_ROMAN_FROM_INT_EQ(4000, "_IV_");
+    TO_ROMAN_FROM_INT_EQ(4001, "_IV_I");
+    TO_ROMAN_FROM_INT_EQ(4002, "_IV_II");
+    TO_ROMAN_FROM_INT_EQ(5000, "_V_");
+    TO_ROMAN_FROM_INT_EQ(5555, "_V_DLV");
+    TO_ROMAN_FROM_INT_EQ(3900001, "_MMMCM_I");
+
+    TO_ROMAN_FROM_INT_EQ(-3000, "-MMM");
+    TO_ROMAN_FROM_INT_EQ(-3999, "-MMMCMXCIX");
+    TO_ROMAN_FROM_INT_EQ(-4000, "-_IV_");
+    TO_ROMAN_FROM_INT_EQ(-4001, "-_IV_I");
+    TO_ROMAN_FROM_INT_EQ(-4002, "-_IV_II");
+    TO_ROMAN_FROM_INT_EQ(-5000, "-_V_");
+    TO_ROMAN_FROM_INT_EQ(-5555, "-_V_DLV");
+    TO_ROMAN_FROM_INT_EQ(-3900001, "-_MMMCM_I");
+}
+
+static void test_to_roman_valid_extremes(void)
+{
+    char roman[NUMERUS_MAX_LEN_WITH_TERM + 1];
+    roman[NUMERUS_MAX_LEN_WITH_TERM] = CANARY;
+    numerus_err_t err;
+
+    TO_ROMAN_FROM_INT_EQ(NUMERUS_MIN_INT_CLASSIC, "-MMMCMXCIX");
+    TO_ROMAN_FROM_INT_EQ(NUMERUS_MAX_INT_CLASSIC, "MMMCMXCIX");
+
+    // Longest integer numeral (without twelfths part)
+    TO_ROMAN_FROM_INT_EQ(-3888888, "-_MMMDCCCLXXXVIII_DCCCLXXXVIII");
+    TO_ROMAN_FROM_INT_EQ(3888888, "_MMMDCCCLXXXVIII_DCCCLXXXVIII");
+
+    TO_ROMAN_FROM_INT_EQ(NUMERUS_MIN_INT, "-_MMMCMXCIX_CMXCIX");
+    TO_ROMAN_FROM_INT_EQ(NUMERUS_MAX_INT, "_MMMCMXCIX_CMXCIX");
+}
+
+/**
+ * @internal
+ * Compares the allocated roman numeral with the expected one,
+ * making the code of the tests_to_roman_alloc_valid*() test cases
+ * easier to read.
+ */
+#define TO_ROMAN_FROM_INT_ALLOC_EQ(x, str) \
+    do { \
+        err = numerus_roman_from_int_alloc(&roman, (x)); \
+        atto_eq(err, NUMERUS_OK); \
+        atto_streq((str), roman, NUMERUS_MAX_LEN_WITH_TERM-1); \
+        free(roman); \
+    } while(0)
+
+
+static void test_to_roman_alloc_valid_first_hundred_positives(void)
+{
+    char* roman = NULL;
+    numerus_err_t err;
+
+    TO_ROMAN_FROM_INT_ALLOC_EQ(0, "NULLA");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(1, "I");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(2, "II");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(3, "III");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(4, "IV");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(5, "V");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(6, "VI");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(7, "VII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(8, "VIII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(9, "IX");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(10, "X");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(11, "XI");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(12, "XII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(13, "XIII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(14, "XIV");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(15, "XV");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(16, "XVI");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(17, "XVII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(18, "XVIII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(19, "XIX");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(20, "XX");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(21, "XXI");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(22, "XXII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(23, "XXIII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(24, "XXIV");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(25, "XXV");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(26, "XXVI");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(27, "XXVII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(28, "XXVIII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(29, "XXIX");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(30, "XXX");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(31, "XXXI");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(32, "XXXII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(33, "XXXIII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(34, "XXXIV");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(35, "XXXV");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(36, "XXXVI");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(37, "XXXVII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(38, "XXXVIII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(39, "XXXIX");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(40, "XL");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(41, "XLI");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(42, "XLII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(43, "XLIII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(44, "XLIV");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(45, "XLV");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(46, "XLVI");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(47, "XLVII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(48, "XLVIII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(49, "XLIX");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(50, "L");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(51, "LI");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(52, "LII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(53, "LIII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(54, "LIV");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(55, "LV");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(56, "LVI");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(57, "LVII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(58, "LVIII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(59, "LIX");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(60, "LX");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(61, "LXI");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(62, "LXII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(63, "LXIII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(64, "LXIV");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(65, "LXV");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(66, "LXVI");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(67, "LXVII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(68, "LXVIII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(69, "LXIX");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(70, "LXX");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(71, "LXXI");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(72, "LXXII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(73, "LXXIII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(74, "LXXIV");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(75, "LXXV");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(76, "LXXVI");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(77, "LXXVII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(78, "LXXVIII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(79, "LXXIX");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(80, "LXXX");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(81, "LXXXI");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(82, "LXXXII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(83, "LXXXIII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(84, "LXXXIV");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(85, "LXXXV");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(86, "LXXXVI");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(87, "LXXXVII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(88, "LXXXVIII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(89, "LXXXIX");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(90, "XC");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(91, "XCI");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(92, "XCII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(93, "XCIII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(94, "XCIV");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(95, "XCV");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(96, "XCVI");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(97, "XCVII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(98, "XCVIII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(99, "XCIX");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(100, "C");
+}
+
+static void test_to_roman_alloc_valid_first_hundred_negatives(void)
+{
+    char* roman = NULL;
+    numerus_err_t err;
+
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-0, "NULLA");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-1, "-I");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-2, "-II");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-3, "-III");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-4, "-IV");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-5, "-V");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-6, "-VI");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-7, "-VII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-8, "-VIII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-9, "-IX");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-10, "-X");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-11, "-XI");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-12, "-XII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-13, "-XIII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-14, "-XIV");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-15, "-XV");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-16, "-XVI");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-17, "-XVII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-18, "-XVIII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-19, "-XIX");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-20, "-XX");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-21, "-XXI");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-22, "-XXII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-23, "-XXIII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-24, "-XXIV");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-25, "-XXV");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-26, "-XXVI");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-27, "-XXVII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-28, "-XXVIII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-29, "-XXIX");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-30, "-XXX");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-31, "-XXXI");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-32, "-XXXII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-33, "-XXXIII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-34, "-XXXIV");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-35, "-XXXV");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-36, "-XXXVI");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-37, "-XXXVII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-38, "-XXXVIII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-39, "-XXXIX");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-40, "-XL");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-41, "-XLI");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-42, "-XLII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-43, "-XLIII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-44, "-XLIV");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-45, "-XLV");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-46, "-XLVI");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-47, "-XLVII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-48, "-XLVIII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-49, "-XLIX");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-50, "-L");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-51, "-LI");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-52, "-LII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-53, "-LIII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-54, "-LIV");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-55, "-LV");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-56, "-LVI");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-57, "-LVII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-58, "-LVIII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-59, "-LIX");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-60, "-LX");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-61, "-LXI");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-62, "-LXII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-63, "-LXIII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-64, "-LXIV");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-65, "-LXV");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-66, "-LXVI");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-67, "-LXVII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-68, "-LXVIII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-69, "-LXIX");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-70, "-LXX");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-71, "-LXXI");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-72, "-LXXII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-73, "-LXXIII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-74, "-LXXIV");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-75, "-LXXV");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-76, "-LXXVI");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-77, "-LXXVII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-78, "-LXXVIII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-79, "-LXXIX");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-80, "-LXXX");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-81, "-LXXXI");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-82, "-LXXXII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-83, "-LXXXIII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-84, "-LXXXIV");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-85, "-LXXXV");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-86, "-LXXXVI");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-87, "-LXXXVII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-88, "-LXXXVIII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-89, "-LXXXIX");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-90, "-XC");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-91, "-XCI");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-92, "-XCII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-93, "-XCIII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-94, "-XCIV");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-95, "-XCV");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-96, "-XCVI");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-97, "-XCVII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-98, "-XCVIII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-99, "-XCIX");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-100, "-C");
+}
+
+
+static void test_to_roman_alloc_valid_some_extended(void)
+{
+    char* roman = NULL;
+    numerus_err_t err;
+
+    TO_ROMAN_FROM_INT_ALLOC_EQ(3000, "MMM");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(3999, "MMMCMXCIX");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(4000, "_IV_");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(4001, "_IV_I");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(4002, "_IV_II");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(5000, "_V_");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(5555, "_V_DLV");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(3900001, "_MMMCM_I");
+
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-3000, "-MMM");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-3999, "-MMMCMXCIX");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-4000, "-_IV_");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-4001, "-_IV_I");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-4002, "-_IV_II");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-5000, "-_V_");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-5555, "-_V_DLV");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-3900001, "-_MMMCM_I");
+}
+
+static void test_to_roman_alloc_valid_extremes(void)
+{
+    char* roman = NULL;
+    numerus_err_t err;
+
+    TO_ROMAN_FROM_INT_ALLOC_EQ(NUMERUS_MIN_INT_CLASSIC, "-MMMCMXCIX");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(NUMERUS_MAX_INT_CLASSIC, "MMMCMXCIX");
+
+    // Longest integer numeral (without twelfths part)
+    TO_ROMAN_FROM_INT_ALLOC_EQ(-3888888, "-_MMMDCCCLXXXVIII_DCCCLXXXVIII");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(3888888, "_MMMDCCCLXXXVIII_DCCCLXXXVIII");
+
+    TO_ROMAN_FROM_INT_ALLOC_EQ(NUMERUS_MIN_INT, "-_MMMCMXCIX_CMXCIX");
+    TO_ROMAN_FROM_INT_ALLOC_EQ(NUMERUS_MAX_INT, "_MMMCMXCIX_CMXCIX");
+}
+
+static void test_to_roman_all_classic(void)
+{
+    char roman[NUMERUS_MAX_LEN_CLASSIC_WITH_TERM + 1];
+    roman[NUMERUS_MAX_LEN_CLASSIC_WITH_TERM] = CANARY;
+    numerus_err_t err;
+
+    for (int32_t i = NUMERUS_MIN_INT_CLASSIC;
+         i <= NUMERUS_MIN_INT_CLASSIC;
+         i++)
+    {
+        err = numerus_roman_from_int(roman, i);
+        atto_eq(err, NUMERUS_OK);
+        atto_le(strlen(roman), NUMERUS_MAX_LEN_CLASSIC_WITH_TERM - 1);
+        atto_eq(roman[NUMERUS_MAX_LEN_CLASSIC_WITH_TERM], CANARY);
+    }
+}
+
+void test_roman_from_int(void)
+{
+    test_to_roman_invalid();
+    test_to_roman_valid_first_hundred_positives();
+    test_to_roman_valid_first_hundred_negatives();
+    test_to_roman_valid_some_extended();
+    test_to_roman_valid_extremes();
+    test_to_roman_alloc_valid_first_hundred_positives();
+    test_to_roman_alloc_valid_first_hundred_negatives();
+    test_to_roman_alloc_valid_some_extended();
+    test_to_roman_alloc_valid_extremes();
+    test_to_roman_all_classic();
+    // TODO test all conversions: all roman numerals value->numeral->value
+    // to check bijectivity, correctness of generated values, length of
+    // generated numeral being <= max length for extended
+    // Maybe split it into multiple threads to make it faster. Don't use
+    // allocations to speed it up.
+}

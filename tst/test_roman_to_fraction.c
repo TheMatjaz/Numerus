@@ -1,7 +1,5 @@
 /**
  * @file
- * Test cases for the **basic** roman numeral to value conversion functions
- * from numerus_from_roman.c
  *
  * @copyright Copyright © 2015-2021, Matjaž Guštin <dev@matjaz.it>
  * <https://matjaz.it>. All rights reserved.
@@ -10,7 +8,7 @@
 
 #include "numerus_test.h"
 
-void test_from_roman_basic(void)
+void test_roman_to_fraction(void)
 {
     atto_fail();
 }

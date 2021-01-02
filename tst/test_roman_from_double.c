@@ -1,7 +1,5 @@
 /**
  * @file
- * Test cases for the value to **basic** roman numeral conversion functions
- * from numerus_roman_from_int.c and numerus_roman_from_int_alloc.c
  *
  * @copyright Copyright © 2015-2021, Matjaž Guštin <dev@matjaz.it>
  * <https://matjaz.it>. All rights reserved.
@@ -9,6 +7,7 @@
  */
 
 #include "numerus_test.h"
+
 
 
 #define CANARY '@'
@@ -19,7 +18,7 @@ static void test_to_roman_invalid(void)
     numerus_err_t err;
 
     roman[0] = 'A';
-    err = numerus_roman_from_int(NULL, 0);
+    err = numerus_roman_from_double(NULL, 0);
     atto_eq(NUMERUS_ERR_NULL_NUMERAL, err);
     atto_streq(roman, "A", NUMERUS_MAX_LEN_CLASSIC_WITH_TERM);
 
@@ -599,7 +598,7 @@ static void test_to_roman_all_classic(void)
     }
 }
 
-void test_to_roman(void)
+void test_roman_from_double(void)
 {
     test_to_roman_invalid();
     test_to_roman_valid_first_hundred_positives();

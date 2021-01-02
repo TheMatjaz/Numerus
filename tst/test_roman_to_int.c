@@ -1,7 +1,5 @@
 /**
  * @file
- * Test cases for the value to **extended** roman numeral conversion functions
- * from numerus_roman_from_int.c and numerus_roman_from_int_alloc.
  *
  * @copyright Copyright © 2015-2021, Matjaž Guštin <dev@matjaz.it>
  * <https://matjaz.it>. All rights reserved.
@@ -10,8 +8,7 @@
 
 #include "numerus_test.h"
 
-
-void test_to_roman_extended(void)
+void test_roman_to_int(void)
 {
     atto_fail();
 }
