@@ -1,3 +1,8 @@
+# Compilation configuration of the Numerus project
+# Copyright © 2015-2021, Matjaž Guštin <dev@matjaz.it> <https://matjaz.it>.
+# All rights reserved.
+# Release under the BSD 3-clause license.
+
 cmake_minimum_required(VERSION 3.6)
 project(Numerus
         VERSION 3.0.0

@@ -3,7 +3,7 @@
  * Test cases for the value to **extended** roman numeral conversion functions
  * from numerus_roman_from_int.c and numerus_roman_from_int_alloc.
  *
- * @copyright Copyright © 2015-2020, Matjaž Guštin <dev@matjaz.it>
+ * @copyright Copyright © 2015-2021, Matjaž Guštin <dev@matjaz.it>
  * <https://matjaz.it>. All rights reserved.
  * @license BSD 3-clause license.
  */
