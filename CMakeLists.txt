@@ -79,8 +79,10 @@ set(TEST_NUMERUS_SRC
     tst/test_fmt.c
     tst/test_roman_from_int.c
     tst/test_roman_from_double.c
+    tst/test_roman_from_fraction.c
     tst/test_roman_to_int.c
     tst/test_roman_to_double.c
+    tst/test_roman_to_fraction.c
     )
 set(NUMERUS_DOXYGEN_SRC
     ${LIBNUMERUS_HEADER}

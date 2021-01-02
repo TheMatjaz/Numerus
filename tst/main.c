@@ -17,7 +17,10 @@ int main(void)
     test_fraction();
     test_fmt();
     test_roman_from_int();
+    test_roman_from_double();
+    test_roman_from_fraction();
     test_roman_to_int();
     test_roman_to_double();
+    test_roman_to_fraction();
     return atto_at_least_one_fail;
 }
