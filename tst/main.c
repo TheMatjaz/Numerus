@@ -22,7 +22,10 @@ int main(void)
     test_roman_to_int();
     test_roman_to_double();
     test_roman_to_fraction();
+#ifndef DEBUG
+    // Run time-consuming tests only in release mode, which is about 3x faster
     test_bijectivity();
     test_benchmark();
+#endif
     return atto_at_least_one_fail;
 }
