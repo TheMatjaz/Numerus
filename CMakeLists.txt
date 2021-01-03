@@ -84,6 +84,7 @@ set(TEST_NUMERUS_SRC
     tst/test_roman_to_double.c
     tst/test_roman_to_fraction.c
     tst/test_bijectivity.c
+    tst/test_benchmark.c
     )
 set(NUMERUS_DOXYGEN_SRC
     ${LIBNUMERUS_HEADER}

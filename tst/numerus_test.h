@@ -17,6 +17,7 @@ extern "C"
 
 #include "atto.h"
 #include "numerus.h"
+#include <time.h>
 
 
 void test_constants(void);
@@ -30,6 +31,7 @@ void test_roman_to_int(void);
 void test_roman_to_double(void);
 void test_roman_to_fraction(void);
 void test_bijectivity(void);
+void test_benchmark(void);
 
 #ifdef __cplusplus
 }

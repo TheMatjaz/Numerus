@@ -15,9 +15,10 @@
 
 
 #define CANARY '@'
-#define LOG_FREQUENCY 30000L
+#define LOG_FREQUENCY 100000L
 
 static const uint32_t TOTAL_ITERATIONS = (NUMERUS_MAX_INT + 1UL) * 12UL * 2UL;
+static size_t generated_chars_with_terms = 0;
 
 inline static void log_state(const numerus_frac_t input_fraction)
 {
@@ -82,6 +83,7 @@ void test_bijectivity(void)
                        input_fraction.twelfths);
                 atto_fail();
             }
+            generated_chars_with_terms += strlen(roman) + 1U;
             // Clear the output fraction to see that it changes
             output_fraction.int_part = 0xFFFFFFFFL;
             output_fraction.twelfths = 0xFFFFFFFFL;
@@ -160,6 +162,7 @@ void test_bijectivity(void)
                        input_fraction.twelfths);
                 atto_fail();
             }
+            generated_chars_with_terms += strlen(roman) + 1U;
             // Clear the output fraction to see that it changes
             output_fraction.int_part = 0xFFFFFFFFL;
             output_fraction.twelfths = 0xFFFFFFFFL;
@@ -193,4 +196,6 @@ void test_bijectivity(void)
         }
     }
     puts("\rNegatives fully bijective.");
+    printf("Generated %zu characters, null-terminators included.\n",
+           generated_chars_with_terms);
 }
