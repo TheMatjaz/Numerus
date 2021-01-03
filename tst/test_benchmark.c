@@ -159,7 +159,8 @@ static void test_benchmark_roman_to_value(const int64_t timedelta_ns_to_roman)
            ((double) timedelta_ns_from_roman) / 1e9);
     printf("Avg. conversion roman->value: %"PRId64" ns\n",
            timedelta_ns_per_iteration_from_roman);
-    printf("Parsing a roman numeral is %.2fx slower than generating one.\n",
+    printf("Parsing a roman numeral is on avg %.2fx slower "
+           "than generating one from a value.\n",
            ((double) timedelta_ns_from_roman) / timedelta_ns_to_roman);
 }
 

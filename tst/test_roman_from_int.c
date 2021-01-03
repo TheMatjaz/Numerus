@@ -609,9 +609,4 @@ void test_roman_from_int(void)
     test_to_roman_alloc_valid_some_extended();
     test_to_roman_alloc_valid_extremes();
     test_to_roman_all_classic();
-    // TODO test all conversions: all roman numerals value->numeral->value
-    // to check bijectivity, correctness of generated values, length of
-    // generated numeral being <= max length for extended
-    // Maybe split it into multiple threads to make it faster. Don't use
-    // allocations to speed it up.
 }
