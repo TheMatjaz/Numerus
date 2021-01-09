@@ -250,7 +250,6 @@ numerus_err_t numerus_roman_to_fraction(
     fraction->twelfths = 0;
     if (numeral == NULL) { return NUMERUS_ERR_NULL_NUMERAL; }
     SKIP_LEADING_WHITESPACE(numeral);
-    if (*numeral == '\0') { return NUMERUS_ERR_PARSING_EMPTY_NUMERAL; }
     if (numerus_is_zero(numeral)) { return NUMERUS_OK; }
     const bool is_negative = (*numeral == '-');
     if (is_negative) { numeral++; }
@@ -263,6 +262,10 @@ numerus_err_t numerus_roman_to_fraction(
         if (*numeral != '_')
         {
             return NUMERUS_ERR_PARSING_NON_TERMINATED_VINCULUM;
+        }
+        if (int_part == 0)
+        {
+            return NUMERUS_ERR_PARSING_EMPTY_VINCULUM;
         }
         numeral++;  // Skip end of vinculum
     }
@@ -286,6 +289,14 @@ numerus_err_t numerus_roman_to_fraction(
     {
         int_part = -int_part;
         twelfths = -twelfths;
+    }
+    if (int_part == 0 && twelfths == 0)
+    {
+        // The numeral is empty: either an empty string or just a negative
+        // sign. No roman characters that represent a value can be found.
+        // A value of zero should be a "NULLA" string, which is catched
+        // at the function's start instead.
+        return NUMERUS_ERR_PARSING_EMPTY_NUMERAL;
     }
     fraction->int_part = int_part;
     fraction->twelfths = twelfths;

@@ -122,6 +122,7 @@ typedef enum numerus_err
     NUMERUS_ERR_MALLOC_FAILURE, ///< Heap memory allocation failed
     /** The numeral contains twelfths characters `S.` when it shouldn't */
     NUMERUS_ERR_PARSING_UNEXPECTED_TWELFTHS,
+    NUMERUS_ERR_PARSING_EMPTY_VINCULUM, ///< No characters in the vinculum
 } numerus_err_t;
 
 /**
